@@ -1,0 +1,21 @@
+name: quantum_stability_lab
+description: Quantum Stability Lab - اتفاق اور قانون کا امتزاج
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  sensors_plus: ^2.0.0
+  fl_chart: ^0.60.0
+  provider: ^6.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
