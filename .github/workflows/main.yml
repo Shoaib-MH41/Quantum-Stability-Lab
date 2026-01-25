@@ -1,0 +1,83 @@
+name: Build Quantum Stability Lab
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+      
+    - name: ☕ Setup Java (JDK 17)
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: 🐦 Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.19.5'
+        channel: 'stable'
+        
+    - name: 📦 Get Dependencies
+      run: |
+        flutter pub get
+        echo "Dependencies installed successfully"
+        
+    - name: 🧹 Clean Project
+      run: flutter clean
+      
+    - name: 🔧 Fix Android Build Issues
+      run: |
+        echo "Fixing Android build configuration..."
+        
+        # 1. Gradle wrapper کو صحیح ورژن پر لائیں
+        cd android
+        ./gradlew wrapper --gradle-version 7.6 --distribution-type all
+        cd ..
+        
+        # 2. آئیکن مسائل کو skip کریں
+        echo "android.enableJetifier=true" >> android/gradle.properties
+        echo "android.nonTransitiveRClass=true" >> android/gradle.properties
+        
+        # 3. Build folder صاف کریں
+        rm -rf android/.gradle
+        rm -rf android/build
+        
+    - name: 🏗️ Build APK (No Icons Shaking)
+      run: |
+        echo "Building Quantum Stability Lab APK..."
+        flutter build apk --release --no-tree-shake-icons --no-shrink
+        echo "✅ APK built successfully!"
+        
+    - name: 📊 APK Info
+      run: |
+        echo "=== Quantum Stability Lab APK Details ==="
+        echo "📦 APK Path: build/app/outputs/flutter-apk/app-release.apk"
+        echo "📏 File Size: $(du -h build/app/outputs/flutter-apk/app-release.apk | cut -f1)"
+        echo "⚛️ Project: Quantum Stability Lab"
+        echo "🎯 Core: 35ms Fixation Law Engine"
+        
+    - name: 📤 Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: quantum-stability-lab-release
+        path: build/app/outputs/flutter-apk/app-release.apk
+        retention-days: 7
+        
+    - name: 🎉 Build Success
+      run: |
+        echo "========================================="
+        echo "🚀 Quantum Stability Lab Build Successful!"
+        echo "========================================="
+        echo "🔬 Scientific Experiment Ready"
+        echo "⚖️ Quantum + Classical Stability System"
+        echo "📈 35ms Fixation Law Implemented"
+        echo "🎯 APK available in artifacts"
