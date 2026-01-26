@@ -23,21 +23,16 @@ jobs:
       with:
         flutter-version: '3.19.5'
 
-    
-    - name: Recreate platform folders
+    - name: Recreate Fresh Android Project
       run: |
+        rm -rf android ios
         flutter create --platforms=android --project-name=quantum_stability_lab .
 
-    # ⭐ دوسرا بدلاؤ: پب گیٹ کو کری ایٹ کے بعد رکھیں
     - name: Flutter pub get
       run: flutter pub get
 
-    - name: Clean build
-      run: flutter clean
-
     - name: Build APK (Release)
       run: |
-        echo "Building APK..."
         flutter build apk --release --no-tree-shake-icons
 
     - name: Upload APK
