@@ -9,35 +9,17 @@ dependencies:
   flutter:
     sdk: flutter
   
-  # Sensor Integration
-  sensors_plus: ^2.0.0
-  connectivity_plus: ^5.0.1
-  device_info_plus: ^10.0.0
-  vibration: ^1.7.4
-  
-  # Charts & Visualization
-  fl_chart: ^0.60.0
-  
-  # State Management
-  provider: ^6.0.0
-  
-  # Network & HTTP
+  # صرف essential packages رکھیں
   http: ^0.13.5
-  
-  # Data Export & Storage
-  csv: ^5.0.1
+  provider: ^6.0.0
   path_provider: ^2.0.15
+  csv: ^5.0.1
   share_plus: ^7.0.2
-  
-  # UI Enhancements
-  shimmer: ^3.0.0
-  animated_text_kit: ^4.2.2
-  
-  # Utilities
-  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
 
+flutter:
+  uses-material-design: true
