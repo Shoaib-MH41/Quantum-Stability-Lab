@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dart:async'; // ٹائمر کے لیے ضروری ہے
+import 'dart:async'; // ٹائمر کے لیے
 import '../utils/constants.dart';
 import '../core/stability_engine.dart';
 
@@ -9,47 +9,47 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  bool lawActive = false; // تجربہ شروع کرنے کے لیے
   double currentNpuTime = 0;
-  String systemStatus = "شروع کریں";
+  String systemStatus = "شروع کرنے کے لیے بٹن دبائیں";
   Color statusColor = Colors.grey;
-  Timer? _timer; // خودکار لوپ کے لیے
+  Timer? _timer;
+  int totalAttempts = 0; // کل کتنی بار نمبر بدلا
+  bool isRunning = false;
   
   final StabilityEngine engine = StabilityEngine();
 
-  // تجربہ شروع یا بند کرنے کا فنکشن
-  void toggleExperiment(bool start) {
-    if (start) {
-      // ہر 100 ملی سیکنڈ میں ڈیٹا اپڈیٹ کریں
-      _timer = Timer.periodic(Duration(milliseconds: 100), (timer) {
-        updateQuantumData();
-      });
-    } else {
-      _timer?.cancel();
-      setState(() {
-        currentNpuTime = 0;
-        systemStatus = "تجربہ موقوف";
-        statusColor = Colors.grey;
-      });
-    }
+  // نظام کو خودکار چلانے کا فنکشن
+  void startExperiment() {
+    setState(() {
+      isRunning = true;
+      totalAttempts = 0;
+      engine.stableCycles = 0; // انجن ری سیٹ
+      systemStatus = "تجربہ جاری ہے...";
+      statusColor = Colors.blue;
+    });
+
+    _timer = Timer.periodic(Duration(milliseconds: 100), (timer) {
+      updateLogic();
+    });
   }
 
-  void updateQuantumData() {
+  void updateLogic() {
     setState(() {
-      // 1. اتفاق: خودکار نمبر جنریٹ کرنا
+      totalAttempts++; // ہر تبدیلی پر گنتی بڑھے گی
+      
+      // 1. اتفاق (Random Number)
       currentNpuTime = 20 + (DateTime.now().millisecond % 30).toDouble();
       
-      // 2. قانون: کیا یہ نمبر 35ms کے قانون کے مطابق ہے؟
-      // ہم یہاں چیک کر رہے ہیں کہ کیا نمبر 30 اور 40 کے درمیان ہے
+      // 2. قانون (35ms کے قریب چیک کرنا)
       bool isStable = currentNpuTime >= 30 && currentNpuTime <= 40;
       bool systemStable = engine.checkStability(isStable);
       
-      // 3. قید: اسٹیٹس اپڈیٹ کرنا
+      // 3. قید (رک جانا جب مستحکم ہو جائے)
       if (systemStable) {
-        systemStatus = "مستحکم نظام";
+        _timer?.cancel(); // نمبرز کو روک دیں
+        isRunning = false;
+        systemStatus = "مستحکم ہو گیا!";
         statusColor = Color(QSLConstants.STABLE_COLOR);
-        _timer?.cancel(); // مستحکم ہونے پر خود بخود رک جائے گا
-        lawActive = false;
       } else if (engine.stableCycles > 0) {
         systemStatus = "استحکام جاری (${engine.stableCycles})";
         statusColor = Color(QSLConstants.ACCIDENT_COLOR);
@@ -62,7 +62,7 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   void dispose() {
-    _timer?.cancel(); // ایپ بند ہونے پر ٹائمر ختم کر دیں
+    _timer?.cancel();
     super.dispose();
   }
 
@@ -76,84 +76,74 @@ class _DashboardState extends State<Dashboard> {
       body: Padding(
         padding: EdgeInsets.all(16),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // NPU Live وقت (خودکار بدلنے والا)
-            Card(
-              elevation: 4,
-              child: Padding(
-                padding: EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    Text("NPU Live وقت", style: TextStyle(fontSize: 16)),
-                    SizedBox(height: 10),
-                    Text(
-                      "${currentNpuTime.toStringAsFixed(1)} ms",
-                      style: TextStyle(
-                        fontSize: 40,
-                        fontWeight: FontWeight.bold,
-                        color: currentNpuTime >= 30 && currentNpuTime <= 40 ? Colors.green : Colors.red,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            // کوششوں کی تعداد
+            Text(
+              "کل کوششیں: $totalAttempts",
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
-            
             SizedBox(height: 20),
             
-            // نظام کی حالت کا ڈسپلے
-            AnimatedContainer(
-              duration: Duration(milliseconds: 300),
-              padding: EdgeInsets.all(20),
+            // NPU وقت کا ڈسپلے
+            Container(
+              padding: EdgeInsets.all(30),
               decoration: BoxDecoration(
-                color: statusColor,
-                borderRadius: BorderRadius.circular(12),
+                color: Colors.black12,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.deepPurple, width: 2),
               ),
-              child: Center(
-                child: Text(
-                  systemStatus,
-                  style: TextStyle(fontSize: 24, color: Colors.white, fontWeight: FontWeight.bold),
+              child: Text(
+                "${currentNpuTime.toStringAsFixed(1)} ms",
+                style: TextStyle(
+                  fontSize: 48,
+                  fontWeight: FontWeight.bold,
+                  color: isRunning ? Colors.blue : Colors.green,
                 ),
               ),
             ),
             
             SizedBox(height: 30),
             
-            // تجربہ شروع کرنے کا سوئچ
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text("تجربہ شروع کریں: ", style: TextStyle(fontSize: 18)),
-                Switch(
-                  value: lawActive,
-                  onChanged: (value) {
-                    setState(() {
-                      lawActive = value;
-                      toggleExperiment(value);
-                    });
-                  },
-                  activeColor: Colors.green,
+            // اسٹیٹس کارڈ
+            Card(
+              color: statusColor,
+              child: Padding(
+                padding: EdgeInsets.all(20),
+                child: Center(
+                  child: Text(
+                    systemStatus,
+                    style: TextStyle(fontSize: 24, color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
                 ),
-              ],
+              ),
             ),
             
+            SizedBox(height: 40),
+            
+            // رزلٹ نوٹ
+            if (!isRunning && totalAttempts > 0)
+              Container(
+                padding: EdgeInsets.all(15),
+                color: Colors.green[50],
+                child: Text(
+                  "نتیجہ: نظام $totalAttempts کوششوں میں مستحکم ہوا۔",
+                  style: TextStyle(fontSize: 18, color: Colors.green[800], fontWeight: FontWeight.bold),
+                ),
+              ),
+              
             SizedBox(height: 20),
-            
-            Text(
-              "قانونِ تثبیت: ${QSLConstants.FIXATION_TIME_MS}ms",
-              style: TextStyle(fontSize: 16, color: Colors.deepPurple, fontWeight: FontWeight.bold),
-            ),
-            
-            Spacer(),
-            
-            // اہم نوٹ
-            Container(
-              padding: EdgeInsets.all(12),
-              decoration: BoxDecoration(color: Colors.blue[50], borderRadius: BorderRadius.circular(8)),
+
+            // بٹن کنٹرول
+            ElevatedButton(
+              onPressed: isRunning ? null : startExperiment,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple,
+                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+              ),
               child: Text(
-                "نوٹ: 'اتفاق' خودکار طور پر پیدا ہو رہا ہے۔ اسے 35ms کے 'قانون' پر ساکن کرنے کی کوشش کریں۔",
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.blue[800]),
+                isRunning ? "جاری ہے..." : "تجربہ شروع کریں",
+                style: TextStyle(fontSize: 18, color: Colors.white),
               ),
             ),
           ],
