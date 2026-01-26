@@ -9,7 +9,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
     - name: Set up Java
       uses: actions/setup-java@v4
@@ -22,12 +23,19 @@ jobs:
       with:
         flutter-version: '3.19.5'
 
-    - run: flutter pub get
-    - run: flutter clean
+    - name: Flutter pub get
+      run: flutter pub get
 
-    - name: Direct APK Build (No Gradle Fix)
+    # ⭐⭐⭐ IMPORTANT FIX ⭐⭐⭐
+    - name: Recreate platform folders (Flutter standard)
+      run: flutter create .
+
+    - name: Clean build
+      run: flutter clean
+
+    - name: Build APK (Release)
       run: |
-        echo "Building APK directly..."
+        echo "Building APK..."
         flutter build apk --release --no-tree-shake-icons
 
     - name: Upload APK
