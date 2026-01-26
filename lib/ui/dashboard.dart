@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dart:async'; // ٹائمر کے لیے
+import 'dart:async';
 import '../utils/constants.dart';
 import '../core/stability_engine.dart';
 
@@ -9,145 +9,115 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  double currentNpuTime = 0;
-  String systemStatus = "شروع کرنے کے لیے بٹن دبائیں";
+  // 10 نمبروں کے لیے لسٹ
+  List<double> npuTimes = List.generate(10, (index) => 0.0);
+  List<bool> stabilityStates = List.generate(10, (index) => false);
+  
+  String systemStatus = "ملٹی کوانٹم ٹیسٹ شروع کریں";
   Color statusColor = Colors.grey;
   Timer? _timer;
-  int totalAttempts = 0; // کل کتنی بار نمبر بدلا
+  int totalAttempts = 0;
   bool isRunning = false;
   
   final StabilityEngine engine = StabilityEngine();
 
-  // نظام کو خودکار چلانے کا فنکشن
   void startExperiment() {
     setState(() {
       isRunning = true;
       totalAttempts = 0;
-      engine.stableCycles = 0; // انجن ری سیٹ
-      systemStatus = "تجربہ جاری ہے...";
+      systemStatus = "اجتماعی استحکام جاری...";
       statusColor = Colors.blue;
     });
 
     _timer = Timer.periodic(Duration(milliseconds: 100), (timer) {
-      updateLogic();
+      updateMultiLogic();
     });
   }
 
-  void updateLogic() {
+  void updateMultiLogic() {
     setState(() {
-      totalAttempts++; // ہر تبدیلی پر گنتی بڑھے گی
-      
-      // 1. اتفاق (Random Number)
-      currentNpuTime = 20 + (DateTime.now().millisecond % 30).toDouble();
-      
-      // 2. قانون (35ms کے قریب چیک کرنا)
-      bool isStable = currentNpuTime >= 30 && currentNpuTime <= 40;
-      bool systemStable = engine.checkStability(isStable);
-      
-      // 3. قید (رک جانا جب مستحکم ہو جائے)
-      if (systemStable) {
-        _timer?.cancel(); // نمبرز کو روک دیں
+      totalAttempts++;
+      bool allStable = true;
+
+      for (int i = 0; i < 10; i++) {
+        // ہر نمبر کے لیے الگ اتفاق
+        npuTimes[i] = 20 + (DateTime.now().millisecond * (i + 1) % 30).toDouble();
+        
+        // ہر نمبر کا اپنا انفرادی استحکام چیک کریں
+        stabilityStates[i] = npuTimes[i] >= 30 && npuTimes[i] <= 40;
+        
+        if (!stabilityStates[i]) allStable = false;
+      }
+
+      // کیا تمام 10 نمبر ایک ساتھ مستحکم ہیں؟
+      if (allStable) {
+        _timer?.cancel();
         isRunning = false;
-        systemStatus = "مستحکم ہو گیا!";
-        statusColor = Color(QSLConstants.STABLE_COLOR);
-      } else if (engine.stableCycles > 0) {
-        systemStatus = "استحکام جاری (${engine.stableCycles})";
-        statusColor = Color(QSLConstants.ACCIDENT_COLOR);
-      } else {
-        systemStatus = "غیر مستحکم";
-        statusColor = Color(QSLConstants.UNSTABLE_COLOR);
+        systemStatus = "کمال ہے! تمام 10 مستحکم";
+        statusColor = Colors.green;
       }
     });
   }
 
   @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Quantum Stability Lab"),
-        backgroundColor: Colors.deepPurple,
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // کوششوں کی تعداد
-            Text(
-              "کل کوششیں: $totalAttempts",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 20),
-            
-            // NPU وقت کا ڈسپلے
-            Container(
-              padding: EdgeInsets.all(30),
-              decoration: BoxDecoration(
-                color: Colors.black12,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.deepPurple, width: 2),
+      appBar: AppBar(title: Text("10-Point Quantum Stability")),
+      body: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.all(10),
+            child: Text("کل اجتماعی کوششیں: $totalAttempts", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          ),
+          
+          // 10 نمبروں کا گرڈ (Grid)
+          Expanded(
+            child: GridView.builder(
+              padding: EdgeInsets.all(10),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2, // دو کالم
+                childAspectRatio: 2,
+                mainAxisSpacing: 10,
+                crossAxisSpacing: 10,
               ),
-              child: Text(
-                "${currentNpuTime.toStringAsFixed(1)} ms",
-                style: TextStyle(
-                  fontSize: 48,
-                  fontWeight: FontWeight.bold,
-                  color: isRunning ? Colors.blue : Colors.green,
-                ),
-              ),
-            ),
-            
-            SizedBox(height: 30),
-            
-            // اسٹیٹس کارڈ
-            Card(
-              color: statusColor,
-              child: Padding(
-                padding: EdgeInsets.all(20),
-                child: Center(
-                  child: Text(
-                    systemStatus,
-                    style: TextStyle(fontSize: 24, color: Colors.white, fontWeight: FontWeight.bold),
+              itemCount: 10,
+              itemBuilder: (context, index) {
+                return Container(
+                  decoration: BoxDecoration(
+                    color: stabilityStates[index] ? Colors.green[100] : Colors.red[100],
+                    border: Border.all(color: stabilityStates[index] ? Colors.green : Colors.red),
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                ),
-              ),
+                  child: Center(
+                    child: Text(
+                      "${npuTimes[index].toStringAsFixed(1)} ms",
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                );
+              },
             ),
-            
-            SizedBox(height: 40),
-            
-            // رزلٹ نوٹ
-            if (!isRunning && totalAttempts > 0)
-              Container(
-                padding: EdgeInsets.all(15),
-                color: Colors.green[50],
-                child: Text(
-                  "نتیجہ: نظام $totalAttempts کوششوں میں مستحکم ہوا۔",
-                  style: TextStyle(fontSize: 18, color: Colors.green[800], fontWeight: FontWeight.bold),
-                ),
-              ),
-              
-            SizedBox(height: 20),
-
-            // بٹن کنٹرول
-            ElevatedButton(
-              onPressed: isRunning ? null : startExperiment,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple,
-                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-              ),
-              child: Text(
-                isRunning ? "جاری ہے..." : "تجربہ شروع کریں",
-                style: TextStyle(fontSize: 18, color: Colors.white),
-              ),
+          ),
+          
+          // اسٹیٹس کارڈ
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(20),
+            color: statusColor,
+            child: Center(
+              child: Text(systemStatus, style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
             ),
-          ],
-        ),
+          ),
+          
+          SizedBox(height: 20),
+          
+          ElevatedButton(
+            onPressed: isRunning ? null : startExperiment,
+            child: Text(isRunning ? "پروسیسنگ..." : "10-پوائنٹ ٹیسٹ شروع کریں"),
+            style: ElevatedButton.styleFrom(padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15)),
+          ),
+          SizedBox(height: 20),
+        ],
       ),
     );
   }
