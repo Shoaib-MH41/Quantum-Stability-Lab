@@ -68,7 +68,7 @@ class HomeScreen extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => Dashboard()),
+                      MaterialPageRoute(builder: (context) => MultiQuantumDashboard()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
