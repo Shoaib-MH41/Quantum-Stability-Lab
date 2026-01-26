@@ -1,40 +1,25 @@
-enum ParticleClassification {
-  STABLE,      // ≤ 30ms
-  BORDERLINE,  // 30–40ms
-  UNSTABLE     // > 40ms
-}
+import 'dart:math';
+import 'package:flutter/material.dart';
 
-extension ParticleClassificationExtension on ParticleClassification {
-  String get displayName {
-    switch (this) {
-      case ParticleClassification.STABLE:
-        return "مستحکم";
-      case ParticleClassification.BORDERLINE:
-        return "سرحدی";
-      case ParticleClassification.UNSTABLE:
-        return "غیر مستحکم";
-    }
-  }
+class QuantumParticle {
+  final int id;
+  double currentTime;
+  double targetTime = 35.0;
+  int stableCount = 0;
   
-  Color get color {
-    switch (this) {
-      case ParticleClassification.STABLE:
-        return Colors.green;
-      case ParticleClassification.BORDERLINE:
-        return Colors.orange;
-      case ParticleClassification.UNSTABLE:
-        return Colors.red;
-    }
-  }
+  QuantumParticle(this.id) : currentTime = Random().nextDouble() * 50 + 10;
   
-  IconData get icon {
-    switch (this) {
-      case ParticleClassification.STABLE:
-        return Icons.check_circle;
-      case ParticleClassification.BORDERLINE:
-        return Icons.warning;
-      case ParticleClassification.UNSTABLE:
-        return Icons.error;
+  bool get isStable => (currentTime >= 30 && currentTime <= 40);
+  bool get isFullyStable => stableCount >= 3;
+  
+  void apply35msLaw() {
+    double adjustment = (targetTime - currentTime) * 0.1;
+    currentTime += adjustment;
+    
+    if (isStable) {
+      stableCount = min(stableCount + 1, 3);
+    } else {
+      stableCount = max(stableCount - 1, 0);
     }
   }
 }
