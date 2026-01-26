@@ -8,9 +8,34 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  
+  # Sensor Integration
   sensors_plus: ^2.0.0
+  battery_plus: ^3.0.3
+  connectivity_plus: ^5.0.1
+  device_info_plus: ^10.0.0
+  vibration: ^1.7.4
+  
+  # Charts & Visualization
   fl_chart: ^0.60.0
+  
+  # State Management
   provider: ^6.0.0
+  
+  # Network & HTTP
+  http: ^0.13.5
+  
+  # Data Export & Storage
+  csv: ^5.0.1
+  path_provider: ^2.0.15
+  share_plus: ^7.0.2
+  
+  # UI Enhancements
+  shimmer: ^3.0.0
+  animated_text_kit: ^4.2.2
+  
+  # Utilities
+  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:
@@ -19,3 +44,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/images/
