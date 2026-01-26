@@ -69,7 +69,7 @@ class HomeScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const MultiQuantumDashboard()),
+                  MaterialPageRoute(builder: (context) => const Dashboard()),
                 );
               },
               style: ElevatedButton.styleFrom(
@@ -87,7 +87,7 @@ class HomeScreen extends StatelessWidget {
             
             const SizedBox(height: 20),
             
-            // Info
+    // Info
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20),
               padding: const EdgeInsets.all(16),
