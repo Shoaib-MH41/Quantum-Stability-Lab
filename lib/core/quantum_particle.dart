@@ -10,11 +10,11 @@ class QuantumParticle {
       isStable = false;
   
   void apply35msLaw() {
-    // Quantum fluctuation
+    // Quantum fluctuation (Bohr)
     double quantumFluctuation = (DateTime.now().microsecond % 100 - 50) / 10.0;
     currentTime += quantumFluctuation;
     
-    // 35ms fixation
+    // 35ms fixation law (Einstein)
     if (currentTime < 30) {
       currentTime += (35 - currentTime) * 0.3;
     } else if (currentTime > 40) {
