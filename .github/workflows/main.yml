@@ -23,12 +23,13 @@ jobs:
       with:
         flutter-version: '3.19.5'
 
+    # ⭐ پہلا بدلاؤ: یہاں ہم نے زبردستی نام ٹھیک کر دیا ہے تاکہ 'valid name' والا ایرر نہ آئے
+    - name: Recreate platform folders
+      run: flutter create --project-name=quantum_stability_lab --force .
+
+    # ⭐ دوسرا بدلاؤ: پب گیٹ کو کری ایٹ کے بعد رکھیں
     - name: Flutter pub get
       run: flutter pub get
-
-    # ⭐⭐⭐ IMPORTANT FIX ⭐⭐⭐
-    - name: Recreate platform folders (Flutter standard)
-      run: flutter create .
 
     - name: Clean build
       run: flutter clean
