@@ -1,34 +1,40 @@
-class QuantumParticle {
-  final int id;
-  double currentTime;
-  int stabilityCount;
-  bool isStable;
-  
-  QuantumParticle(this.id) 
-    : currentTime = 20 + (id * 3 % 20).toDouble(),
-      stabilityCount = 0,
-      isStable = false;
-  
-  void apply35msLaw() {
-    // Quantum fluctuation (Bohr)
-    double quantumFluctuation = (DateTime.now().microsecond % 100 - 50) / 10.0;
-    currentTime += quantumFluctuation;
-    
-    // 35ms fixation law (Einstein)
-    if (currentTime < 30) {
-      currentTime += (35 - currentTime) * 0.3;
-    } else if (currentTime > 40) {
-      currentTime -= (currentTime - 35) * 0.3;
-    }
-    
-    // Stability check
-    isStable = currentTime >= 30 && currentTime <= 40;
-    if (isStable) {
-      stabilityCount++;
-    } else {
-      stabilityCount = 0;
+enum ParticleClassification {
+  STABLE,      // ≤ 30ms
+  BORDERLINE,  // 30–40ms
+  UNSTABLE     // > 40ms
+}
+
+extension ParticleClassificationExtension on ParticleClassification {
+  String get displayName {
+    switch (this) {
+      case ParticleClassification.STABLE:
+        return "مستحکم";
+      case ParticleClassification.BORDERLINE:
+        return "سرحدی";
+      case ParticleClassification.UNSTABLE:
+        return "غیر مستحکم";
     }
   }
   
-  bool get isFullyStable => stabilityCount >= 3;
+  Color get color {
+    switch (this) {
+      case ParticleClassification.STABLE:
+        return Colors.green;
+      case ParticleClassification.BORDERLINE:
+        return Colors.orange;
+      case ParticleClassification.UNSTABLE:
+        return Colors.red;
+    }
+  }
+  
+  IconData get icon {
+    switch (this) {
+      case ParticleClassification.STABLE:
+        return Icons.check_circle;
+      case ParticleClassification.BORDERLINE:
+        return Icons.warning;
+      case ParticleClassification.UNSTABLE:
+        return Icons.error;
+    }
+  }
 }
