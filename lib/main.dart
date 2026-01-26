@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'ui/multi_quantum_dashboard.dart';
+import 'ui/dashboard.dart';
 
 void main() {
   runApp(const QuantumStabilityLabApp());
