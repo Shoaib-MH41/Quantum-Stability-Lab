@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'ui/dashboard.dart';
+import 'ui/multi_quantum_dashboard.dart';
 
 void main() {
-  runApp(QuantumStabilityLabApp());
+  runApp(const QuantumStabilityLabApp());
 }
 
 class QuantumStabilityLabApp extends StatelessWidget {
+  const QuantumStabilityLabApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -13,32 +15,38 @@ class QuantumStabilityLabApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
+        useMaterial3: true,
       ),
-      home: HomePage(),
+      home: const HomeScreen(),
     );
   }
 }
 
-class HomePage extends StatelessWidget {
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Quantum Stability Lab'),
+        title: const Text('Quantum Stability Lab'),
         backgroundColor: Colors.deepPurple,
+        centerTitle: true,
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
+            // Logo
+            const Icon(
               Icons.science,
               size: 80,
               color: Colors.deepPurple,
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             
-            Text(
+            // Title
+            const Text(
               'Quantum Stability Lab',
               style: TextStyle(
                 fontSize: 24,
@@ -46,27 +54,67 @@ class HomePage extends StatelessWidget {
                 color: Colors.deepPurple,
               ),
             ),
-            SizedBox(height: 10),
-            Text(
-              '35ms Fixation Law',
+            const SizedBox(height: 10),
+            const Text(
+              '35ms Fixation Law Experiment',
               style: TextStyle(
-                color: Colors.deepPurple[700],
+                color: Colors.deepPurple,
               ),
             ),
             
-            SizedBox(height: 50),
+            const SizedBox(height: 40),
             
+            // Start Button
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Dashboard()),
+                  MaterialPageRoute(builder: (context) => const MultiQuantumDashboard()),
                 );
               },
-              child: Text('Start Basic Test'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.deepPurple,
-                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text(
+                'Start 10-Quantum Experiment',
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
+            
+            const SizedBox(height: 20),
+            
+            // Info
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.deepPurple.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Column(
+                children: [
+                  Text(
+                    'Hybrid Quantum-Classical System',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.deepPurple,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    '• Bohr (Quantum) + Einstein (Classical)\n'
+                    '• 35ms Fixation Law\n'
+                    '• 10 Quantum Particles Simulation',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.deepPurple,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
