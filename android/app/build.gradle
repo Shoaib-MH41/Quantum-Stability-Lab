@@ -1,3 +1,20 @@
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterRoot = localProperties.getProperty('flutter.sdk')
+if (flutterRoot == null) {
+    throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
+}
+
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+
 android {
     namespace "com.example.quantumstabilitylab"
     compileSdkVersion 34
@@ -8,7 +25,16 @@ android {
         targetSdkVersion 34
         versionCode 1
         versionName "1.0"
-        multiDexEnabled true
+        multiDexEnabled true // بھاری لائبریریز کے لیے ضروری ہے
+    }
+
+    // ⭐ یہاں ہم ڈپلیکیٹ کلاسز کا مسئلہ حل کر رہے ہیں
+    configurations.all {
+        resolutionStrategy {
+            force "org.jetbrains.kotlin:kotlin-stdlib:1.9.23"
+            force "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.23"
+            force "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.23"
+        }
     }
 
     buildTypes {
@@ -21,7 +47,7 @@ android {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.9.23"
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'com.google.android.material:material:1.11.0'
 }
