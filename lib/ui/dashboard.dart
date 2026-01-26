@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async'; // ٹائمر کے لیے ضروری ہے
 import '../utils/constants.dart';
 import '../core/stability_engine.dart';
 
@@ -8,13 +9,63 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  bool lawActive = true;
+  bool lawActive = false; // تجربہ شروع کرنے کے لیے
   double currentNpuTime = 0;
   String systemStatus = "شروع کریں";
   Color statusColor = Colors.grey;
+  Timer? _timer; // خودکار لوپ کے لیے
   
   final StabilityEngine engine = StabilityEngine();
-  
+
+  // تجربہ شروع یا بند کرنے کا فنکشن
+  void toggleExperiment(bool start) {
+    if (start) {
+      // ہر 100 ملی سیکنڈ میں ڈیٹا اپڈیٹ کریں
+      _timer = Timer.periodic(Duration(milliseconds: 100), (timer) {
+        updateQuantumData();
+      });
+    } else {
+      _timer?.cancel();
+      setState(() {
+        currentNpuTime = 0;
+        systemStatus = "تجربہ موقوف";
+        statusColor = Colors.grey;
+      });
+    }
+  }
+
+  void updateQuantumData() {
+    setState(() {
+      // 1. اتفاق: خودکار نمبر جنریٹ کرنا
+      currentNpuTime = 20 + (DateTime.now().millisecond % 30).toDouble();
+      
+      // 2. قانون: کیا یہ نمبر 35ms کے قانون کے مطابق ہے؟
+      // ہم یہاں چیک کر رہے ہیں کہ کیا نمبر 30 اور 40 کے درمیان ہے
+      bool isStable = currentNpuTime >= 30 && currentNpuTime <= 40;
+      bool systemStable = engine.checkStability(isStable);
+      
+      // 3. قید: اسٹیٹس اپڈیٹ کرنا
+      if (systemStable) {
+        systemStatus = "مستحکم نظام";
+        statusColor = Color(QSLConstants.STABLE_COLOR);
+        _timer?.cancel(); // مستحکم ہونے پر خود بخود رک جائے گا
+        lawActive = false;
+      } else if (engine.stableCycles > 0) {
+        systemStatus = "استحکام جاری (${engine.stableCycles})";
+        statusColor = Color(QSLConstants.ACCIDENT_COLOR);
+      } else {
+        systemStatus = "غیر مستحکم";
+        statusColor = Color(QSLConstants.UNSTABLE_COLOR);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel(); // ایپ بند ہونے پر ٹائمر ختم کر دیں
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,23 +77,21 @@ class _DashboardState extends State<Dashboard> {
         padding: EdgeInsets.all(16),
         child: Column(
           children: [
-            // NPU Live وقت
+            // NPU Live وقت (خودکار بدلنے والا)
             Card(
+              elevation: 4,
               child: Padding(
                 padding: EdgeInsets.all(20),
                 child: Column(
                   children: [
-                    Text(
-                      "NPU Live وقت",
-                      style: TextStyle(fontSize: 16),
-                    ),
+                    Text("NPU Live وقت", style: TextStyle(fontSize: 16)),
                     SizedBox(height: 10),
                     Text(
                       "${currentNpuTime.toStringAsFixed(1)} ms",
                       style: TextStyle(
-                        fontSize: 32,
+                        fontSize: 40,
                         fontWeight: FontWeight.bold,
-                        color: currentNpuTime <= 40 ? Colors.green : Colors.red,
+                        color: currentNpuTime >= 30 && currentNpuTime <= 40 ? Colors.green : Colors.red,
                       ),
                     ),
                   ],
@@ -52,118 +101,63 @@ class _DashboardState extends State<Dashboard> {
             
             SizedBox(height: 20),
             
-            // نظام کی حالت
-            Card(
-              color: statusColor,
-              child: Padding(
-                padding: EdgeInsets.all(20),
-                child: Center(
-                  child: Text(
-                    systemStatus,
-                    style: TextStyle(
-                      fontSize: 24,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+            // نظام کی حالت کا ڈسپلے
+            AnimatedContainer(
+              duration: Duration(milliseconds: 300),
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: statusColor,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Center(
+                child: Text(
+                  systemStatus,
+                  style: TextStyle(fontSize: 24, color: Colors.white, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
             
-            SizedBox(height: 20),
+            SizedBox(height: 30),
             
-            // قانون ON/OFF
+            // تجربہ شروع کرنے کا سوئچ
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  "قانونِ حادثہ: ",
-                  style: TextStyle(fontSize: 18),
-                ),
+                Text("تجربہ شروع کریں: ", style: TextStyle(fontSize: 18)),
                 Switch(
                   value: lawActive,
                   onChanged: (value) {
                     setState(() {
                       lawActive = value;
-                      if (value) {
-                        systemStatus = "قانون فعال";
-                        statusColor = Color(QSLConstants.STABLE_COLOR);
-                      } else {
-                        systemStatus = "قانون غیر فعال";
-                        statusColor = Colors.grey;
-                      }
+                      toggleExperiment(value);
                     });
                   },
                   activeColor: Colors.green,
-                ),
-                Text(
-                  lawActive ? "ON" : "OFF",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: lawActive ? Colors.green : Colors.red,
-                  ),
                 ),
               ],
             ),
             
             SizedBox(height: 20),
             
-            // 35ms قانون کی نشاندہی
-            Container(
-              padding: EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.deepPurple),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Text(
-                "قانونِ تثبیت: ${QSLConstants.FIXATION_TIME_MS}ms",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.deepPurple,
-                ),
-              ),
+            Text(
+              "قانونِ تثبیت: ${QSLConstants.FIXATION_TIME_MS}ms",
+              style: TextStyle(fontSize: 16, color: Colors.deepPurple, fontWeight: FontWeight.bold),
             ),
             
             Spacer(),
             
             // اہم نوٹ
             Container(
-              padding: EdgeInsets.all(10),
-              color: Colors.blue[50],
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(color: Colors.blue[50], borderRadius: BorderRadius.circular(8)),
               child: Text(
-                "نوٹ: یہ ایک سائنسی تجربہ ہے۔ اتفاق کو قانون میں قید کریں۔",
+                "نوٹ: 'اتفاق' خودکار طور پر پیدا ہو رہا ہے۔ اسے 35ms کے 'قانون' پر ساکن کرنے کی کوشش کریں۔",
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.blue[800]),
               ),
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // یہاں آپ NPU وقت اپڈیٹ کریں گے
-          setState(() {
-            currentNpuTime = 20 + (DateTime.now().millisecond % 40).toDouble();
-            
-            // استحکام چیک کریں
-            bool isStable = currentNpuTime >= 30 && currentNpuTime <= 40;
-            bool systemStable = engine.checkStability(isStable);
-            
-            if (systemStable) {
-              systemStatus = "مستحکم نظام";
-              statusColor = Color(QSLConstants.STABLE_COLOR);
-            } else if (engine.stableCycles > 0) {
-              systemStatus = "استحکام جاری (${engine.stableCycles})";
-              statusColor = Color(QSLConstants.ACCIDENT_COLOR);
-            } else {
-              systemStatus = "غیر مستحکم";
-              statusColor = Color(QSLConstants.UNSTABLE_COLOR);
-            }
-          });
-        },
-        child: Icon(Icons.play_arrow),
-        backgroundColor: Colors.green,
       ),
     );
   }
