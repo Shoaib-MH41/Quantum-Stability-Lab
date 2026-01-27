@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import '../core/real_quantum_particle.dart'; // حقیقی سینسر والی فائل
+import '../core/real_quantum_particle.dart';
 
-class MultiQuantumDashboard extends StatefulWidget {
+class Dashboard extends StatefulWidget {
   @override
   _MultiQuantumDashboardState createState() => _MultiQuantumDashboardState();
 }
 
-class _MultiQuantumDashboardState extends State<MultiQuantumDashboard> {
-  static const int particleCount = 60; // 60 پارٹیکلز کا ہدف
+class _MultiQuantumDashboardState extends State<Dashboard> {
+  static const int particleCount = 60;
   List<RealQuantumParticle> particles = List.generate(particleCount, (i) => RealQuantumParticle(i));
   
   bool isRunning = false;
-  bool isGPUMode = false; // NPU vs GPU سوئچ
+  bool isGPUMode = false; 
   int totalAttempts = 0;
   String systemStatus = "60-پوائنٹ ٹیسٹ تیار";
   Color statusColor = Colors.grey;
@@ -39,79 +39,98 @@ class _MultiQuantumDashboardState extends State<MultiQuantumDashboard> {
       totalAttempts++;
       bool allStable = true;
 
-      // GPU موڈ میں مصنوعی بوجھ ڈالنا
       if (isGPUMode) {
         for (int i = 0; i < 30000; i++) { double x = i * 0.001; } 
       }
 
       for (var p in particles) {
-        p.apply35msLaw(); // حقیقی سینسرز سے قانون نافذ کرنا
+        p.apply35msLaw();
         if (!p.isFullyStable) allStable = false;
       }
 
-      // جب سب مستحکم ہو جائیں تو رک جائیں
       if (allStable) {
         _experimentTimer?.cancel();
         stopwatch.stop();
         isRunning = false;
-        systemStatus = "کامیابی! تمام 60 مستحکم\nوقت: ${stopwatch.elapsed.inSeconds}s | کوششیں: $totalAttempts";
+        systemStatus = "کامیابی! تمام 60 مستحکم\nوقت: ${stopwatch.elapsed.inSeconds}s";
         statusColor = Colors.green;
       }
     });
   }
 
-  void stopExperiment() {
-    _experimentTimer?.cancel();
-    stopwatch.stop();
-    setState(() {
-      isRunning = false;
-      systemStatus = "تجربہ موقوف کر دیا گیا";
-      statusColor = Colors.grey;
-    });
+  // غائب شدہ فنکشنز (Methods) یہاں ہیں:
+
+  Widget _buildModeSwitch() {
+    return Padding(
+      padding: EdgeInsets.all(10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text("NPU", style: TextStyle(color: Colors.blue)),
+          Switch(
+            value: isGPUMode,
+            onChanged: (val) => setState(() => isGPUMode = val),
+            activeColor: Colors.red,
+          ),
+          Text("GPU", style: TextStyle(color: Colors.red)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTopMetrics() {
+    return Padding(
+      padding: EdgeInsets.all(16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Text("کوششیں: $totalAttempts", style: TextStyle(color: Colors.white, fontSize: 18)),
+          Text("وقت: ${stopwatch.elapsed.inSeconds}s", style: TextStyle(color: Colors.white, fontSize: 18)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBottomControls() {
+    return Container(
+      padding: EdgeInsets.all(20),
+      color: statusColor,
+      child: Column(
+        children: [
+          Text(systemStatus, textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          SizedBox(height: 10),
+          ElevatedButton(
+            onPressed: isRunning ? null : startExperiment,
+            child: Text(isRunning ? "جاری..." : "ٹیسٹ شروع کریں"),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: AppBar(title: Text("60-Point Quantum Master Lab"), backgroundColor: Colors.deepPurple),
+      appBar: AppBar(title: Text("Quantum Master Lab"), backgroundColor: Colors.deepPurple),
       body: Column(
         children: [
-          // NPU vs GPU سوئچ
           _buildModeSwitch(),
-          
-          // میٹرکس بار
           _buildTopMetrics(),
-
-          // 60 پارٹیکلز کا گرڈ
           Expanded(
             child: GridView.builder(
               padding: EdgeInsets.all(8),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 6, // 6 کالمز
-                mainAxisSpacing: 4,
-                crossAxisSpacing: 4,
-              ),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 6),
               itemCount: particleCount,
               itemBuilder: (context, index) => Container(
-                decoration: BoxDecoration(
-                  color: particles[index].isFullyStable ? Colors.green : Colors.red.withOpacity(0.4),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Center(
-                  child: Text("${particles[index].currentTime.toStringAsFixed(0)}", 
-                  style: TextStyle(color: Colors.white, fontSize: 10)),
-                ),
+                margin: EdgeInsets.all(2),
+                color: particles[index].isFullyStable ? Colors.green : Colors.red.withOpacity(0.3),
               ),
             ),
           ),
-
-          // اسٹیٹس اور بٹن
           _buildBottomControls(),
         ],
       ),
     );
   }
-
-  // باقی مددگار وزٹس (Metrics, Controls وغیرہ) یہاں آئیں گے
 }
