@@ -20,7 +20,7 @@ class _MultiQuantumDashboardState
   bool isGPUMode = false;
   int totalAttempts = 0;
 
-  String systemStatus = "30-پوائنٹ ٹیسٹ تیار";
+  String systemStatus = "15-پوائنٹ ٹیسٹ تیار";
   Color statusColor = Colors.grey;
 
   Stopwatch stopwatch = Stopwatch();
@@ -69,7 +69,7 @@ class _MultiQuantumDashboardState
         isRunning = false;
 
         systemStatus =
-            "کامیابی! تمام 30 مستحکم\nوقت: ${stopwatch.elapsed.inSeconds}s";
+            "کامیابی! تمام 15 مستحکم\nوقت: ${stopwatch.elapsed.inSeconds}s";
 
         statusColor = Colors.green;
       }
