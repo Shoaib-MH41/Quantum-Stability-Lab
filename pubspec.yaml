@@ -9,12 +9,19 @@ dependencies:
   flutter:
     sdk: flutter
   
-  # صرف essential packages رکھیں
+  # نیٹ ورک اور اسٹیٹ مینجمنٹ
   http: ^0.13.5
   provider: ^6.0.0
+  
+  # ڈیٹا ایکسپورٹ اور اسٹوریج
   path_provider: ^2.0.15
   csv: ^5.0.1
   share_plus: ^7.0.2
+
+  # ⭐ سینسرز اور ہارڈویئر (ان کا ہونا لازمی ہے)
+  sensors_plus: ^4.0.2
+  battery_plus: ^5.0.1
+  vibration: ^1.8.4
 
 dev_dependencies:
   flutter_test:
