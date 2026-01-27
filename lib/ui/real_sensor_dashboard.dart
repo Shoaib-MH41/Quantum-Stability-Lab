@@ -9,7 +9,7 @@ class RealSensorDashboard extends StatefulWidget {
 
 class _RealSensorDashboardState extends State<RealSensorDashboard> {
   // 60 پارٹیکلز کا اضافہ
-  static const int particleCount = 30;
+  static const int particleCount = 15;
   List<RealQuantumParticle> particles = List.generate(particleCount, (i) => RealQuantumParticle(i));
   
   bool isRunning = false;
@@ -61,7 +61,7 @@ class _RealSensorDashboardState extends State<RealSensorDashboard> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: AppBar(title: Text("GPU vs NPU: 30 Particles"), backgroundColor: Colors.deepPurple),
+      appBar: AppBar(title: Text("GPU vs NPU: 15 Particles"), backgroundColor: Colors.deepPurple),
       body: Column(
         children: [
           // موڈ سلیکٹر
