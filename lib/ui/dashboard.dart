@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'dart:math';
-import '../core/quantum_particle.dart';
+import '../core/real_quantum_particle.dart'; // حقیقی سینسر والی فائل
 
 class MultiQuantumDashboard extends StatefulWidget {
   @override
@@ -9,373 +8,110 @@ class MultiQuantumDashboard extends StatefulWidget {
 }
 
 class _MultiQuantumDashboardState extends State<MultiQuantumDashboard> {
-  List<QuantumParticle> particles = [];
-  int totalAttempts = 0;
-  int successfulStabilizations = 0;
+  static const int particleCount = 60; // 60 پارٹیکلز کا ہدف
+  List<RealQuantumParticle> particles = List.generate(particleCount, (i) => RealQuantumParticle(i));
+  
   bool isRunning = false;
-  Timer? _experimentTimer;
-  String systemStatus = "10-کوانٹم ٹیسٹ تیار";
+  bool isGPUMode = false; // NPU vs GPU سوئچ
+  int totalAttempts = 0;
+  String systemStatus = "60-پوائنٹ ٹیسٹ تیار";
   Color statusColor = Colors.grey;
-  List<int> attemptsHistory = [];
+  Stopwatch stopwatch = Stopwatch();
+  Timer? _experimentTimer;
 
-  @override
-  void initState() {
-    super.initState();
-    initializeParticles();
-  }
-
-  void initializeParticles() {
-    particles.clear();
-    for (int i = 0; i < 10; i++) {
-      particles.add(QuantumParticle(i));
-    }
-  }
-
-  void startQuantumExperiment() {
+  void startExperiment() {
     setState(() {
       isRunning = true;
       totalAttempts = 0;
-      successfulStabilizations = 0;
-      attemptsHistory.clear();
-      initializeParticles();
-      systemStatus = "10-کوانٹم استحکام جاری...";
-      statusColor = Colors.blue;
+      stopwatch.reset();
+      stopwatch.start();
+      systemStatus = isGPUMode ? "GPU (سپر کمپیوٹر) موڈ جاری..." : "NPU (کوانٹم) موڈ جاری...";
+      statusColor = isGPUMode ? Colors.red : Colors.blue;
     });
 
     _experimentTimer = Timer.periodic(Duration(milliseconds: 100), (timer) {
-      updateQuantumSystem();
+      updateSystemLogic();
     });
   }
 
-  void updateQuantumSystem() {
+  void updateSystemLogic() {
     setState(() {
       totalAttempts++;
-      
-      for (var particle in particles) {
-        particle.apply35msLaw();
+      bool allStable = true;
+
+      // GPU موڈ میں مصنوعی بوجھ ڈالنا
+      if (isGPUMode) {
+        for (int i = 0; i < 30000; i++) { double x = i * 0.001; } 
       }
-      
-      int stableParticles = particles.where((p) => p.isStable).length;
-      int fullyStableParticles = particles.where((p) => p.isFullyStable).length;
-      
-      if (fullyStableParticles == 10) {
-        successfulStabilizations++;
+
+      for (var p in particles) {
+        p.apply35msLaw(); // حقیقی سینسرز سے قانون نافذ کرنا
+        if (!p.isFullyStable) allStable = false;
+      }
+
+      // جب سب مستحکم ہو جائیں تو رک جائیں
+      if (allStable) {
         _experimentTimer?.cancel();
+        stopwatch.stop();
         isRunning = false;
-        
-        systemStatus = "کمال! تمام 10 پارٹیکل مستحکم\n"
-                      "کوششیں: $totalAttempts";
+        systemStatus = "کامیابی! تمام 60 مستحکم\nوقت: ${stopwatch.elapsed.inSeconds}s | کوششیں: $totalAttempts";
         statusColor = Colors.green;
-        attemptsHistory.add(totalAttempts);
-        
-        Timer(Duration(seconds: 2), () {
-          if (mounted) {
-            startQuantumExperiment();
-          }
-        });
-        
-      } else if (stableParticles >= 7) {
-        systemStatus = "اچھا! $stableParticles/10 مستحکم\n"
-                      "کوشش: $totalAttempts";
-        statusColor = Colors.blue;
-      } else if (stableParticles >= 4) {
-        systemStatus = "جاری... $stableParticles/10 مستحکم";
-        statusColor = Colors.orange;
-      } else {
-        systemStatus = "شروع... $stableParticles/10 مستحکم";
-        statusColor = Colors.red;
       }
     });
   }
 
   void stopExperiment() {
     _experimentTimer?.cancel();
+    stopwatch.stop();
     setState(() {
       isRunning = false;
-      systemStatus = "ٹیسٹ روک دیا\n"
-                    "کل کوششیں: $totalAttempts\n"
-                    "کامیاب استحکام: $successfulStabilizations";
+      systemStatus = "تجربہ موقوف کر دیا گیا";
       statusColor = Colors.grey;
     });
   }
 
   @override
-  void dispose() {
-    _experimentTimer?.cancel();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("10-کوانٹم استحکام تجربہ"),
-        backgroundColor: Colors.deepPurple,
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // تجربے کی معلومات
-              Card(
-                elevation: 4,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      Text(
-                        "35ms قانون کا 10-کوانٹم ٹیسٹ",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.deepPurple,
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          _buildInfoBox("کل کوششیں", "$totalAttempts", Colors.blue),
-                          _buildInfoBox("کامیاب استحکام", "$successfulStabilizations", Colors.green),
-                          _buildInfoBox("مستحکم پارٹیکل", 
-                            "${particles.where((p) => p.isStable).length}/10", 
-                            Colors.orange),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
+      backgroundColor: Colors.black,
+      appBar: AppBar(title: Text("60-Point Quantum Master Lab"), backgroundColor: Colors.deepPurple),
+      body: Column(
+        children: [
+          // NPU vs GPU سوئچ
+          _buildModeSwitch(),
+          
+          // میٹرکس بار
+          _buildTopMetrics(),
+
+          // 60 پارٹیکلز کا گرڈ
+          Expanded(
+            child: GridView.builder(
+              padding: EdgeInsets.all(8),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 6, // 6 کالمز
+                mainAxisSpacing: 4,
+                crossAxisSpacing: 4,
               ),
-              
-              SizedBox(height: 20),
-              
-              // 10 پارٹیکلز کا گرڈ
-              Text(
-                "کوانٹم پارٹیکلز (ہر 100ms اپڈیٹ)",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 10),
-              
-              GridView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 2.0,
-                  mainAxisSpacing: 10,
-                  crossAxisSpacing: 10,
-                ),
-                itemCount: particles.length,
-                itemBuilder: (context, index) {
-                  final particle = particles[index];
-                  return _buildParticleCard(particle);
-                },
-              ),
-              
-              SizedBox(height: 20),
-              
-              // نظام کی حالت
-              Container(
-                padding: EdgeInsets.all(16),
+              itemCount: particleCount,
+              itemBuilder: (context, index) => Container(
                 decoration: BoxDecoration(
-                  color: statusColor,
-                  borderRadius: BorderRadius.circular(12),
+                  color: particles[index].isFullyStable ? Colors.green : Colors.red.withOpacity(0.4),
+                  borderRadius: BorderRadius.circular(4),
                 ),
-                child: Column(
-                  children: [
-                    Icon(
-                      _getStatusIcon(),
-                      size: 40,
-                      color: Colors.white,
-                    ),
-                    SizedBox(height: 10),
-                    Text(
-                      systemStatus,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
+                child: Center(
+                  child: Text("${particles[index].currentTime.toStringAsFixed(0)}", 
+                  style: TextStyle(color: Colors.white, fontSize: 10)),
                 ),
               ),
-              
-              SizedBox(height: 20),
-              
-              // بٹنز
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: isRunning ? null : startQuantumExperiment,
-                      icon: Icon(Icons.play_arrow),
-                      label: Text(isRunning ? "جاری ہے..." : "ٹیسٹ شروع کریں"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        padding: EdgeInsets.symmetric(vertical: 15),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: isRunning ? stopExperiment : null,
-                      icon: Icon(Icons.stop),
-                      label: Text("روکیں"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        padding: EdgeInsets.symmetric(vertical: 15),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              
-              SizedBox(height: 20),
-              
-              // تاریخ کے نتائج
-              if (attemptsHistory.isNotEmpty) ...[
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "آخری نتائج:",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Wrap(
-                          spacing: 10,
-                          children: attemptsHistory.reversed.take(5).map((attempts) {
-                            return Chip(
-                              label: Text("$attempts کوششیں"),
-                              backgroundColor: attempts <= 20 
-                                ? Colors.green[100] 
-                                : attempts <= 50 
-                                  ? Colors.orange[100] 
-                                  : Colors.red[100],
-                            );
-                          }).toList(),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ],
+            ),
           ),
-        ),
+
+          // اسٹیٹس اور بٹن
+          _buildBottomControls(),
+        ],
       ),
     );
   }
-  
-  Widget _buildInfoBox(String title, String value, Color color) {
-    return Column(
-      children: [
-        Text(
-          title,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey[600],
-          ),
-        ),
-        SizedBox(height: 5),
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: color),
-          ),
-          child: Text(
-            value,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-  
-  Widget _buildParticleCard(QuantumParticle particle) {
-    return Card(
-      elevation: 2,
-      color: particle.isFullyStable
-          ? Colors.green[50]
-          : particle.isStable
-              ? Colors.blue[50]
-              : Colors.red[50],
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "پارٹیکل ${particle.id + 1}",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: particle.isFullyStable ? Colors.green[800] : Colors.grey[800],
-              ),
-            ),
-            SizedBox(height: 5),
-            Text(
-              "${particle.currentTime.toStringAsFixed(1)} ms",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.deepPurple,
-              ),
-            ),
-            SizedBox(height: 5),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  particle.isFullyStable 
-                      ? Icons.check_circle 
-                      : particle.isStable 
-                          ? Icons.autorenew 
-                          : Icons.error,
-                  size: 16,
-                  color: particle.isFullyStable 
-                      ? Colors.green 
-                      : particle.isStable 
-                          ? Colors.blue 
-                          : Colors.red,
-                ),
-                SizedBox(width: 5),
-                Text(
-                  particle.isFullyStable 
-                      ? "مکمل مستحکم" 
-                      : particle.isStable 
-                          ? "مستحکم" 
-                          : "غیر مستحکم",
-                  style: TextStyle(fontSize: 12),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-  
-  IconData _getStatusIcon() {
-    if (systemStatus.contains("کمال")) return Icons.celebration;
-    if (systemStatus.contains("اچھا")) return Icons.thumb_up;
-    if (systemStatus.contains("جاری")) return Icons.autorenew;
-    return Icons.play_arrow;
-  }
+
+  // باقی مددگار وزٹس (Metrics, Controls وغیرہ) یہاں آئیں گے
 }
