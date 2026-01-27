@@ -11,7 +11,7 @@ class MultiQuantumDashboard extends StatefulWidget {
 class _MultiQuantumDashboardState
     extends State<MultiQuantumDashboard> {
 
-  static const int particleCount = 30;
+  static const int particleCount = 15;
 
   List<RealQuantumParticle> particles =
       List.generate(particleCount, (i) => RealQuantumParticle(i));
