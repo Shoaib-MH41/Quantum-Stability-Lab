@@ -11,7 +11,8 @@ class RealSensorDashboard extends StatefulWidget {
 class _RealSensorDashboardState
     extends State<RealSensorDashboard> {
 
-  static const int particleCount = 15;
+  // 1. تعداد 20 کر دی گئی ہے تاکہ ہارڈویئر کا بہتر امتحان ہو
+  static const int particleCount = 20;
 
   final List<RealQuantumParticle> particles =
       List.generate(particleCount, (i) => RealQuantumParticle(i));
@@ -20,8 +21,8 @@ class _RealSensorDashboardState
   bool isGPUMode = false;
   int attempts = 0;
 
-  String status = "موڈ منتخب کریں";
-  Stopwatch stopwatch = Stopwatch();
+  String status = "موڈ منتخب کریں اور ٹیسٹ شروع کریں";
+  final Stopwatch stopwatch = Stopwatch();
   Timer? _timer;
 
   int stableFrames = 0;
@@ -37,8 +38,8 @@ class _RealSensorDashboardState
         ..start();
 
       status = isGPUMode
-          ? "GPU سینسر لوڈ"
-          : "NPU سینسر پیٹرن";
+          ? "GPU موڈ: Brute Force (بھاری حساب کتاب)"
+          : "NPU موڈ: Pattern Logic (تیز رفتار پیٹرن)";
     });
 
     _timer = Timer.periodic(
@@ -50,20 +51,21 @@ class _RealSensorDashboardState
   void _tick() {
     setState(() {
       attempts++;
-      bool stable = true;
+      bool allStable = true;
 
+      // GPU تصدیق کے لیے بوجھ میں اضافہ (50k iterations)
       if (isGPUMode) {
-        for (int i = 0; i < 20000; i++) {
-          double x = i * 0.001;
+        for (int i = 0; i < 50000; i++) {
+          double x = i * 0.0001;
         }
       }
 
       for (final p in particles) {
         p.apply35msLaw();
-        if (!p.isFullyStable) stable = false;
+        if (!p.isFullyStable) allStable = false;
       }
 
-      if (stable) {
+      if (allStable) {
         stableFrames++;
       } else {
         stableFrames = 0;
@@ -74,7 +76,7 @@ class _RealSensorDashboardState
         stopwatch.stop();
         isRunning = false;
         status =
-            "✅ استحکام حاصل\n${stopwatch.elapsed.inSeconds}s";
+            "✅ استحکام حاصل!\nوقت: ${stopwatch.elapsed.inSeconds}s | کوششیں: $attempts";
       }
     });
   }
@@ -84,41 +86,119 @@ class _RealSensorDashboardState
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text("Real Sensor Test"),
-        backgroundColor: Colors.deepPurple,
+        title: const Text("NPU vs GPU: 20 Particle Test"),
+        backgroundColor: Colors.indigo,
       ),
       body: Column(
         children: [
-          SwitchListTile(
-            title: const Text("GPU موڈ",
-                style: TextStyle(color: Colors.white)),
-            value: isGPUMode,
-            onChanged: (v) => setState(() => isGPUMode = v),
-          ),
-          Text("کوششیں: $attempts",
-              style: const TextStyle(color: Colors.white)),
+          // موڈ سلیکٹر کارڈ
+          _buildModeSelector(),
+
+          // میٹرکس بار
+          _buildMetricsBar(),
+
+          // پارٹیکل گرڈ (20 پارٹیکلز کے لیے 4 کالم)
           Expanded(
-            child: GridView.count(
-              crossAxisCount: 5,
-              children: particles.map((p) {
-                return Container(
-                  margin: const EdgeInsets.all(3),
-                  color: p.isFullyStable
-                      ? Colors.green
-                      : Colors.red.withOpacity(0.5),
-                );
-              }).toList(),
+            child: GridView.builder(
+              padding: const EdgeInsets.all(10),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 4,
+                childAspectRatio: 1.2,
+                mainAxisSpacing: 8,
+                crossAxisSpacing: 8,
+              ),
+              itemCount: particleCount,
+              itemBuilder: (_, i) => _buildParticleTile(particles[i]),
             ),
           ),
-          ElevatedButton(
-            onPressed: isRunning ? null : start,
-            child: Text(isRunning ? "چل رہا ہے..." : "شروع کریں"),
-          ),
-          const SizedBox(height: 10),
-          Text(status,
-              style: const TextStyle(color: Colors.white70)),
+
+          // کنٹرول ایریا
+          _buildBottomPanel(),
         ],
       ),
     );
+  }
+
+  Widget _buildModeSelector() {
+    return SwitchListTile(
+      tileColor: Colors.white10,
+      title: Text(isGPUMode ? "GPU: Heavy Load" : "NPU: Smart Pattern",
+          style: TextStyle(color: isGPUMode ? Colors.redAccent : Colors.blueAccent, fontWeight: FontWeight.bold)),
+      subtitle: const Text("موڈ بدلنے کے لیے سوئچ استعمال کریں", style: TextStyle(color: Colors.white54, fontSize: 10)),
+      value: isGPUMode,
+      onChanged: isRunning ? null : (v) => setState(() => isGPUMode = v),
+      activeColor: Colors.red,
+      inactiveThumbColor: Colors.blue,
+    );
+  }
+
+  Widget _buildMetricsBar() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _metricColumn("کوششیں", "$attempts"),
+          _metricColumn("وقت", "${stopwatch.elapsed.inSeconds}s"),
+          _metricColumn("مستحکم ٹکس", "$stableFrames/$requiredStableFrames"),
+        ],
+      ),
+    );
+  }
+
+  Widget _metricColumn(String label, String value) {
+    return Column(
+      children: [
+        Text(label, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+        Text(value, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+      ],
+    );
+  }
+
+  Widget _buildParticleTile(RealQuantumParticle p) {
+    return Container(
+      decoration: BoxDecoration(
+        color: p.isFullyStable ? Colors.green.withOpacity(0.8) : Colors.red.withOpacity(0.2),
+        border: Border.all(color: p.isFullyStable ? Colors.green : Colors.redAccent.withOpacity(0.5)),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Center(
+        child: Text(
+          p.currentTime.toStringAsFixed(1),
+          style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomPanel() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: const BoxDecoration(
+        color: Colors.white10,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Column(
+        children: [
+          Text(status, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70, fontSize: 14)),
+          const SizedBox(height: 15),
+          ElevatedButton(
+            onPressed: isRunning ? null : start,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: isGPUMode ? Colors.red : Colors.blue,
+              minimumSize: const Size(double.infinity, 50),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            child: Text(isRunning ? "ٹیسٹ جاری ہے..." : "تجربہ شروع کریں", style: const TextStyle(fontSize: 16)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 }
