@@ -4,13 +4,18 @@ import '../core/real_quantum_particle.dart';
 
 class MultiQuantumDashboard extends StatefulWidget {
   @override
-  _MultiQuantumDashboardState createState() => _MultiQuantumDashboardState();
+  _MultiQuantumDashboardState createState() =>
+      _MultiQuantumDashboardState();
 }
 
-class _MultiQuantumDashboardState extends State<Dashboard> {
+class _MultiQuantumDashboardState
+    extends State<MultiQuantumDashboard> {
+
   static const int particleCount = 60;
-  List<RealQuantumParticle> particles = List.generate(particleCount, (i) => RealQuantumParticle(i));
-  
+
+  List<RealQuantumParticle> particles =
+      List.generate(particleCount, (i) => RealQuantumParticle(i));
+}
   bool isRunning = false;
   bool isGPUMode = false; 
   int totalAttempts = 0;
