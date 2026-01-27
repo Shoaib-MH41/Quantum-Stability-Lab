@@ -39,6 +39,7 @@ class _MultiQuantumDashboardState extends State<Dashboard> {
       totalAttempts++;
       bool allStable = true;
 
+      // GPU موڈ میں مصنوعی بوجھ ڈالنا
       if (isGPUMode) {
         for (int i = 0; i < 30000; i++) { double x = i * 0.001; } 
       }
@@ -58,21 +59,21 @@ class _MultiQuantumDashboardState extends State<Dashboard> {
     });
   }
 
-  // غائب شدہ فنکشنز (Methods) یہاں ہیں:
-
+  // پچھلے بلڈ میں یہ حصے غائب تھے جنہیں اب جوڑ دیا گیا ہے
   Widget _buildModeSwitch() {
     return Padding(
       padding: EdgeInsets.all(10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text("NPU", style: TextStyle(color: Colors.blue)),
+          Text("NPU", style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold)),
           Switch(
             value: isGPUMode,
             onChanged: (val) => setState(() => isGPUMode = val),
             activeColor: Colors.red,
+            inactiveThumbColor: Colors.blue,
           ),
-          Text("GPU", style: TextStyle(color: Colors.red)),
+          Text("GPU", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
         ],
       ),
     );
@@ -80,12 +81,12 @@ class _MultiQuantumDashboardState extends State<Dashboard> {
 
   Widget _buildTopMetrics() {
     return Padding(
-      padding: EdgeInsets.all(16),
+      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text("کوششیں: $totalAttempts", style: TextStyle(color: Colors.white, fontSize: 18)),
-          Text("وقت: ${stopwatch.elapsed.inSeconds}s", style: TextStyle(color: Colors.white, fontSize: 18)),
+          Text("کوششیں: $totalAttempts", style: TextStyle(color: Colors.white, fontSize: 16)),
+          Text("وقت: ${stopwatch.elapsed.inSeconds}s", style: TextStyle(color: Colors.cyanAccent, fontSize: 16)),
         ],
       ),
     );
@@ -94,14 +95,22 @@ class _MultiQuantumDashboardState extends State<Dashboard> {
   Widget _buildBottomControls() {
     return Container(
       padding: EdgeInsets.all(20),
-      color: statusColor,
+      decoration: BoxDecoration(
+        color: statusColor.withOpacity(0.8),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       child: Column(
         children: [
-          Text(systemStatus, textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-          SizedBox(height: 10),
+          Text(systemStatus, textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+          SizedBox(height: 15),
           ElevatedButton(
             onPressed: isRunning ? null : startExperiment,
-            child: Text(isRunning ? "جاری..." : "ٹیسٹ شروع کریں"),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.black,
+              minimumSize: Size(double.infinity, 50),
+            ),
+            child: Text(isRunning ? "پروسیسنگ..." : "ٹیسٹ شروع کریں", style: TextStyle(fontSize: 18)),
           ),
         ],
       ),
@@ -112,7 +121,7 @@ class _MultiQuantumDashboardState extends State<Dashboard> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: AppBar(title: Text("Quantum Master Lab"), backgroundColor: Colors.deepPurple),
+      appBar: AppBar(title: Text("Quantum Master Lab (60)"), backgroundColor: Colors.deepPurple),
       body: Column(
         children: [
           _buildModeSwitch(),
@@ -120,11 +129,21 @@ class _MultiQuantumDashboardState extends State<Dashboard> {
           Expanded(
             child: GridView.builder(
               padding: EdgeInsets.all(8),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 6),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 6,
+                mainAxisSpacing: 4,
+                crossAxisSpacing: 4,
+              ),
               itemCount: particleCount,
               itemBuilder: (context, index) => Container(
-                margin: EdgeInsets.all(2),
-                color: particles[index].isFullyStable ? Colors.green : Colors.red.withOpacity(0.3),
+                decoration: BoxDecoration(
+                  color: particles[index].isFullyStable ? Colors.green : Colors.red.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Center(
+                  child: Text("${particles[index].currentTime.toStringAsFixed(0)}", 
+                  style: TextStyle(color: Colors.white, fontSize: 9)),
+                ),
               ),
             ),
           ),
