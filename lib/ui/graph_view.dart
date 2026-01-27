@@ -4,44 +4,76 @@ import 'package:fl_chart/fl_chart.dart';
 class GraphView extends StatelessWidget {
   final List<double> npuData;
   final List<double> lightData;
-  
+
   const GraphView({
+    Key? key,
     required this.npuData,
     required this.lightData,
-  });
-  
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return Container(
+    if (npuData.isEmpty && lightData.isEmpty) {
+      return const SizedBox(
+        height: 200,
+        child: Center(
+          child: Text(
+            "کوئی ڈیٹا موجود نہیں",
+            style: TextStyle(color: Colors.white54),
+          ),
+        ),
+      );
+    }
+
+    return SizedBox(
       height: 200,
-      padding: EdgeInsets.all(8),
-      child: LineChart(
-        LineChartData(
-          gridData: FlGridData(show: false),
-          titlesData: FlTitlesData(show: false),
-          borderData: FlBorderData(show: false),
-          lineBarsData: [
-            // NPU وقت کا گراف
-            LineChartBarData(
-              spots: npuData.asMap().entries.map((e) {
-                return FlSpot(e.key.toDouble(), e.value);
-              }).toList(),
-              isCurved: true,
-              color: Colors.blue,
-              dotData: FlDotData(show: false),
-            ),
-            // روشنی کا گراف
-            LineChartBarData(
-              spots: lightData.asMap().entries.map((e) {
-                return FlSpot(e.key.toDouble(), e.value / 100);
-              }).toList(),
-              isCurved: true,
-              color: Colors.orange,
-              dotData: FlDotData(show: false),
-            ),
-          ],
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: LineChart(
+          LineChartData(
+            minX: 0,
+            maxX: _maxLength().toDouble(),
+            minY: 0,
+            maxY: 1,
+            gridData: FlGridData(show: false),
+            titlesData: FlTitlesData(show: false),
+            borderData: FlBorderData(show: false),
+            lineBarsData: [
+              _buildLine(
+                data: npuData,
+                color: Colors.blue,
+              ),
+              _buildLine(
+                data: lightData.map((e) => e / 100).toList(),
+                color: Colors.orange,
+              ),
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  LineChartBarData _buildLine({
+    required List<double> data,
+    required Color color,
+  }) {
+    return LineChartBarData(
+      spots: data.asMap().entries.map(
+        (e) => FlSpot(e.key.toDouble(), e.value),
+      ).toList(),
+      isCurved: true,
+      colors: [color],
+      barWidth: 2,
+      dotData: FlDotData(show: false),
+      belowBarData: BarAreaData(show: false),
+    );
+  }
+
+  int _maxLength() {
+    return [
+      npuData.length,
+      lightData.length,
+    ].reduce((a, b) => a > b ? a : b);
   }
 }
