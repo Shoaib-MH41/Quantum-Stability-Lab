@@ -21,6 +21,7 @@ dependencies:
   # ⭐ سینسرز اور ہارڈویئر (ان کا ہونا لازمی ہے)
   sensors_plus: ^4.0.2
   battery_plus: ^5.0.1
+  connectivity_plus: ^5.0.2
   vibration: ^1.8.4
 
 dev_dependencies:
