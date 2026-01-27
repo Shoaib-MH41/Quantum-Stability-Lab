@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import '../core/real_quantum_particle.dart';
 
-class Dashboard extends StatefulWidget {
+class MultiQuantumDashboard extends StatefulWidget {
   @override
   _MultiQuantumDashboardState createState() => _MultiQuantumDashboardState();
 }
