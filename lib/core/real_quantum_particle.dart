@@ -10,7 +10,7 @@ class RealQuantumParticle {
 
   // Core quantum state
   double currentTime;
-  final double targetTime = 35.0;
+  final double targetTime = 25.0;
 
   int stableCount = 0;
 
