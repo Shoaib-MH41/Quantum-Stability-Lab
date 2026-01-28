@@ -11,7 +11,6 @@ class RealSensorDashboard extends StatefulWidget {
 class _RealSensorDashboardState
     extends State<RealSensorDashboard> {
 
-  // 🚀 اب ہدف 2000 پارٹیکلز ہے!
   static const int particleCount = 2000;
 
   final List<RealQuantumParticle> particles =
@@ -30,6 +29,9 @@ class _RealSensorDashboardState
 
   void start() {
     setState(() {
+      // 🔑 اہم: ٹیسٹ شروع ہونے پر کلسٹر لاجک سیٹ کریں
+      RealQuantumParticle.useClusterLogic = !isGPUMode;
+      
       attempts = 0;
       stableFrames = 0;
       isRunning = true;
@@ -41,7 +43,7 @@ class _RealSensorDashboardState
     });
 
     _timer = Timer.periodic(
-      const Duration(milliseconds: 50), // رفتار مزید تیز کر دی گئی ہے
+      const Duration(milliseconds: 50),
       (_) => _tick(),
     );
   }
@@ -51,8 +53,8 @@ class _RealSensorDashboardState
       attempts++;
       bool allStable = true;
 
-      // 🔥 GPU بوجھ کو 5 لاکھ کر دیا گیا ہے تاکہ 12GB RAM کا امتحان ہو سکے
       if (isGPUMode) {
+        // GPU بوجھ: 12GB RAM کا امتحان
         for (int i = 0; i < 500000; i++) {
           double x = i * 0.0001;
         }
@@ -92,14 +94,13 @@ class _RealSensorDashboardState
           _buildModeSelector(),
           _buildMetricsBar(),
 
-          // 2,000 پارٹیکلز کے لیے نینو گرڈ (40 کالمز)
           Expanded(
             child: Container(
               padding: const EdgeInsets.all(2),
               color: Colors.white.withOpacity(0.05),
               child: GridView.builder(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 40, // 40 کالمز تاکہ سب کچھ اسکرین پر آ جائے
+                  crossAxisCount: 40,
                   childAspectRatio: 1.0, 
                   mainAxisSpacing: 1,
                   crossAxisSpacing: 1,
@@ -122,7 +123,13 @@ class _RealSensorDashboardState
       title: Text(isGPUMode ? "GPU: Extreme Stress" : "NPU: Smart Pattern",
           style: TextStyle(color: isGPUMode ? Colors.redAccent : Colors.blueAccent, fontWeight: FontWeight.bold, fontSize: 13)),
       value: isGPUMode,
-      onChanged: isRunning ? null : (v) => setState(() => isGPUMode = v),
+      onChanged: isRunning ? null : (v) {
+        setState(() {
+          isGPUMode = v;
+          // 👈 سوئچ بدلتے ہی لاجک موڈ بھی بدل دیں
+          RealQuantumParticle.useClusterLogic = !isGPUMode;
+        });
+      },
       activeColor: Colors.red,
       inactiveThumbColor: Colors.blue,
     );
@@ -151,7 +158,6 @@ class _RealSensorDashboardState
     );
   }
 
-  // 2,000 پارٹیکلز کے لیے انتہائی چھوٹا ٹائل
   Widget _buildNanoTile(RealQuantumParticle p) {
     return Container(
       decoration: BoxDecoration(
