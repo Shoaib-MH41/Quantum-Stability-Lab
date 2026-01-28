@@ -4,6 +4,7 @@ import 'ui/experiment_history.dart';
 import 'ui/multi_quantum_dashboard.dart';
 import 'ui/real_sensor_dashboard.dart';
 import 'ui/intelligence_vs_strength_test.dart';
+import 'ui/philosophy_comparison.dart'; // Hybrid particle والی سکرین
 
 void main() {
   runApp(QuantumStabilityLabApp());
@@ -26,6 +27,7 @@ class QuantumStabilityLabApp extends StatelessWidget {
         '/history': (context) => ExperimentHistory(),
         '/sensor': (context) => RealSensorDashboard(),
         '/intelligence': (context) => IntelligenceVsStrengthTest(),
+        '/philosophy': (context) => PhilosophyComparisonScreen(), // نیا
       },
     );
   }
@@ -126,7 +128,17 @@ class HomeScreen extends StatelessWidget {
                     route: IntelligenceVsStrengthTest(),
                   ),
                   
-                  // Card 5: Experiment History
+                  // Card 5: Philosophy Comparison
+                  _buildExperimentCard(
+                    context: context,
+                    title: 'Philosophy',
+                    subtitle: 'Bohr vs Einstein',
+                    icon: Icons.lightbulb,
+                    color: Colors.deepOrange,
+                    route: PhilosophyComparisonScreen(), // یہ hybrid والی ہے
+                  ),
+                  
+                  // Card 6: Experiment History
                   _buildExperimentCard(
                     context: context,
                     title: 'History',
@@ -136,21 +148,21 @@ class HomeScreen extends StatelessWidget {
                     route: ExperimentHistory(),
                   ),
                   
-                  // Card 6: Philosophy
+                  // Card 7: Hybrid Particle Test
                   _buildExperimentCard(
                     context: context,
-                    title: 'Philosophy',
-                    subtitle: 'Bohr vs Einstein',
-                    icon: Icons.lightbulb,
-                    color: Colors.deepOrange,
-                    route: Dashboard(), // یا philosophy screen
+                    title: 'Hybrid System',
+                    subtitle: 'Quantum + Classical',
+                    icon: Icons.merge,
+                    color: Colors.indigo,
+                    route: Dashboard(), // یا dedicated hybrid test
                   ),
                 ],
               ),
               
               const SizedBox(height: 40),
               
-              // Footer
+              // Core Files Info
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -160,7 +172,7 @@ class HomeScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(
-                      'Scientific Principles:',
+                      'Core Scientific Files:',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -168,16 +180,19 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Text(
-                      '• Quantum (Bohr) + Classical (Einstein) Hybrid\n'
-                      '• 35ms Fixation Law Application\n'
-                      '• Real-time Quantum Simulation\n'
-                      '• Strength vs Intelligence Analysis',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.deepPurple[800],
-                        height: 1.5,
-                      ),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        _buildFileChip('real_quantum_particle.dart'),
+                        _buildFileChip('hybrid_particle.dart'),
+                        _buildFileChip('quantum_particle.dart'),
+                        _buildFileChip('stability_engine.dart'),
+                        _buildFileChip('accident_law.dart'),
+                        _buildFileChip('fixation_law.dart'),
+                        _buildFileChip('experiment_manager.dart'),
+                        _buildFileChip('quantum_intelligence_vs_strength.dart'),
+                      ],
                     ),
                   ],
                 ),
@@ -262,6 +277,17 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+  
+  Widget _buildFileChip(String fileName) {
+    return Chip(
+      label: Text(
+        fileName,
+        style: TextStyle(fontSize: 10),
+      ),
+      backgroundColor: Colors.deepPurple[100],
+      visualDensity: VisualDensity.compact,
     );
   }
 }
