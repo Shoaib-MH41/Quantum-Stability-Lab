@@ -12,7 +12,7 @@ class _RealSensorDashboardState
     extends State<RealSensorDashboard> {
 
   // 1. تعداد 20 کر دی گئی ہے تاکہ ہارڈویئر کا بہتر امتحان ہو
-  static const int particleCount = 20;
+  static const int particleCount = 100;
 
   final List<RealQuantumParticle> particles =
       List.generate(particleCount, (i) => RealQuantumParticle(i));
