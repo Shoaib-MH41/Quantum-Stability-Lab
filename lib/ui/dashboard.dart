@@ -11,8 +11,8 @@ class MultiQuantumDashboard extends StatefulWidget {
 class _MultiQuantumDashboardState
     extends State<MultiQuantumDashboard> {
 
-  // 1. تعداد 100 کر دی گئی ہے - آپ کے Moto فون کی 12GB RAM کا اصل امتحان
-  static const int particleCount = 100;
+  // 🚀 اب ہدف 2000 پارٹیکلز کا سپر ٹیسٹ ہے
+  static const int particleCount = 2000;
 
   final List<RealQuantumParticle> particles =
       List.generate(particleCount, (i) => RealQuantumParticle(i));
@@ -21,13 +21,13 @@ class _MultiQuantumDashboardState
   bool isGPUMode = false;
   int totalAttempts = 0;
 
-  String systemStatus = "100 پوائنٹ ٹیسٹ تیار";
+  String systemStatus = "2,000 پارٹیکل کوانٹم لیب تیار";
   Color statusColor = Colors.grey;
 
   final Stopwatch stopwatch = Stopwatch();
   Timer? _timer;
 
-  // استحکام کی جانچ
+  // استحکام کی جانچ کے لیے ٹکس
   int stableTicksRequired = 6;
   int currentStableTicks = 0;
 
@@ -36,19 +36,17 @@ class _MultiQuantumDashboardState
       isRunning = true;
       totalAttempts = 0;
       currentStableTicks = 0;
-      stopwatch
-        ..reset()
-        ..start();
+      stopwatch..reset()..start();
 
       systemStatus = isGPUMode
-          ? "GPU موڈ: Brute Force بوجھ"
-          : "NPU موڈ: Pattern Logic پیٹرن";
+          ? "GPU: Extreme Stress (500k Math Load)"
+          : "NPU: Parallel Pattern Logic";
 
-      statusColor = isGPUMode ? Colors.red : Colors.blue;
+      statusColor = isGPUMode ? Colors.redAccent : Colors.blueAccent;
     });
 
     _timer = Timer.periodic(
-      const Duration(milliseconds: 100),
+      const Duration(milliseconds: 50), // رفتار مزید تیز کر دی گئی ہے
       (_) => _updateLogic(),
     );
   }
@@ -58,9 +56,9 @@ class _MultiQuantumDashboardState
       totalAttempts++;
       bool allStable = true;
 
-      // GPU موڈ میں پروسیسر پر دباؤ بڑھانے کے لیے بوجھ
+      // 🔥 GPU موڈ میں 5 لاکھ لوپس کا شدید بوجھ
       if (isGPUMode) {
-        for (int i = 0; i < 50000; i++) {
+        for (int i = 0; i < 500000; i++) {
           double x = i * 0.0001;
         }
       }
@@ -84,7 +82,7 @@ class _MultiQuantumDashboardState
         isRunning = false;
 
         systemStatus =
-            "✅ 100 پارٹیکلز مستحکم!\n"
+            "🏆 2000 پارٹیکلز مستحکم!\n"
             "وقت: ${stopwatch.elapsed.inSeconds}s | کوششیں: $totalAttempts";
 
         statusColor = Colors.green;
@@ -97,15 +95,23 @@ class _MultiQuantumDashboardState
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text("NPU vs GPU: 100 Particle Test"),
-        backgroundColor: Colors.deepPurple,
+        title: const Text("Quantum Core: 2000 Test"),
+        backgroundColor: Colors.deepPurple[900],
       ),
       body: Column(
         children: [
           _modeSwitch(),
           _topMetrics(),
-          // 100 پارٹیکلز کے لیے موزوں گرڈ
-          Expanded(child: _particleGrid()),
+          // 2000 پارٹیکلز کے لیے نینو گرڈ
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.white10),
+              ),
+              child: _particleGrid(),
+            ),
+          ),
           _bottomControls(),
         ],
       ),
@@ -127,7 +133,7 @@ class _MultiQuantumDashboardState
           Switch(
             value: isGPUMode,
             activeColor: Colors.red,
-            onChanged: (v) => setState(() => isGPUMode = v),
+            onChanged: isRunning ? null : (v) => setState(() => isGPUMode = v),
           ),
           const Text("GPU", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
         ],
@@ -137,12 +143,12 @@ class _MultiQuantumDashboardState
 
   Widget _topMetrics() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text("کوششیں: $totalAttempts", style: const TextStyle(color: Colors.white, fontSize: 14)),
-          Text("وقت: ${stopwatch.elapsed.inSeconds}s", style: const TextStyle(color: Colors.cyanAccent, fontSize: 14)),
+          Text("Attempts: $totalAttempts", style: const TextStyle(color: Colors.white, fontSize: 13)),
+          Text("Time: ${stopwatch.elapsed.inSeconds}s", style: const TextStyle(color: Colors.cyanAccent, fontSize: 13)),
         ],
       ),
     );
@@ -150,25 +156,18 @@ class _MultiQuantumDashboardState
 
   Widget _particleGrid() {
     return GridView.builder(
-      padding: const EdgeInsets.all(4),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 10, // 10 کالمز تاکہ 100 پارٹیکلز اسکرین پر سما جائیں
-        mainAxisSpacing: 2,
-        crossAxisSpacing: 2,
+        crossAxisCount: 40, // 40 کالمز تاکہ 2000 پارٹیکلز سما سکیں
+        mainAxisSpacing: 1,
+        crossAxisSpacing: 1,
       ),
       itemCount: particleCount,
       itemBuilder: (_, i) => Container(
         decoration: BoxDecoration(
           color: particles[i].isFullyStable
-              ? Colors.green.withOpacity(0.9)
-              : Colors.red.withOpacity(0.3),
-          borderRadius: BorderRadius.circular(2),
-        ),
-        child: Center(
-          child: Text(
-            "${particles[i].currentTime.toStringAsFixed(0)}", // جگہ بچانے کے لیے صرف راؤنڈ فگر
-            style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
-          ),
+              ? Colors.green
+              : Colors.red.withOpacity(0.4),
+          borderRadius: BorderRadius.circular(0.5),
         ),
       ),
     );
@@ -179,23 +178,29 @@ class _MultiQuantumDashboardState
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
         color: statusColor.withOpacity(0.9),
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
         children: [
-          Text(systemStatus, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+          Text(systemStatus, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
           const SizedBox(height: 10),
           ElevatedButton(
             onPressed: isRunning ? null : startExperiment,
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white,
               foregroundColor: Colors.black,
-              minimumSize: const Size(double.infinity, 40),
+              minimumSize: const Size(double.infinity, 45),
             ),
-            child: Text(isRunning ? "ٹیسٹ جاری ہے..." : "100 پارٹیکل ٹیسٹ شروع کریں"),
+            child: Text(isRunning ? "پروسیسنگ..." : "2000 پارٹیکل ٹیسٹ شروع کریں"),
           ),
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 }
