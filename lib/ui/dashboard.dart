@@ -11,7 +11,6 @@ class MultiQuantumDashboard extends StatefulWidget {
 class _MultiQuantumDashboardState
     extends State<MultiQuantumDashboard> {
 
-  // 🚀 اب ہدف 2000 پارٹیکلز کا سپر ٹیسٹ ہے
   static const int particleCount = 2000;
 
   final List<RealQuantumParticle> particles =
@@ -27,12 +26,14 @@ class _MultiQuantumDashboardState
   final Stopwatch stopwatch = Stopwatch();
   Timer? _timer;
 
-  // استحکام کی جانچ کے لیے ٹکس
   int stableTicksRequired = 6;
   int currentStableTicks = 0;
 
   void startExperiment() {
     setState(() {
+      // 🔑 کلسٹر لاجک کو یہاں سے کنٹرول کریں
+      RealQuantumParticle.useClusterLogic = !isGPUMode;
+      
       isRunning = true;
       totalAttempts = 0;
       currentStableTicks = 0;
@@ -46,7 +47,7 @@ class _MultiQuantumDashboardState
     });
 
     _timer = Timer.periodic(
-      const Duration(milliseconds: 50), // رفتار مزید تیز کر دی گئی ہے
+      const Duration(milliseconds: 50),
       (_) => _updateLogic(),
     );
   }
@@ -102,7 +103,6 @@ class _MultiQuantumDashboardState
         children: [
           _modeSwitch(),
           _topMetrics(),
-          // 2000 پارٹیکلز کے لیے نینو گرڈ
           Expanded(
             child: Container(
               padding: const EdgeInsets.all(2),
@@ -133,7 +133,13 @@ class _MultiQuantumDashboardState
           Switch(
             value: isGPUMode,
             activeColor: Colors.red,
-            onChanged: isRunning ? null : (v) => setState(() => isGPUMode = v),
+            onChanged: isRunning ? null : (v) {
+              setState(() {
+                isGPUMode = v;
+                // 👈 سوئچ بدلتے ہی کلسٹرنگ موڈ کو بھی اپ ڈیٹ کریں
+                RealQuantumParticle.useClusterLogic = !isGPUMode;
+              });
+            },
           ),
           const Text("GPU", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
         ],
@@ -157,7 +163,7 @@ class _MultiQuantumDashboardState
   Widget _particleGrid() {
     return GridView.builder(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 40, // 40 کالمز تاکہ 2000 پارٹیکلز سما سکیں
+        crossAxisCount: 40,
         mainAxisSpacing: 1,
         crossAxisSpacing: 1,
       ),
