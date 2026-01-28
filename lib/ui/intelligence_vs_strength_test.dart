@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:async'; // ٹائمر (Timer) کے ایرر کے لیے لازمی ہے
+import 'dart:math';  // 'min' فنکشن کے ایرر کے لیے لازمی ہے
 import '../core/quantum_intelligence_vs_strength.dart';
 
 class IntelligenceVsStrengthTest extends StatefulWidget {
