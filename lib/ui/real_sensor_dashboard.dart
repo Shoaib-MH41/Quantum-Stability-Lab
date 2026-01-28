@@ -11,7 +11,7 @@ class RealSensorDashboard extends StatefulWidget {
 class _RealSensorDashboardState
     extends State<RealSensorDashboard> {
 
-  // 1. تعداد 20 کر دی گئی ہے تاکہ ہارڈویئر کا بہتر امتحان ہو
+  // 1. تعداد 100 کر دی گئی ہے - اب آپ کا اصل چیلنج شروع ہوتا ہے
   static const int particleCount = 100;
 
   final List<RealQuantumParticle> particles =
@@ -21,7 +21,7 @@ class _RealSensorDashboardState
   bool isGPUMode = false;
   int attempts = 0;
 
-  String status = "موڈ منتخب کریں اور ٹیسٹ شروع کریں";
+  String status = "100 پارٹیکل ٹیسٹ تیار ہے";
   final Stopwatch stopwatch = Stopwatch();
   Timer? _timer;
 
@@ -38,8 +38,8 @@ class _RealSensorDashboardState
         ..start();
 
       status = isGPUMode
-          ? "GPU موڈ: Brute Force (بھاری حساب کتاب)"
-          : "NPU موڈ: Pattern Logic (تیز رفتار پیٹرن)";
+          ? "GPU موڈ: شدید بوجھ (Brute Force)"
+          : "NPU موڈ: متوازی پیٹرن (Pattern Logic)";
     });
 
     _timer = Timer.periodic(
@@ -53,7 +53,7 @@ class _RealSensorDashboardState
       attempts++;
       bool allStable = true;
 
-      // GPU تصدیق کے لیے بوجھ میں اضافہ (50k iterations)
+      // 100 پارٹیکلز کے ساتھ GPU پر دباؤ ڈالنے کے لیے بوجھ برقرار رکھا گیا ہے
       if (isGPUMode) {
         for (int i = 0; i < 50000; i++) {
           double x = i * 0.0001;
@@ -76,7 +76,7 @@ class _RealSensorDashboardState
         stopwatch.stop();
         isRunning = false;
         status =
-            "✅ استحکام حاصل!\nوقت: ${stopwatch.elapsed.inSeconds}s | کوششیں: $attempts";
+            "✅ 100 پارٹیکلز مستحکم!\nوقت: ${stopwatch.elapsed.inSeconds}s | کوششیں: $attempts";
       }
     });
   }
@@ -86,33 +86,29 @@ class _RealSensorDashboardState
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text("NPU vs GPU: 100 Particle Test"),
+        title: const Text("NPU vs GPU: 100 Particle Lab"),
         backgroundColor: Colors.indigo,
       ),
       body: Column(
         children: [
-          // موڈ سلیکٹر کارڈ
           _buildModeSelector(),
-
-          // میٹرکس بار
           _buildMetricsBar(),
 
-          // پارٹیکل گرڈ (20 پارٹیکلز کے لیے 4 کالم)
+          // 100 پارٹیکلز کے لیے 10 کالمز کا گرڈ
           Expanded(
             child: GridView.builder(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(5),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
-                childAspectRatio: 1.2,
-                mainAxisSpacing: 8,
-                crossAxisSpacing: 8,
+                crossAxisCount: 10, // 10 کالم تاکہ سب ایک اسکرین پر نظر آئیں
+                childAspectRatio: 1.0, 
+                mainAxisSpacing: 2,
+                crossAxisSpacing: 2,
               ),
               itemCount: particleCount,
-              itemBuilder: (_, i) => _buildParticleTile(particles[i]),
+              itemBuilder: (_, i) => _buildSmallParticleTile(particles[i]),
             ),
           ),
 
-          // کنٹرول ایریا
           _buildBottomPanel(),
         ],
       ),
@@ -122,9 +118,8 @@ class _RealSensorDashboardState
   Widget _buildModeSelector() {
     return SwitchListTile(
       tileColor: Colors.white10,
-      title: Text(isGPUMode ? "GPU: Heavy Load" : "NPU: Smart Pattern",
-          style: TextStyle(color: isGPUMode ? Colors.redAccent : Colors.blueAccent, fontWeight: FontWeight.bold)),
-      subtitle: const Text("موڈ بدلنے کے لیے سوئچ استعمال کریں", style: TextStyle(color: Colors.white54, fontSize: 10)),
+      title: Text(isGPUMode ? "GPU: Maximum Load" : "NPU: Parallel Pattern",
+          style: TextStyle(color: isGPUMode ? Colors.redAccent : Colors.blueAccent, fontWeight: FontWeight.bold, fontSize: 14)),
       value: isGPUMode,
       onChanged: isRunning ? null : (v) => setState(() => isGPUMode = v),
       activeColor: Colors.red,
@@ -133,14 +128,14 @@ class _RealSensorDashboardState
   }
 
   Widget _buildMetricsBar() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           _metricColumn("کوششیں", "$attempts"),
           _metricColumn("وقت", "${stopwatch.elapsed.inSeconds}s"),
-          _metricColumn("مستحکم ٹکس", "$stableFrames/$requiredStableFrames"),
+          _metricColumn("Stability", "$stableFrames/6"),
         ],
       ),
     );
@@ -149,23 +144,23 @@ class _RealSensorDashboardState
   Widget _metricColumn(String label, String value) {
     return Column(
       children: [
-        Text(label, style: const TextStyle(color: Colors.grey, fontSize: 12)),
-        Text(value, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+        Text(label, style: const TextStyle(color: Colors.grey, fontSize: 10)),
+        Text(value, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
       ],
     );
   }
 
-  Widget _buildParticleTile(RealQuantumParticle p) {
+  // 100 پارٹیکلز کے لیے چھوٹا ٹائل
+  Widget _buildSmallParticleTile(RealQuantumParticle p) {
     return Container(
       decoration: BoxDecoration(
-        color: p.isFullyStable ? Colors.green.withOpacity(0.8) : Colors.red.withOpacity(0.2),
-        border: Border.all(color: p.isFullyStable ? Colors.green : Colors.redAccent.withOpacity(0.5)),
-        borderRadius: BorderRadius.circular(8),
+        color: p.isFullyStable ? Colors.green : Colors.red.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(2),
       ),
       child: Center(
         child: Text(
-          p.currentTime.toStringAsFixed(1),
-          style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+          p.currentTime.toStringAsFixed(0), // جگہ بچانے کے لیے اعشاریہ ختم
+          style: const TextStyle(color: Colors.white, fontSize: 7, fontWeight: FontWeight.bold),
         ),
       ),
     );
@@ -173,23 +168,19 @@ class _RealSensorDashboardState
 
   Widget _buildBottomPanel() {
     return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(
-        color: Colors.white10,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      padding: const EdgeInsets.all(15),
+      decoration: const BoxDecoration(color: Colors.white10),
       child: Column(
         children: [
-          Text(status, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70, fontSize: 14)),
-          const SizedBox(height: 15),
+          Text(status, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+          const SizedBox(height: 10),
           ElevatedButton(
             onPressed: isRunning ? null : start,
             style: ElevatedButton.styleFrom(
               backgroundColor: isGPUMode ? Colors.red : Colors.blue,
-              minimumSize: const Size(double.infinity, 50),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              minimumSize: const Size(double.infinity, 45),
             ),
-            child: Text(isRunning ? "ٹیسٹ جاری ہے..." : "تجربہ شروع کریں", style: const TextStyle(fontSize: 16)),
+            child: Text(isRunning ? "پروسیسنگ جاری ہے..." : "100 پارٹیکل ٹیسٹ شروع کریں"),
           ),
         ],
       ),
