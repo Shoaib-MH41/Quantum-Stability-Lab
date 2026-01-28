@@ -11,8 +11,8 @@ class RealSensorDashboard extends StatefulWidget {
 class _RealSensorDashboardState
     extends State<RealSensorDashboard> {
 
-  // 1. تعداد 100 کر دی گئی ہے - اب آپ کا اصل چیلنج شروع ہوتا ہے
-  static const int particleCount = 100;
+  // 🚀 اب ہدف 2000 پارٹیکلز ہے!
+  static const int particleCount = 2000;
 
   final List<RealQuantumParticle> particles =
       List.generate(particleCount, (i) => RealQuantumParticle(i));
@@ -21,7 +21,7 @@ class _RealSensorDashboardState
   bool isGPUMode = false;
   int attempts = 0;
 
-  String status = "100 پارٹیکل ٹیسٹ تیار ہے";
+  String status = "2,000 پارٹیکل سپر ٹیسٹ تیار";
   final Stopwatch stopwatch = Stopwatch();
   Timer? _timer;
 
@@ -33,17 +33,15 @@ class _RealSensorDashboardState
       attempts = 0;
       stableFrames = 0;
       isRunning = true;
-      stopwatch
-        ..reset()
-        ..start();
+      stopwatch..reset()..start();
 
       status = isGPUMode
-          ? "GPU موڈ: شدید بوجھ (Brute Force)"
-          : "NPU موڈ: متوازی پیٹرن (Pattern Logic)";
+          ? "GPU: Extreme Stress (500k Load)"
+          : "NPU: Quantum Pattern Logic";
     });
 
     _timer = Timer.periodic(
-      const Duration(milliseconds: 80),
+      const Duration(milliseconds: 50), // رفتار مزید تیز کر دی گئی ہے
       (_) => _tick(),
     );
   }
@@ -53,9 +51,9 @@ class _RealSensorDashboardState
       attempts++;
       bool allStable = true;
 
-      // 100 پارٹیکلز کے ساتھ GPU پر دباؤ ڈالنے کے لیے بوجھ برقرار رکھا گیا ہے
+      // 🔥 GPU بوجھ کو 5 لاکھ کر دیا گیا ہے تاکہ 12GB RAM کا امتحان ہو سکے
       if (isGPUMode) {
-        for (int i = 0; i < 50000; i++) {
+        for (int i = 0; i < 500000; i++) {
           double x = i * 0.0001;
         }
       }
@@ -76,7 +74,7 @@ class _RealSensorDashboardState
         stopwatch.stop();
         isRunning = false;
         status =
-            "✅ 100 پارٹیکلز مستحکم!\nوقت: ${stopwatch.elapsed.inSeconds}s | کوششیں: $attempts";
+            "🏆 2000 پارٹیکلز مستحکم!\nوقت: ${stopwatch.elapsed.inSeconds}s | کوششیں: $attempts";
       }
     });
   }
@@ -86,26 +84,29 @@ class _RealSensorDashboardState
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text("NPU vs GPU: 100 Particle Lab"),
-        backgroundColor: Colors.indigo,
+        title: const Text("Quantum Stress Lab: 2000"),
+        backgroundColor: Colors.indigo[900],
       ),
       body: Column(
         children: [
           _buildModeSelector(),
           _buildMetricsBar(),
 
-          // 100 پارٹیکلز کے لیے 10 کالمز کا گرڈ
+          // 2,000 پارٹیکلز کے لیے نینو گرڈ (40 کالمز)
           Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.all(5),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 10, // 10 کالم تاکہ سب ایک اسکرین پر نظر آئیں
-                childAspectRatio: 1.0, 
-                mainAxisSpacing: 2,
-                crossAxisSpacing: 2,
+            child: Container(
+              padding: const EdgeInsets.all(2),
+              color: Colors.white.withOpacity(0.05),
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 40, // 40 کالمز تاکہ سب کچھ اسکرین پر آ جائے
+                  childAspectRatio: 1.0, 
+                  mainAxisSpacing: 1,
+                  crossAxisSpacing: 1,
+                ),
+                itemCount: particleCount,
+                itemBuilder: (_, i) => _buildNanoTile(particles[i]),
               ),
-              itemCount: particleCount,
-              itemBuilder: (_, i) => _buildSmallParticleTile(particles[i]),
             ),
           ),
 
@@ -118,8 +119,8 @@ class _RealSensorDashboardState
   Widget _buildModeSelector() {
     return SwitchListTile(
       tileColor: Colors.white10,
-      title: Text(isGPUMode ? "GPU: Maximum Load" : "NPU: Parallel Pattern",
-          style: TextStyle(color: isGPUMode ? Colors.redAccent : Colors.blueAccent, fontWeight: FontWeight.bold, fontSize: 14)),
+      title: Text(isGPUMode ? "GPU: Extreme Stress" : "NPU: Smart Pattern",
+          style: TextStyle(color: isGPUMode ? Colors.redAccent : Colors.blueAccent, fontWeight: FontWeight.bold, fontSize: 13)),
       value: isGPUMode,
       onChanged: isRunning ? null : (v) => setState(() => isGPUMode = v),
       activeColor: Colors.red,
@@ -129,13 +130,13 @@ class _RealSensorDashboardState
 
   Widget _buildMetricsBar() {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 15),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           _metricColumn("کوششیں", "$attempts"),
           _metricColumn("وقت", "${stopwatch.elapsed.inSeconds}s"),
-          _metricColumn("Stability", "$stableFrames/6"),
+          _metricColumn("Status", "$stableFrames/6 Stable"),
         ],
       ),
     );
@@ -145,42 +146,36 @@ class _RealSensorDashboardState
     return Column(
       children: [
         Text(label, style: const TextStyle(color: Colors.grey, fontSize: 10)),
-        Text(value, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+        Text(value, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
       ],
     );
   }
 
-  // 100 پارٹیکلز کے لیے چھوٹا ٹائل
-  Widget _buildSmallParticleTile(RealQuantumParticle p) {
+  // 2,000 پارٹیکلز کے لیے انتہائی چھوٹا ٹائل
+  Widget _buildNanoTile(RealQuantumParticle p) {
     return Container(
       decoration: BoxDecoration(
-        color: p.isFullyStable ? Colors.green : Colors.red.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(2),
-      ),
-      child: Center(
-        child: Text(
-          p.currentTime.toStringAsFixed(0), // جگہ بچانے کے لیے اعشاریہ ختم
-          style: const TextStyle(color: Colors.white, fontSize: 7, fontWeight: FontWeight.bold),
-        ),
+        color: p.isFullyStable ? Colors.green : Colors.red.withOpacity(0.4),
+        borderRadius: BorderRadius.circular(0.5),
       ),
     );
   }
 
   Widget _buildBottomPanel() {
     return Container(
-      padding: const EdgeInsets.all(15),
+      padding: const EdgeInsets.all(12),
       decoration: const BoxDecoration(color: Colors.white10),
       child: Column(
         children: [
-          Text(status, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70, fontSize: 12)),
-          const SizedBox(height: 10),
+          Text(status, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70, fontSize: 11)),
+          const SizedBox(height: 8),
           ElevatedButton(
             onPressed: isRunning ? null : start,
             style: ElevatedButton.styleFrom(
               backgroundColor: isGPUMode ? Colors.red : Colors.blue,
               minimumSize: const Size(double.infinity, 45),
             ),
-            child: Text(isRunning ? "پروسیسنگ جاری ہے..." : "100 پارٹیکل ٹیسٹ شروع کریں"),
+            child: Text(isRunning ? "انٹیلی جنس پروسیسنگ جاری..." : "2000 پارٹیکل ٹیسٹ شروع کریں"),
           ),
         ],
       ),
