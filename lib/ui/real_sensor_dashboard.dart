@@ -86,7 +86,7 @@ class _RealSensorDashboardState
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text("NPU vs GPU: 20 Particle Test"),
+        title: const Text("NPU vs GPU: 100 Particle Test"),
         backgroundColor: Colors.indigo,
       ),
       body: Column(
