@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'ui/dashboard.dart';
 import 'ui/experiment_history.dart';
-import 'ui/multi_quantum_dashboard.dart';
 import 'ui/real_sensor_dashboard.dart';
 import 'ui/intelligence_vs_strength_test.dart';
 import 'ui/philosophy_comparison.dart'; // Hybrid particle والی سکرین
