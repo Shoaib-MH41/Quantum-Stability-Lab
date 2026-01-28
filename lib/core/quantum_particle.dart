@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class QuantumParticle {
   final int id;
   double currentTime;
-  double targetTime = 35.0;
+  double targetTime = 30.0;
   int stableCount = 0;
   
   QuantumParticle(this.id) : currentTime = Random().nextDouble() * 50 + 10;
