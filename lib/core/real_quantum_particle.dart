@@ -12,7 +12,7 @@ class RealQuantumParticle {
   static List<RealQuantumParticle> allParticles = [];
 
   double currentTime;
-  final double targetTime = 20.0;
+  final double targetTime = 30.0;
   int stableCount = 0;
 
   bool get isStable => (currentTime - targetTime).abs() <= 1.5;
