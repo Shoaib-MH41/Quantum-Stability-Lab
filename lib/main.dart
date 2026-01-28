@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'ui/dashboard.dart';
-import 'ui/experiment_history.dart'; // اب یہ فائل موجود ہے
+import 'ui/experiment_history.dart';
+import 'ui/multi_quantum_dashboard.dart';
+import 'ui/real_sensor_dashboard.dart';
+import 'ui/intelligence_vs_strength_test.dart';
 
 void main() {
   runApp(QuantumStabilityLabApp());
@@ -14,11 +17,15 @@ class QuantumStabilityLabApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
+        useMaterial3: true,
       ),
       home: HomeScreen(),
       routes: {
+        '/dashboard': (context) => Dashboard(),
         '/simulation': (context) => MultiQuantumDashboard(),
         '/history': (context) => ExperimentHistory(),
+        '/sensor': (context) => RealSensorDashboard(),
+        '/intelligence': (context) => IntelligenceVsStrengthTest(),
       },
     );
   }
@@ -33,97 +40,222 @@ class HomeScreen extends StatelessWidget {
         backgroundColor: Colors.deepPurple,
         centerTitle: true,
       ),
-      body: Center(
+      body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.all(20.0),
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Header
+              Container(
+                margin: const EdgeInsets.only(top: 30, bottom: 40),
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.science,
+                      size: 80,
+                      color: Colors.deepPurple,
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      'Quantum Stability Lab',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.deepPurple,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      '35ms Fixation Law Experiments',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.deepPurple[700],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              // Experiment Cards Grid
+              GridView.count(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                crossAxisCount: 2,
+                childAspectRatio: 1.2,
+                mainAxisSpacing: 15,
+                crossAxisSpacing: 15,
+                children: [
+                  // Card 1: Basic Dashboard
+                  _buildExperimentCard(
+                    context: context,
+                    title: 'Basic Test',
+                    subtitle: 'Single Particle',
+                    icon: Icons.play_circle_fill,
+                    color: Colors.green,
+                    route: Dashboard(),
+                  ),
+                  
+                  // Card 2: 2000 Particles
+                  _buildExperimentCard(
+                    context: context,
+                    title: '2000 Particles',
+                    subtitle: 'Mass Simulation',
+                    icon: Icons.psychology,
+                    color: Colors.blue,
+                    route: MultiQuantumDashboard(),
+                  ),
+                  
+                  // Card 3: Real Sensor Test
+                  _buildExperimentCard(
+                    context: context,
+                    title: 'Real Sensors',
+                    subtitle: 'Mobile Sensors',
+                    icon: Icons.sensors,
+                    color: Colors.orange,
+                    route: RealSensorDashboard(),
+                  ),
+                  
+                  // Card 4: Intelligence vs Strength
+                  _buildExperimentCard(
+                    context: context,
+                    title: 'Strength 🆚 Intelligence',
+                    subtitle: 'GPU vs NPU',
+                    icon: Icons.bolt,
+                    color: Colors.purple,
+                    route: IntelligenceVsStrengthTest(),
+                  ),
+                  
+                  // Card 5: Experiment History
+                  _buildExperimentCard(
+                    context: context,
+                    title: 'History',
+                    subtitle: 'Past Experiments',
+                    icon: Icons.history,
+                    color: Colors.teal,
+                    route: ExperimentHistory(),
+                  ),
+                  
+                  // Card 6: Philosophy
+                  _buildExperimentCard(
+                    context: context,
+                    title: 'Philosophy',
+                    subtitle: 'Bohr vs Einstein',
+                    icon: Icons.lightbulb,
+                    color: Colors.deepOrange,
+                    route: Dashboard(), // یا philosophy screen
+                  ),
+                ],
+              ),
+              
+              const SizedBox(height: 40),
+              
+              // Footer
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.deepPurple[50],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      'Scientific Principles:',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.deepPurple,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      '• Quantum (Bohr) + Classical (Einstein) Hybrid\n'
+                      '• 35ms Fixation Law Application\n'
+                      '• Real-time Quantum Simulation\n'
+                      '• Strength vs Intelligence Analysis',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.deepPurple[800],
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              const SizedBox(height: 20),
+              
+              // Credits
+              Text(
+                '⚛️ بوہر + آئنسٹائن کا امتزاج ⚖️',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+  
+  Widget _buildExperimentCard({
+    required BuildContext context,
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color color,
+    required Widget route,
+  }) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => route),
+          );
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.all(16),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.science,
-                size: 80,
-                color: Colors.deepPurple,
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  icon,
+                  size: 30,
+                  color: color,
+                ),
               ),
-              SizedBox(height: 20),
-              
+              const SizedBox(height: 15),
               Text(
-                'Quantum Stability Lab',
+                title,
+                textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 24,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: Colors.deepPurple,
+                  color: color,
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 5),
               Text(
-                '35ms Fixation Law Experiment',
+                subtitle,
+                textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Colors.deepPurple,
-                ),
-              ),
-              
-              SizedBox(height: 40),
-              
-              // Simulation Button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/simulation');
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple,
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  child: Text('سیمیولیشن ٹیسٹ شروع کریں'),
-                ),
-              ),
-              
-              SizedBox(height: 20),
-              
-              // History Button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/history');
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  child: Text('تجرباتی تاریخ'),
-                ),
-              ),
-              
-              SizedBox(height: 30),
-              
-              // Info Card
-              Card(
-                color: Colors.deepPurple.withOpacity(0.1),
-                child: Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      Text(
-                        'Hybrid Quantum-Classical System',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.deepPurple,
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      Text(
-                        '• 10 Quantum Particles\n'
-                        '• 35ms Fixation Law\n'
-                        '• Real-time Simulation',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.deepPurple,
-                        ),
-                      ),
-                    ],
-                  ),
+                  fontSize: 12,
+                  color: Colors.grey[600],
                 ),
               ),
             ],
