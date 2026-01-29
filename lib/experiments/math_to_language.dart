@@ -1,5 +1,14 @@
+import 'cpu_translator.dart';
+
 class MathToLanguageConverter {
-  // عدد ←→ اردو الفاظ
+  final CPUTranslator cpuTranslator = CPUTranslator();
+  
+  String convert(num result, String originalQuestion) {
+    // CPU Translator استعمال کریں
+    return cpuTranslator.translateToUrdu(result);
+  }
+}
+
   final Map<String, String> numberWords = {
     '0': 'صفر', '1': 'ایک', '2': 'دو', '3': 'تین', '4': 'چار',
     '5': 'پانچ', '6': 'چھ', '7': 'سات', '8': 'آٹھ', '9': 'نو',
