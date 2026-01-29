@@ -1,3 +1,4 @@
+import 'dart:math';
 
 class AdvancedMathLaws {
   static final Map<String, Function> laws = {
