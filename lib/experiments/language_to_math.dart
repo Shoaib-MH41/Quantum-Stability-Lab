@@ -1,43 +1,29 @@
 class LanguageToMathConverter {
-  // اردو الفاظ ←→ ریاضی علامات
   final Map<String, String> dictionary = {
-    // اعداد
     'ایک': '1', 'دو': '2', 'تین': '3', 'چار': '4', 'پانچ': '5',
     'چھ': '6', 'سات': '7', 'آٹھ': '8', 'نو': '9', 'دس': '10',
-    
-    // عملیات
-    'جمع': '+', 'اور': '+', 'کا مجموعہ': '+',
-    'تفریق': '-', 'منفی': '-',
-    'ضرب': '*', 'کا حاصل ضرب': '*', 'دفعہ': '*',
-    'تقسیم': '/', 'بٹا': '/',
-    
-    // سوال کے الفاظ
-    'کیا ہے': '=', 'کتنے': '=', 'ہے': '=',
+    'جمع': '+', 'اور': '+', 'تفریق': '-', 'منفی': '-',
+    'ضرب': '*', 'دفعہ': '*', 'تقسیم': '/', 'بٹا': '/',
   };
   
-  // اردو سوال کو ریاضی ایکسپریشن میں بدلیں
   String convert(String urduQuestion) {
     String expression = urduQuestion;
     
-    // 1. تمام الفاظ کو ریاضی علامات میں بدلیں
+    // 1. ڈکشنری کے مطابق الفاظ بدلیں
     dictionary.forEach((urdu, math) {
-      expression = expression.replaceAll(urdu, math);
+      expression = expression.replaceAll(urdu, ' $math ');
     });
     
-    // 2. اضافی سپیس ہٹائیں
-    expression = expression.trim();
+    // 2. اہم ترین تبدیلی: نمبروں اور علامتوں کے علاوہ سب کچھ ہٹا دیں
+    // یہ ریگولر ایکسپریشن صرف 0-9 اور + - * / کو باقی رکھے گا
+    expression = expression.replaceAll(RegExp(r'[^0-9\+\-\*\/\.\s]'), '');
     
-    // 3. "=" شامل کریں اگر نہیں ہے
-    if (!expression.contains('=')) {
-      expression += ' =';
-    }
+    // 3. اضافی سپیس صاف کریں
+    expression = expression.trim().replaceAll(RegExp(r'\s+'), ' ');
     
-    print('✅ اردو → حساب: "$urduQuestion" → "$expression"');
+    print('✅ صاف شدہ حساب: "$expression"');
     return expression;
   }
-  
-  // ✅ درست: یہی کلاس کا نام استعمال کریں
-  static LanguageToMathConverter instance() {
-    return LanguageToMathConverter();
-  }
+
+  static LanguageToMathConverter instance() => LanguageToMathConverter();
 }
