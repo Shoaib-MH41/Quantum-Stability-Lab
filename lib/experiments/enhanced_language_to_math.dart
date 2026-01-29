@@ -9,33 +9,14 @@ class EnhancedLanguageToMath {
     'لاکھ': '*100000',
     'ہزار': '*1000',
     'سو': '*100',
-    
-    // ریاضیاتی اصطلاحات
-    'مربع': '^2',
-    'جذر': 'sqrt',
-    'فبونیکی': 'fib',
-    'پرائم نمبر': 'prime',
-    'سیریز': 'series',
-    
-    // منطقی اصطلاحات
-    'مصافحہ': 'handshake',
-    'افراد': 'people',
-    'زاویہ': 'angle',
-    'گھڑی': 'clock',
-    'آبادی': 'population',
-    'فیصد': '%',
-    
-    // کوانٹم اصطلاحات
-    'کوانٹم': 'quantum',
-    'بٹ': 'qubit',
-    'حالت': 'state',
   };
   
   static String convertAdvanced(String urduQuestion) {
     String result = urduQuestion;
     
     // پہلے بنیادی تبدیلی
-    result = LanguageToMathConverter().convert(result);
+    final converter = LanguageToMathConverter(); // ✅ درست
+    result = converter.convert(result);
     
     // پھر ایڈوانسڈ تبدیلی
     advancedDictionary.forEach((urdu, math) {
