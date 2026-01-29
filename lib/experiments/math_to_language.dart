@@ -1,8 +1,11 @@
 
+import 'cpu_translator.dart';
+
 class MathToLanguageConverter {
+  // ✅ CPUTranslator کا ابجیکٹ یہاں درست طریقے سے بنایا گیا ہے
   final CPUTranslator cpuTranslator = CPUTranslator();
 
-  // 1. نمبرز کی ڈکشنری (کلاس کے اندر ہونی چاہیے)
+  // 1. نمبرز کی ڈکشنری
   final Map<String, String> numberWords = {
     '0': 'صفر', '1': 'ایک', '2': 'دو', '3': 'تین', '4': 'چار',
     '5': 'پانچ', '6': 'چھ', '7': 'سات', '8': 'آٹھ', '9': 'نو',
@@ -21,11 +24,11 @@ class MathToLanguageConverter {
     if (numberWords.containsKey(resultInWords)) {
       resultInWords = numberWords[resultInWords]!;
     } else {
-      // اگر ہماری ڈکشنری میں نہیں ہے، تو CPU Translator کا استعمال کریں
+      // اگر ڈکشنری میں نہیں ہے، تو CPU Translator کا استعمال کریں
       resultInWords = cpuTranslator.translateToUrdu(result);
     }
     
-    // جواب کا جملہ بنانا (آپ کی لاجک کے مطابق)
+    // جواب کا جملہ بنانا (آپ کی لاجک اور فلسفے کے مطابق)
     String response = '';
     
     if (originalQuestion.contains('کیا ہے') || 
@@ -44,8 +47,8 @@ class MathToLanguageConverter {
   // 3. ٹیسٹ فنکشن
   void test() {
     print('🔤 ٹیسٹنگ شروع:');
-    print(convert(4, 'دو جمع دو کیا ہے'));    
-    print(convert(12, 'تین ضرب چار کتنے'));   
-    print(convert(5, 'دس تفریق پانچ ہے'));    
+    print(convert(4, 'دو جمع دو کیا ہے'));
+    print(convert(12, 'تین ضرب چار کتنے'));
+    print(convert(5, 'دس تفریق پانچ ہے'));
   }
-} // کلاس یہاں ختم ہو رہی ہے
+}
