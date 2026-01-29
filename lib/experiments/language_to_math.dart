@@ -1,27 +1,53 @@
 class LanguageToMathConverter {
-  final Map<String, String> dictionary = {
-    'ایک': '1', 'دو': '2', 'تین': '3', 'چار': '4', 'پانچ': '5',
-    'چھ': '6', 'سات': '7', 'آٹھ': '8', 'نو': '9', 'دس': '10',
-    'جمع': '+', 'اور': '+', 'تفریق': '-', 'منفی': '-',
-    'ضرب': '*', 'دفعہ': '*', 'تقسیم': '/', 'بٹا': '/',
+  static final Map<String, String> dictionary = {
+    'ایک': '1',
+    'دو': '2',
+    'تین': '3',
+    'چار': '4',
+    'پانچ': '5',
+    'چھ': '6',
+    'سات': '7',
+    'آٹھ': '8',
+    'نو': '9',
+    'دس': '10',
+
+    'جمع': '+',
+    'تفریق': '-',
+    'منفی': '-',
+    'ضرب': '*',
+    'دفعہ': '*',
+    'تقسیم': '/',
+    'بٹا': '/',
   };
-  
+
+  /// 🧠 اردو → ریاضی (CPU Logic)
   String convert(String urduQuestion) {
     String expression = urduQuestion;
-    
-    // 1. ڈکشنری کے مطابق الفاظ بدلیں
+
+    // 1️⃣ صرف پورے الفاظ بدلیں (safe replace)
     dictionary.forEach((urdu, math) {
-      expression = expression.replaceAll(urdu, ' $math ');
+      expression = expression.replaceAll(
+        RegExp(r'\b' + urdu + r'\b'),
+        ' $math ',
+      );
     });
-    
-    // 2. اہم ترین تبدیلی: نمبروں اور علامتوں کے علاوہ سب کچھ ہٹا دیں
-    // یہ ریگولر ایکسپریشن صرف 0-9 اور + - * / کو باقی رکھے گا
-    expression = expression.replaceAll(RegExp(r'[^0-9\+\-\*\/\.\s]'), '');
-    
-    // 3. اضافی سپیس صاف کریں
+
+    // 2️⃣ غیر ضروری حروف ہٹائیں
+    expression = expression.replaceAll(
+      RegExp(r'[^0-9\+\-\*\/\.\s]'),
+      '',
+    );
+
+    // 3️⃣ اسپیس normalize کریں
     expression = expression.trim().replaceAll(RegExp(r'\s+'), ' ');
-    
-    print('✅ صاف شدہ حساب: "$expression"');
+
+    // 4️⃣ اگر ایک سے زیادہ operators ہوں → CPU reject
+    final operators = RegExp(r'[\+\-\*\/]').allMatches(expression);
+    if (operators.length != 1) {
+      throw Exception('CPU: ایک وقت میں صرف ایک ریاضیاتی عمل ممکن ہے');
+    }
+
+    print('🧠 CPU → GPU ایکسپریشن: "$expression"');
     return expression;
   }
 
