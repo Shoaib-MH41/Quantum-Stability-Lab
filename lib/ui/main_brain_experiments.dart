@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import './brain_research/brain_keyboard_particle.dart';
-import './brain_research/brain_datacenter_particle.dart';
+import '../../brain_research/brain_keyboard_particle.dart';
+import '../../brain_research/brain_datacenter_particle.dart';
 
 void main() {
   runApp(BrainPhilosophyApp());
