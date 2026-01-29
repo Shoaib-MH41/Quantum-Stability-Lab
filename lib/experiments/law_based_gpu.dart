@@ -1,67 +1,57 @@
 class LawBasedGPUCalculator {
-  // GPU کو دیے جانے والے قوانین
+  // ⚡ GPU قوانین (Einstein Style: Fast & Strict)
   final Map<String, Function> laws = {
-    // بنیادی قوانین
-    '+': (List<num> nums) {
-      // جمع کا قانون: a + b
-      return nums.reduce((a, b) => a + b);
-    },
-    '-': (List<num> nums) {
-      // تفریق کا قانون: a - b
-      return nums.reduce((a, b) => a - b);
-    },
-    '*': (List<num> nums) {
-      // ضرب کا قانون: a × b
-      return nums.reduce((a, b) => a * b);
-    },
-    '/': (List<num> nums) {
-      // تقسیم کا قانون: a ÷ b
-      return nums.reduce((a, b) => a / b);
+    '+': (num a, num b) => a + b,
+    '-': (num a, num b) => a - b,
+    '*': (num a, num b) => a * b,
+    '/': (num a, num b) {
+      if (b == 0) {
+        throw Exception('تقسیم صفر سے ممکن نہیں');
+      }
+      return a / b;
     },
   };
-  
-  // ریاضی ایکسپریشن کو حل کریں
+
+  // 🧮 ریاضی حل کریں (GPU = brute force, no philosophy)
   num calculate(String expression) {
     print('🧮 GPU حساب شروع: $expression');
-    
+
     try {
-      // 1. ایکسپریشن کو حصوں میں تقسیم کریں
-      final parts = expression.split(' ');
-      
-      // 2. آپریشن ڈھونڈیں
-      String operation = '';
-      List<num> numbers = [];
-      
-      for (var part in parts) {
-        if (laws.containsKey(part)) {
-          operation = part;
-        } else if (double.tryParse(part) != null) {
-          numbers.add(double.parse(part));
-        }
+      final parts = expression.trim().split(RegExp(r'\s+'));
+
+      if (parts.length != 3) {
+        throw Exception('GPU صرف سادہ a op b سمجھتا ہے');
       }
-      
-      // 3. قانون لاگو کریں
-      if (operation.isNotEmpty && numbers.length >= 2) {
-        final law = laws[operation]!;
-        final result = law(numbers);
-        
-        print('✅ GPU نے حساب کیا: $expression = $result');
-        return result;
+
+      final num? a = num.tryParse(parts[0]);
+      final String op = parts[1];
+      final num? b = num.tryParse(parts[2]);
+
+      if (a == null || b == null || !laws.containsKey(op)) {
+        throw Exception('غلط ایکسپریشن');
       }
-      
-      throw Exception('غلط ایکسپریشن');
-      
+
+      final result = laws[op]!(a, b);
+
+      print('✅ GPU نتیجہ: $a $op $b = $result');
+      return result;
+
     } catch (e) {
-      print('❌ GPU حساب میں غلطی: $e');
+      print('❌ GPU ناکام: $e');
       return 0;
     }
   }
-  
-  // ٹیسٹ فنکشن
+
+  // 🔬 ٹیسٹ
   void test() {
-    print('⚡ قانونی GPU ٹیسٹ:');
-    print(calculate('2 + 2'));  // 4
-    print(calculate('3 * 4'));  // 12
-    print(calculate('10 - 5')); // 5
+    print('⚡ GPU Laws Test');
+    calculate('2 + 2');
+    calculate('10 - 5');
+    calculate('3 * 4');
+    calculate('8 / 2');
+
+    // Edge cases
+    calculate('8 / 0');     // protected
+    calculate('2 +');       // invalid
   }
 }
