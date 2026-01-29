@@ -1,5 +1,4 @@
-// lib/experiments/hybrid_law_system.dart
-
+// تمام اہم فائلوں کا امپورٹ
 import 'language_to_math.dart';
 import 'cpu_translator.dart';
 import 'law_based_gpu.dart';
@@ -10,108 +9,66 @@ import 'advanced_math_laws.dart';
 import 'quantum_logic.dart';
 
 class HybridLawSystem {
-  // -------------------- ماڈیولز --------------------
-
-  final CPUTranslator cpu = CPUTranslator();
-  final LawBasedGPUCalculator gpu = LawBasedGPUCalculator();
+  // ماڈیولز
+  final LanguageToMathConverter languageToMath = LanguageToMathConverter();
+  final LawBasedGPUCalculator gpuCalculator = LawBasedGPUCalculator();
   final MathToLanguageConverter mathToLanguage = MathToLanguageConverter();
-
-  // -------------------- مرکزی جواب --------------------
+  final CPUTranslator cpu = CPUTranslator(); // 🔑 اصل دماغ
 
   String answer(String urduQuestion) {
-    print('\n🎯 Hybrid Processing Start: "$urduQuestion"');
+    print('\n🧠 CPU نے سوال وصول کیا: "$urduQuestion"');
 
     try {
-      // 1️⃣ پہلے منطقی / فلسفیانہ پہیلی؟
-      final logic = LogicSolver.solvePuzzle(urduQuestion);
-      if (!logic.containsKey('error')) {
-        return _formatLogicResponse(logic);
+      // 1️⃣ CPU فیصلہ کرے: سوال کی نوعیت کیا ہے؟
+      final intent = cpu.detectIntent(urduQuestion);
+      print('🔍 CPU فیصلہ: $intent');
+
+      // 2️⃣ اگر پہیلی / فلسفہ / عمومی سوال
+      if (intent == CPUIntent.puzzle) {
+        final puzzle = LogicSolver.solvePuzzle(urduQuestion);
+        if (!puzzle.containsKey('error')) {
+          return puzzle['solution'];
+        }
       }
 
-      // 2️⃣ کوانٹم سوال؟
-      if (_isQuantumQuestion(urduQuestion)) {
-        final q = QuantumLogic.solveQuantumProblem(urduQuestion);
-        return _formatQuantumResponse(q);
+      // 3️⃣ اگر کوانٹم سوال ہے → NPU / Bohr logic
+      if (intent == CPUIntent.quantum) {
+        final quantumResult = QuantumLogic.process(urduQuestion);
+        if (quantumResult != null && quantumResult.isNotEmpty) {
+          return quantumResult;
+        }
       }
 
-      // 3️⃣ ریاضیاتی سوال → Language → Math
-      final mathExpression =
-          EnhancedLanguageToMath.convertAdvanced(urduQuestion);
+      // 4️⃣ اگر ریاضی ہے → GPU / Einstein logic
+      if (intent == CPUIntent.math) {
+        final mathExpression =
+            EnhancedLanguageToMath.convertAdvanced(urduQuestion);
 
-      if (mathExpression == null || mathExpression.toString().isEmpty) {
-        return '❓ سوال واضح نہیں، مزید وضاحت کریں۔';
+        final mathResult = gpuCalculator.calculate(mathExpression);
+
+        // ⚠️ اگر نتیجہ null یا خالی ہو تو سوال واپس مت دو
+        if (mathResult == null) {
+          return '❌ حساب مکمل نہیں ہو سکا';
+        }
+
+        return mathToLanguage.convert(mathResult, urduQuestion);
       }
 
-      // 4️⃣ GPU (Einstein) حساب
-      final mathResult = gpu.calculate(mathExpression);
-
-      // 5️⃣ CPU → اردو + معنی
-      return cpu.translateToUrdu(mathResult);
+      // 5️⃣ fallback (اگر CPU کنفیوز ہو)
+      return '🤔 سوال سمجھ میں نہیں آیا، دوبارہ پوچھیں';
 
     } catch (e) {
-      return '❌ نظام میں رکاوٹ: $e';
+      return '❌ نظام میں خرابی: $e';
     }
   }
 
-  // -------------------- Helper Methods --------------------
-
-  bool _isQuantumQuestion(String q) {
-    return q.contains('کوانٹم') ||
-        q.contains('سپر پوزیشن') ||
-        q.contains('اینٹینگلمنٹ') ||
-        q.contains('کوانٹم بٹ') ||
-        q.contains('حالت');
-  }
-
-  String _formatLogicResponse(Map<String, dynamic> logic) {
-    final buffer = StringBuffer();
-
-    if (logic.containsKey('solution')) {
-      buffer.writeln('🧠 منطقی جواب:');
-      buffer.writeln(logic['solution']);
-    }
-
-    if (logic.containsKey('explanation')) {
-      buffer.writeln('\n📘 وضاحت:');
-      buffer.writeln(logic['explanation']);
-    }
-
-    if (logic.containsKey('npu_status')) {
-      buffer.writeln('\n⚙️ نظام: ${logic['npu_status']}');
-    }
-
-    return buffer.toString().trim();
-  }
-
-  String _formatQuantumResponse(Map<String, dynamic> q) {
-    final buffer = StringBuffer('⚛️ کوانٹم جواب:\n');
-
-    if (q.containsKey('solution')) {
-      buffer.writeln(q['solution']);
-    }
-
-    if (q.containsKey('explanation')) {
-      buffer.writeln('\n📘 وضاحت:');
-      buffer.writeln(q['explanation']);
-    }
-
-    return buffer.toString().trim();
-  }
-
-  // -------------------- ٹیسٹ --------------------
-
+  // ٹیسٹنگ
   void test() {
-    print('🧪 Hybrid System Tests:\n');
+    print('🧪 Hybrid System Test شروع');
 
     print(answer('دو جمع دو'));
-    print('----------------');
-
-    print(answer('تین کوانٹم بٹس میں کتنی حالتیں ہیں'));
-    print('----------------');
-
-    print(answer('کائنات کا راز کیا ہے'));
-    print('----------------');
-
     print(answer('پانچ لاکھ ضرب دو'));
+    print(answer('کائنات کا راز کیا ہے'));
+    print(answer('سپر پوزیشن کیا ہے'));
   }
 }
