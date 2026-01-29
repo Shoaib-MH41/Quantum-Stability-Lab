@@ -1,4 +1,3 @@
-import 'cpu_translator.dart';
 
 class MathToLanguageConverter {
   final CPUTranslator cpuTranslator = CPUTranslator();
