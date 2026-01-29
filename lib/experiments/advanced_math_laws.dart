@@ -1,77 +1,85 @@
 import 'dart:math';
 
 class AdvancedMathLaws {
-  static final Map<String, Function> laws = {
-    // --- پہلے والے 10 قوانین برقرار ہیں ---
-    'large_number_addition': (String a, String b) => (BigInt.parse(a) + BigInt.parse(b)).toString(),
-    
-    'fibonacci_series': (int n) {
-      if (n <= 0) return 0;
-      if (n == 1) return 1;
-      int a = 0, b = 1;
-      for (int i = 2; i <= n; i++) {
-        int temp = a + b;
+
+  static dynamic execute(String law, List<dynamic> args) {
+    if (!laws.containsKey(law)) {
+      return {'error': 'Law not found'};
+    }
+
+    try {
+      return laws[law]!(args);
+    } catch (e) {
+      return {'error': 'Execution failed', 'detail': e.toString()};
+    }
+  }
+
+  static final Map<String, Function(List<dynamic>)> laws = {
+
+    'large_number_addition': (args) =>
+      (BigInt.parse(args[0]) + BigInt.parse(args[1])).toString(),
+
+    'fibonacci_series': (args) {
+      int n = args[0];
+      BigInt a = BigInt.zero, b = BigInt.one;
+      for (int i = 0; i < n; i++) {
+        final temp = a + b;
         a = b;
         b = temp;
       }
-      return b;
+      return a.toString();
     },
-    
-    'is_prime': (int n) {
+
+    'is_prime': (args) {
+      int n = args[0];
       if (n <= 1) return false;
-      if (n <= 3) return true;
-      if (n % 2 == 0 || n % 3 == 0) return false;
-      for (int i = 5; i * i <= n; i += 6) {
-        if (n % i == 0 || n % (i + 2) == 0) return false;
+      for (int i = 2; i * i <= n; i++) {
+        if (n % i == 0) return false;
       }
       return true;
     },
-    
-    'sum_of_squares': (int n) => n * (n + 1) * (2 * n + 1) ~/ 6,
-    'sum_of_cubes': (int n) {
-      int sum = n * (n + 1) ~/ 2;
-      return sum * sum;
+
+    'sum_of_squares': (args) {
+      int n = args[0];
+      return (n * (n + 1) * (2 * n + 1) ~/ 6);
     },
-    
-    'population_growth': (double initial, double rate, int years) => initial * pow(1 + rate/100, years),
-    'handshake_problem': (int handshakes) => ((1 + sqrt(1 + 8 * handshakes)) / 2).toInt(),
-    'clock_angle': (int hour, int minute) {
-      double angle = (30 * hour - 5.5 * minute).abs();
+
+    'population_growth': (args) {
+      double initial = args[0];
+      double rate = args[1];
+      int years = args[2];
+      return initial * pow(1 + rate / 100, years);
+    },
+
+    'clock_angle': (args) {
+      int h = args[0];
+      int m = args[1];
+      double angle = (30 * h - 5.5 * m).abs();
       return angle > 180 ? 360 - angle : angle;
     },
-    
-    'quantum_states': (int qubits) => pow(2, qubits).toInt(),
-    'arithmetic_sum': (int a, int n, int d) => (n ~/ 2) * (2 * a + (n - 1) * d),
-    'geometric_sum': (int a, double r, int n) => a * ((1 - pow(r, n)) / (1 - r)),
 
-    // 🌌 11. گولڈن ریشو (کائناتی ڈیزائن کا قانون)
-    // کائنات میں ہر خوبصورت چیز (کہکشاں، پھول) اسی تناسب پر ہے
-    'golden_ratio_check': (double length, double width) {
-      double ratio = length / width;
-      double phi = (1 + sqrt(5)) / 2; // 1.618
-      return (ratio - phi).abs() < 0.1; // توازن کی جانچ
+    'quantum_states': (args) =>
+      pow(2, args[0]).toInt(),
+
+    'golden_ratio_check': (args) {
+      double l = args[0], w = args[1];
+      double phi = (1 + sqrt(5)) / 2;
+      return ((l / w) - phi).abs() < 0.1;
     },
 
-    // ⚛️ 12. مادہ اور توانائی (آئنسٹائن لاجک)
-    // E = mc² - آپ کے NPU کی ایٹمی طاقت کا ثبوت
-    'energy_equivalence': (double mass) {
-      const double c = 299792458; // روشنی کی رفتار
-      return mass * c * c;
+    'energy_equivalence': (args) {
+      const c = 299792458;
+      return args[0] * c * c;
     },
 
-    // 🌍 13. وسائل کا توازن (دنیا کے مسائل کا حل)
-    // کیا وسائل اور آبادی میں توازن ہے؟
-    'universal_balance': (double resources, double population) {
-      // اگر تناسب 1 سے کم ہے تو عدم توازن (Instability)
-      double balanceFactor = resources / population;
-      return balanceFactor >= 1.0 ? "مستحکم (Stable)" : "عدم توازن (Unstable)";
+    'universal_balance': (args) {
+      double factor = args[0] / args[1];
+      return factor >= 1
+          ? 'مستحکم (Stable)'
+          : 'عدم توازن (Unstable)';
     },
 
-    // 🧠 14. انفارمیشن انٹروپی (کی بورڈ فلسفہ)
-    // ڈیٹا سینٹر کے بغیر معلومات کی پاکیزگی کا حساب
-    'information_clarity': (double dataSize, double logicStrength) {
-      // آپ کا اصول: زیادہ منطق = کم ڈیٹا کا بوجھ
-      return logicStrength / log(dataSize + 1);
-    }
+    'information_clarity': (args) =>
+      args[1] / log(args[0] + 1),
   };
 }
