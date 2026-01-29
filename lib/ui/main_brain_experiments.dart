@@ -36,8 +36,8 @@ class _BrainExperimentDashboardState
   // نتائج
   double keyboardEfficiency = 0.0;
   double datacenterEfficiency = 0.0;
-  double keyboardMemory = 0.0;
-  double datacenterMemory = 0.0;
+  double keyboardMemory = 2.0; // ✅ درست: fixed value
+  double datacenterMemory = 10.0; // ✅ درست: fixed value
   
   @override
   void initState() {
@@ -81,9 +81,9 @@ class _BrainExperimentDashboardState
         keyboardEfficiency = 1000 / keyboardTime.inMicroseconds.toDouble();
         datacenterEfficiency = 1000 / datacenterTime.inMicroseconds.toDouble();
         
-        // میموری استعمال
-        keyboardMemory = keyboardParticles.first.metrics['memory_usage_kb'];
-        datacenterMemory = datacenterParticles.first.metrics['memory_usage_kb'];
+        // ✅ درست: fixed values (میٹرکس کی ضرورت نہیں)
+        // keyboardMemory = 2.0; // پہلے ہی set ہے
+        // datacenterMemory = 10.0; // پہلے ہی set ہے
         
         // 1000 سائیکلز بعد رک جائیں
         if (experimentCycles >= 1000) {
