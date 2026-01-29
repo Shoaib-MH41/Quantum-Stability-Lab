@@ -1,46 +1,52 @@
-class LanguageToMathConverter {
-  // اردو الفاظ ←→ ریاضی علامات
-  final Map<String, String> dictionary = {
-    // اعداد
-    'ایک': '1', 'دو': '2', 'تین': '3', 'چار': '4', 'پانچ': '5',
-    'چھ': '6', 'سات': '7', 'آٹھ': '8', 'نو': '9', 'دس': '10',
+class EnhancedLanguageToMath {
+  // نئے الفاظ شامل کریں
+  
+  static final Map<String, String> advancedDictionary = {
+    // بڑے اعداد
+    'کروڑ': '*10000000',
+    'لاکھ': '*100000',
+    'ہزار': '*1000',
+    'سو': '*100',
     
-    // عملیات
-    'جمع': '+', 'اور': '+', 'کا مجموعہ': '+',
-    'تفریق': '-', 'منفی': '-',
-    'ضرب': '*', 'کا حاصل ضرب': '*', 'دفعہ': '*',
-    'تقسیم': '/', 'بٹا': '/',
+    // ریاضیاتی اصطلاحات
+    'مربع': '²',
+    'جذر': '√',
+    'فبونیکی': 'fib',
+    'پرائم نمبر': 'prime',
+    'سیریز': 'series',
     
-    // سوال کے الفاظ
-    'کیا ہے': '=', 'کتنے': '=', 'ہے': '=',
+    // منطقی اصطلاحات
+    'مصافحہ': 'handshake',
+    'افراد': 'people',
+    'زاویہ': 'angle',
+    'گھڑی': 'clock',
+    'آبادی': 'population',
+    'فیصد': '%',
+    
+    // کوانٹم اصطلاحات
+    'کوانٹم': 'quantum',
+    'بٹ': 'qubit',
+    'حالت': 'state',
   };
   
-  // اردو سوال کو ریاضی ایکسپریشن میں بدلیں
-  String convert(String urduQuestion) {
-    String expression = urduQuestion;
+  static String convertAdvanced(String urduQuestion) {
+    String result = urduQuestion;
     
-    // 1. تمام الفاظ کو ریاضی علامات میں بدلیں
-    dictionary.forEach((urdu, math) {
-      expression = expression.replaceAll(urdu, math);
+    // پہلے بنیادی تبدیلی
+    result = LanguageToMathConverter().convert(result);
+    
+    // پھر ایڈوانسڈ تبدیلی
+    advancedDictionary.forEach((urdu, math) {
+      result = result.replaceAll(urdu, math);
     });
     
-    // 2. اضافی سپیس ہٹائیں
-    expression = expression.trim();
-    
-    // 3. "=" شامل کریں اگر نہیں ہے
-    if (!expression.contains('=')) {
-      expression += ' =';
+    // منطقی مسائل کی شناخت
+    if (result.contains('handshake') || 
+        result.contains('angle') || 
+        result.contains('population')) {
+      return 'LOGIC:' + result;
     }
     
-    print('✅ اردو → حساب: "$urduQuestion" → "$expression"');
-    return expression;
-  }
-  
-  // ٹیسٹ فنکشن
-  void test() {
-    print('🧪 زبان → حساب ٹیسٹ:');
-    print(convert('دو جمع دو کیا ہے'));     // "2 + 2 ="
-    print(convert('تین ضرب چار کتنے'));     // "3 * 4 ="
-    print(convert('دس تفریق پانچ ہے'));     // "10 - 5 ="
+    return result;
   }
 }
