@@ -1,5 +1,6 @@
 // تمام اہم فائلوں کا امپورٹ
 import 'language_to_math.dart';
+import 'cpu_translator.dart';
 import 'law_based_gpu.dart';
 import 'math_to_language.dart';
 import 'logic_solver.dart'; // پہیلیوں کے لیے
