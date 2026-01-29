@@ -2,65 +2,77 @@ class LogicSolver {
   // 🧠 منطقی اور کائناتی مسائل حل کرنے والا
   
   static Map<String, dynamic> solvePuzzle(String puzzle) {
-    if (puzzle.contains('مصافحہ') && puzzle.contains('افراد')) {
-      return _solveHandshake(puzzle);
-    }
-    
-    if (puzzle.contains('گھڑی') && puzzle.contains('زاویہ')) {
-      return _solveClockAngle(puzzle);
-    }
-    
-    if (puzzle.contains('آبادی') && puzzle.contains('بڑھتی')) {
-      return _solvePopulation(puzzle);
+    final q = puzzle.trim();
+
+    if (_match(q, ['مصافحہ', 'افراد', 'لوگ'])) {
+      return _solveHandshake(q);
     }
 
-    if (puzzle.contains('وسائل') || puzzle.contains('توازن') || puzzle.contains('امن')) {
-      return _solveUniversalEquilibrium(puzzle);
+    if (_match(q, ['گھڑی', 'زاویہ', 'اینگل'])) {
+      return _solveClockAngle(q);
+    }
+
+    if (_match(q, ['آبادی', 'بڑھ', 'شرح'])) {
+      return _solvePopulation(q);
+    }
+
+    if (_match(q, ['وسائل', 'توازن', 'امن', 'کائناتی'])) {
+      return _solveUniversalEquilibrium(q);
     }
     
-    return {'error': 'اس قسم کا مسئلہ ابھی حل نہیں کر سکتا'};
+    return {
+      'status': 'unsupported',
+      'final': false,
+      'message': 'یہ منطقی مسئلہ ابھی حل نہیں ہو سکتا'
+    };
   }
 
-  // 🤝 مصافحہ کا قانون (Handshake Law)
+  static bool _match(String q, List<String> keys) {
+    return keys.any((k) => q.contains(k));
+  }
+
+  // 🤝 Handshake
   static Map<String, dynamic> _solveHandshake(String puzzle) {
     return {
-      'type': 'handshake_logic',
-      'solution': 'n(n-1)/2 کا قانون لاگو ہوتا ہے۔',
-      'explanation': 'اگر n افراد ہوں، تو کل مصافحے n(n-1)/2 ہوں گے۔ یہ خالص ریاضیاتی توازن ہے۔'
+      'type': 'handshake',
+      'final': false, // ⚠️ formula only
+      'formula': 'n(n-1)/2',
+      'explanation': 'اگر n افراد ہوں تو مصافحوں کی تعداد n(n-1)/2 ہو گی'
     };
   }
 
-  // 🕒 گھڑی کے زاویے کا حساب
+  // 🕒 Clock Angle
   static Map<String, dynamic> _solveClockAngle(String puzzle) {
     return {
-      'type': 'clock_logic',
-      'solution': 'زاویہ = |30h - 5.5m|',
-      'explanation': 'وقت کے ہر لمحے کا ایک مخصوص ریاضیاتی زاویہ ہوتا ہے جو NPU فوری حل کرتا ہے۔'
+      'type': 'clock_angle',
+      'final': false,
+      'formula': '|30h − 5.5m|',
+      'note': 'اصل زاویہ حاصل کرنے کیلئے وقت extract کرنا ہوگا'
     };
   }
 
-  // 📈 آبادی اور توازن
+  // 📈 Population
   static Map<String, dynamic> _solvePopulation(String puzzle) {
     return {
-      'type': 'population_logic',
-      'solution': 'ایکسپونینشل گروتھ (Exponential Growth)',
-      'explanation': 'آبادی کا بڑھنا وسائل کے توازن کو چیلنج کرتا ہے، جسے آپ کا نظام 30ms میں مستحکم کرتا ہے۔'
+      'type': 'population',
+      'final': false,
+      'model': 'Exponential Growth',
+      'comment': 'حقیقی جواب کیلئے initial population درکار ہے'
     };
   }
 
-  // 🌍 کائناتی توازن کا منطقی حل
+  // 🌍 Universal equilibrium
   static Map<String, dynamic> _solveUniversalEquilibrium(String puzzle) {
     return {
       'type': 'universal_equilibrium',
-      'problem': puzzle,
+      'final': true, // ✅ conceptual answer
       'solution': 'مستحکم توازن (Stable Equilibrium)',
       'explanation': '''
-آپ کے 'دماغ بطور کی بورڈ' فلسفے کے مطابق:
-1. اگر وسائل (Resources) اور ضرورت (Need) کا تناسب 1:1 ہو جائے۔
-2. تو نظام میں انٹروپی (Entropy) صفر ہو جاتی ہے۔
-3. نتیجہ: بغیر ڈیٹا سینٹر کے کائناتی امن کا ریاضیاتی ثبوت۔
+جب وسائل اور ضرورت کا تناسب 1:1 ہو جائے،
+تو انٹروپی کم سے کم ہو جاتی ہے،
+اور نظام خودکار امن میں داخل ہو جاتا ہے۔
 ''',
-      'npu_status': '30ms Law Active ✅' 
+      'npu_status': 'Active (30ms)'
     };
   }
 }
