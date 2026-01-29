@@ -1,88 +1,123 @@
 // lib/experiments/cpu_translator.dart
+
 class CPUTranslator {
-  // نمبروں کو اردو الفاظ میں بدلنے کی ڈکشنری
+  // -------------------- اردو عدد --------------------
+
   static final Map<int, String> numberToUrdu = {
-    0: 'صفر', 1: 'ایک', 2: 'دو', 3: 'تین', 4: 'چار', 5: 'پانچ',
-    6: 'چھ', 7: 'سات', 8: 'آٹھ', 9: 'نو', 10: 'دس',
-    11: 'گیارہ', 12: 'بارہ', 13: 'تیرہ', 14: 'چودہ', 15: 'پندرہ',
-    16: 'سولہ', 17: 'سترہ', 18: 'اٹھارہ', 19: 'انیس', 20: 'بیس',
-    24: 'چوبیس', 30: 'تیس', 40: 'چالیس', 50: 'پچاس', 60: 'ساٹھ',
-    70: 'ستر', 80: 'اسی', 90: 'نوے', 100: 'سو', 1000: 'ہزار',
-    100000: 'لاکھ', 10000000: 'کروڑ'
+    0: 'صفر',
+    1: 'ایک',
+    2: 'دو',
+    3: 'تین',
+    4: 'چار',
+    5: 'پانچ',
+    6: 'چھ',
+    7: 'سات',
+    8: 'آٹھ',
+    9: 'نو',
+    10: 'دس',
+    11: 'گیارہ',
+    12: 'بارہ',
+    13: 'تیرہ',
+    14: 'چودہ',
+    15: 'پندرہ',
+    16: 'سولہ',
+    17: 'سترہ',
+    18: 'اٹھارہ',
+    19: 'انیس',
+    20: 'بیس',
+    30: 'تیس',
+    40: 'چالیس',
+    50: 'پچاس',
+    60: 'ساٹھ',
+    70: 'ستر',
+    80: 'اسی',
+    90: 'نوے',
+    100: 'سو',
+    1000: 'ہزار',
+    100000: 'لاکھ',
+    10000000: 'کروڑ',
   };
 
-  // کائناتی نتائج کے لیے "فلسفیانہ میپنگ"
-  static final Map<double, String> cosmicMeanings = {
-    1.618: 'کائنات ایک عظیم توازن (Golden Ratio) پر قائم ہے۔',
-    3.14159: 'کائنات کی بنیادی ساخت (π)',
-    2.71828: 'قدرتی ترقی کا بنیادی تناسب (e)',
-    0.0: 'نظام مکمل طور پر ساکن اور مستحکم ہے۔',
-    30.0: 'تثبیت کا قانون (Law of Fixation) لاگو ہو چکا ہے۔',
-    35.0: 'پانچویں قانون (35ms Law) فعال ہے۔',
-    100.0: 'مکمل استحکام حاصل ہو چکا ہے۔',
-  };
+  // -------------------- اردو عدد بنانا --------------------
 
-  // نمبر کو اردو میں بدلیں
   String translateNumberToUrdu(int number) {
     if (numberToUrdu.containsKey(number)) {
       return numberToUrdu[number]!;
     }
-    
-    // مرکب نمبر بنائیں
+
     if (number < 100) {
       final tens = (number ~/ 10) * 10;
       final ones = number % 10;
-      
-      if (tens > 0 && ones > 0) {
-        return '${numberToUrdu[tens]!} ${numberToUrdu[ones]!}';
-      }
+      return ones == 0
+          ? numberToUrdu[tens]!
+          : '${numberToUrdu[tens]!} ${numberToUrdu[ones]!}';
     }
-    
-    return number.toString();
+
+    if (number < 1000) {
+      final hundreds = number ~/ 100;
+      final rest = number % 100;
+      final h = hundreds == 1
+          ? 'سو'
+          : '${numberToUrdu[hundreds]!} سو';
+      return rest == 0 ? h : '$h ${translateNumberToUrdu(rest)}';
+    }
+
+    return number.toString(); // fallback
   }
 
-  // کائناتی معنی ڈھونڈیں
+  // -------------------- کائناتی معنی --------------------
+
   String findCosmicMeaning(double value) {
-    // قریب ترین کائناتی قدر
-    for (var cosmicValue in cosmicMeanings.keys) {
-      if ((value - cosmicValue).abs() < 0.01) {
-        return cosmicMeanings[cosmicValue]!;
-      }
+    if (_near(value, 1.618, 0.01)) {
+      return 'کائنات عظیم توازن (Golden Ratio) پر قائم ہے۔';
     }
-    
-    // فلسفیانہ تشریح
-    if (value == 0) return 'عدم (صفر) - ہر شے خاموش';
-    if (value == 1) return 'وحدانیت - ہر شے ایک';
-    if (value > 1000) return 'وسعت - لامحدود کائنات';
-    
+    if (_near(value, 3.14159, 0.001)) {
+      return 'کائناتی ساخت کا بنیادی مستقل (π)';
+    }
+    if (_near(value, 2.71828, 0.001)) {
+      return 'قدرتی ترقی کا قانون (e)';
+    }
+    if (_near(value, 30.0, 0.5)) {
+      return 'تثبیت کا قانون (30ms Law) فعال ہے۔';
+    }
+    if (_near(value, 35.0, 0.5)) {
+      return 'پانچواں قانون (35ms Law) فعال ہے۔';
+    }
+
+    if (value == 0) return 'عدم — ہر شے خاموش';
+    if (value == 1) return 'وحدانیت — سب ایک';
+
     return 'حسابی نتیجہ: $value';
   }
 
-  // عمومی ترجمہ
-  String translateToUrdu(dynamic result) {
-    // اگر نتیجہ کائناتی مستقل ہے
-    if (result is double) {
-      final meaning = findCosmicMeaning(result);
-      if (meaning != 'حسابی نتیجہ: $result') {
-        return meaning;
-      }
-    }
-
-    // اگر نتیجہ سادہ عدد ہے
-    if (result is int) {
-      final urduNumber = translateNumberToUrdu(result);
-      return 'جواب ہے: $urduNumber';
-    }
-
-    // ڈیفالٹ
-    return 'حسابی نتیجہ: $result';
+  bool _near(double a, double b, double tolerance) {
+    return (a - b).abs() <= tolerance;
   }
-  
-  // ریورس: اردو ←→ نمبر
+
+  // -------------------- عمومی ترجمہ --------------------
+
+  String translateToUrdu(dynamic result) {
+    if (result == null) {
+      return 'کوئی نتیجہ حاصل نہیں ہوا';
+    }
+
+    if (result is int) {
+      return 'جواب ہے: ${translateNumberToUrdu(result)}';
+    }
+
+    if (result is double) {
+      return findCosmicMeaning(result);
+    }
+
+    return 'نتیجہ: $result';
+  }
+
+  // -------------------- ریورس میپ --------------------
+
   int? translateUrduToNumber(String urduWord) {
-    for (var entry in numberToUrdu.entries) {
-      if (entry.value == urduWord) {
-        return entry.key;
+    for (final e in numberToUrdu.entries) {
+      if (e.value == urduWord.trim()) {
+        return e.key;
       }
     }
     return null;
