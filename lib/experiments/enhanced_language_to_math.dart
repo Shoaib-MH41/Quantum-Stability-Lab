@@ -1,4 +1,3 @@
-import 'language_to_math.dart';
 
 class EnhancedLanguageToMath {
   // نئے الفاظ شامل کریں
