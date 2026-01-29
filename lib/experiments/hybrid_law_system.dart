@@ -1,15 +1,18 @@
-import 'advanced_math_laws.dart';
-import 'logic_solver.dart';
-import 'enhanced_language_to_math.dart';
+import 'language_to_math.dart';
+import 'law_based_gpu.dart';
+import 'math_to_language.dart';
 
-class SuperHybridSystem {
-  final EnhancedLanguageToMath languageConverter = EnhancedLanguageToMath();
-  final LogicSolver logicSolver = LogicSolver();
+class HybridLawSystem {
+  // سادہ ورژن (جو کام کر رہا تھا)
+  final LanguageToMathConverter languageToMath = LanguageToMathConverter();
+  final LawBasedGPUCalculator gpuCalculator = LawBasedGPUCalculator();
+  final MathToLanguageConverter mathToLanguage = MathToLanguageConverter();
   
-  String answerSuperQuestion(String urduQuestion) {
-    print('\n🚀 سپر کمپیوٹر ٹیسٹ: "$urduQuestion"');
-    
-    // 1. منطقی مسئلہ کی شناخت
+  String answer(String urduQuestion) {
+    // موجودہ کوڈ
+  }
+}
+// 1. منطقی مسئلہ کی شناخت
     if (_isLogicProblem(urduQuestion)) {
       return _solveLogicProblem(urduQuestion);
     }
