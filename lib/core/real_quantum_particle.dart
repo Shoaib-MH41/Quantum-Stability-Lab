@@ -1,25 +1,25 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:sensors_plus/sensors_plus.dart';
+import 'package:sensors_plus/sensors_plus.dart'; // موبائل سینسرز کے لیے
 
 class RealQuantumParticle {
   final int id;
   
-  // سوئچ: NPU vs GPU
+  // سوئچ: NPU (Cluster Logic) بمقابلہ GPU (Individual)
   static bool useClusterLogic = false;
   
-  // تمام پارٹیکلز کی لسٹ
+  // تمام پارٹیکلز کی لسٹ (اجتماعی مشاہدے کے لیے)
   static List<RealQuantumParticle> allParticles = [];
 
   double currentTime;
-  final double targetTime = 30.0;
+  final double targetTime = 30.0; // آپ کا 30ms کا قانون
   int stableCount = 0;
 
   bool get isStable => (currentTime - targetTime).abs() <= 1.5;
   bool get isFullyStable => stableCount >= 3;
 
-  double environmentalNoise = 0.0;
-  double quantumRandomness = 0.0;
+  double environmentalNoise = 0.0; // بیرونی شور (موبائل کی حرکت)
+  double quantumRandomness = 0.0; // کوانٹم رینڈم لہریں
 
   StreamSubscription? _sensorSub;
   Timer? _randomTimer;
@@ -33,12 +33,15 @@ class RealQuantumParticle {
     }
   }
 
+  // سینسرز کو متحرک کرنا (ٹرین یا کار کے حادثے کا ڈیٹا یہاں سے شروع ہوتا ہے)
   void _initializeSensors() {
     try {
       _sensorSub = accelerometerEvents.listen((AccelerometerEvent e) {
+        // موبائل کو ہلانے سے پیدا ہونے والی لہروں کا حساب
         environmentalNoise = (e.x.abs() + e.y.abs() + e.z.abs()) * 0.1;
       });
     } catch (e) {
+      // اگر سینسر کام نہ کرے تو رینڈم ڈیٹا
       environmentalNoise = Random().nextDouble() * 0.5;
     }
   }
@@ -49,17 +52,19 @@ class RealQuantumParticle {
     });
   }
 
+  // ⚛️ قانونِ تثبیت کا اطلاق (30ms Law)
   void apply35msLaw() {
     double step;
 
     if (useClusterLogic) {
-      // NPU: گروپ انٹیلی جنس
+      // NPU: بوہر کا انداز (گروپ انٹیلی جنس)
       step = _calculateNPUStep();
     } else {
-      // GPU: انفرادی بروٹ فورس
+      // GPU: آئنسٹائن کا انداز (انفرادی طاقت)
       step = _calculateGPUStep();
     }
 
+    // جھٹکا (Jitter): سینسرز اور کوانٹم شور کا ملاپ
     double jitter = (Random().nextDouble() - 0.5) * (quantumRandomness + environmentalNoise);
     
     currentTime += step + jitter;
@@ -71,11 +76,13 @@ class RealQuantumParticle {
     }
   }
 
+  // 🧠 NPU لاجک: پورے گروپ کا مشاہدہ
   double _calculateNPUStep() {
     if (allParticles.length < 2) {
       return (targetTime - currentTime) * 0.15;
     }
 
+    // 10 پارٹیکلز کے گروپ میں معلومات کا تبادلہ
     int groupSize = min(10, allParticles.length);
     int start = max(0, id - groupSize ~/ 2);
     int end = min(allParticles.length, start + groupSize);
@@ -97,6 +104,7 @@ class RealQuantumParticle {
     return (targetTime - groupAvg) * factor;
   }
 
+  // ⚡ GPU لاجک: انفرادی بروٹ فورس
   double _calculateGPUStep() {
     double distance = (targetTime - currentTime).abs();
     
