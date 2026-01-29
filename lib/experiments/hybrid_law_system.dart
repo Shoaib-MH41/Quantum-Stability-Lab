@@ -1,51 +1,99 @@
-import 'language_to_math.dart';
-import 'law_based_gpu.dart';
-import 'math_to_language.dart';
+import 'advanced_math_laws.dart';
+import 'logic_solver.dart';
+import 'enhanced_language_to_math.dart';
 
-class HybridLawSystem {
-  // تینوں ماڈیولز
-  final LanguageToMathConverter languageToMath = LanguageToMathConverter();
-  final LawBasedGPUCalculator gpuCalculator = LawBasedGPUCalculator();
-  final MathToLanguageConverter mathToLanguage = MathToLanguageConverter();
+class SuperHybridSystem {
+  final EnhancedLanguageToMath languageConverter = EnhancedLanguageToMath();
+  final LogicSolver logicSolver = LogicSolver();
   
-  // اردو سوال کا جواب دیں
-  String answer(String urduQuestion) {
-    print('\n🎯 نیا سوال: "$urduQuestion"');
-    print('─' * 50);
+  String answerSuperQuestion(String urduQuestion) {
+    print('\n🚀 سپر کمپیوٹر ٹیسٹ: "$urduQuestion"');
     
-    // مرحلہ 1: اردو → حساب
-    print('📝 مرحلہ 1: زبان سمجھنا (NPU)');
-    final mathExpression = languageToMath.convert(urduQuestion);
+    // 1. منطقی مسئلہ کی شناخت
+    if (_isLogicProblem(urduQuestion)) {
+      return _solveLogicProblem(urduQuestion);
+    }
     
-    // مرحلہ 2: حساب کریں (GPU)
-    print('\n⚡ مرحلہ 2: حساب کرنا (GPU)');
-    final mathResult = gpuCalculator.calculate(mathExpression);
+    // 2. ریاضیاتی مسئلہ
+    if (_isMathProblem(urduQuestion)) {
+      return _solveMathProblem(urduQuestion);
+    }
     
-    // مرحلہ 3: حساب → اردو جواب
-    print('\n🔤 مرحلہ 3: جواب بنانا (NPU)');
-    final urduAnswer = mathToLanguage.convert(mathResult, urduQuestion);
-    
-    print('\n✅ مکمل جواب: $urduAnswer');
-    print('─' * 50);
-    
-    return urduAnswer;
+    // 3. عام مسئلہ
+    return HybridLawSystem().answer(urduQuestion);
   }
   
-  // ٹیسٹ تمام سوالات
-  void runAllTests() {
-    print('🧪 ہائبرڈ قانونی نظام - مکمل ٹیسٹ');
+  bool _isLogicProblem(String question) {
+    final keywords = ['مصافحہ', 'زاویہ', 'آبادی', 'پہیلی', 'مسئلہ'];
+    return keywords.any((word) => question.contains(word));
+  }
+  
+  bool _isMathProblem(String question) {
+    final keywords = ['فبونیکی', 'پرائم', 'سیریز', 'مربع', 'جذر'];
+    return keywords.any((word) => question.contains(word));
+  }
+  
+  String _solveLogicProblem(String question) {
+    final solution = logicSolver.solvePuzzle(question);
+    
+    if (solution.containsKey('error')) {
+      return '❌ یہ منطقی مسئلہ ابھی حل نہیں کر سکتا';
+    }
+    
+    return '''
+✅ منطقی حل:
+مسئلہ: ${solution['problem']}
+حل: ${solution['solution']}
+وضاحت: ${solution['explanation']}
+''';
+  }
+  
+  String _solveMathProblem(String question) {
+    final expression = languageConverter.convertAdvanced(question);
+    
+    if (expression.contains('fib')) {
+      // فبونیکی سیریز
+      final n = _extractNumber(question);
+      final result = AdvancedMathLaws.laws['fibonacci_series']!(n);
+      return 'فبونیکی سیریز کا $n وا عدد: $result';
+    }
+    
+    if (expression.contains('prime')) {
+      // پرائم نمبر
+      final n = _extractNumber(question);
+      final isPrime = AdvancedMathLaws.laws['is_prime']!(n);
+      return '$n ${isPrime ? 'پرائم نمبر ہے' : 'پرائم نمبر نہیں ہے'}';
+    }
+    
+    return '❌ یہ ریاضیاتی مسئلہ ابھی حل نہیں کر سکتا';
+  }
+  
+  int _extractNumber(String text) {
+    final regex = RegExp(r'(\d+)');
+    final match = regex.firstMatch(text);
+    return match != null ? int.parse(match.group(1)!) : 0;
+  }
+  
+  // ٹیسٹ تمام سپر سوالات
+  void runSuperTests() {
+    print('🧪 سپر کمپیوٹر ٹیسٹس');
     print('=' * 50);
     
-    final tests = [
-      'دو جمع دو کیا ہے',
-      'تین ضرب چار کتنے',
-      'دس تفریق پانچ ہے',
-      'آٹھ تقسیم دو ہے',
-      'پانچ جمع تین کیا ہے',
+    final superQuestions = [
+      'ایک کمرے میں ہر شخص ہر دوسرے شخص سے مصافحہ کرے اور کل ۴۵ مصافحے ہوں تو کمرے میں کتنے افراد ہیں؟',
+      'اگر ایک شہر کی آبادی دس لاکھ ہے اور ہر سال ۵ فیصد بڑھتی ہے تو تین سال بعد آبادی کیا ہوگی؟',
+      'پہلے دس فبونیکی اعداد کا مجموعہ کیا ہے؟',
+      'کیا ۹۷ پرائم نمبر ہے؟',
+      'پہلے بیس قدرتی اعداد کے مربعوں کا مجموعہ کیا ہے؟',
+      'گیارہ بجے پچیس منٹ پر گھڑی کے دونوں سوئیوں کے درمیان زاویہ کیا ہے؟',
+      'تین کوانٹم بٹس میں کتنے ممکنہ حالت ہیں؟',
     ];
     
-    for (var question in tests) {
-      answer(question);
+    for (var question in superQuestions) {
+      print('\nسوال: $question');
+      print('─' * 50);
+      print(answerSuperQuestion(question));
+      print('─' * 50);
     }
   }
 }
