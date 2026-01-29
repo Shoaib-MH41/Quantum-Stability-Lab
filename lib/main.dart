@@ -6,6 +6,7 @@ import 'ui/intelligence_vs_strength_test.dart';
 import 'ui/philosophy_comparison.dart';
 import 'ui/main_brain_experiments.dart'; // Brain Experiment
 import 'ui/hybrid_law_dashboard.dart';
+import 'ui/quantum_master_dashboard.dart'; // ✨ نیا Quantum Master
 
 void main() {
   runApp(QuantumStabilityLabApp());
@@ -34,6 +35,7 @@ class QuantumStabilityLabApp extends StatelessWidget {
         // ✨ نئے تجربات
         '/brain_experiment': (context) => BrainExperimentDashboard(),
         '/hybrid_law': (context) => HybridLawDashboard(),
+        '/quantum_master': (context) => QuantumMasterDashboard(), // ✨ نیا
       },
     );
   }
@@ -74,7 +76,7 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               
-              // Experiment Cards Grid - ✨ اب 6 کارڈز
+              // Experiment Cards Grid - ✨ اب 7 کارڈز
               GridView.count(
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
@@ -123,7 +125,17 @@ class HomeScreen extends StatelessWidget {
                     route: IntelligenceVsStrengthTest(),
                   ),
                   
-                  // 5. فلسفہ
+                  // ✨ 5. Quantum Master (نیا ترین)
+                  _buildExperimentCard(
+                    context: context,
+                    title: 'Quantum Master',
+                    subtitle: 'CPU+NPU+GPU Integration',
+                    icon: Icons.auto_awesome,
+                    color: Colors.purpleAccent,
+                    route: QuantumMasterDashboard(),
+                  ),
+                  
+                  // 6. فلسفہ
                   _buildExperimentCard(
                     context: context,
                     title: 'Philosophy',
@@ -133,7 +145,7 @@ class HomeScreen extends StatelessWidget {
                     route: PhilosophyComparisonScreen(),
                   ),
                   
-                  // ✨ 6. ہائبرڈ قانون (نیا ترین)
+                  // ✨ 7. ہائبرڈ قانون (نیا)
                   _buildExperimentCard(
                     context: context,
                     title: 'Hybrid Law',
@@ -147,6 +159,52 @@ class HomeScreen extends StatelessWidget {
               
               const SizedBox(height: 40),
               
+              // ✨ نظام کی فلسفیانہ وضاحت
+              Card(
+                color: Colors.purple[50],
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Text(
+                        '🧬 Quantum Master System',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.purple[900],
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'CPU: زبان سمجھنا (اردو/انگریزی)\n'
+                        'NPU: منطق + قوانین (کی بورڈ ماڈل)\n'
+                        'GPU: حساب + طاقت (قانونی حساب)',
+                        style: TextStyle(color: Colors.purple[800]),
+                      ),
+                      const SizedBox(height: 15),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => QuantumMasterDashboard(),
+                            ),
+                          );
+                        },
+                        icon: Icon(Icons.play_arrow, color: Colors.white),
+                        label: Text('Quantum Master شروع کریں'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.purple,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              
+              const SizedBox(height: 20),
+              
               // ✨ نئے تجربات کا تعارف
               Card(
                 color: Colors.teal[50],
@@ -155,7 +213,7 @@ class HomeScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       Text(
-                        '🧠 نئے تحقیقی تجربات',
+                        '🧠 تحقیقی تجربات',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -165,7 +223,8 @@ class HomeScreen extends StatelessWidget {
                       const SizedBox(height: 10),
                       Text(
                         '1. Brain Research: دماغ = کی بورڈ یا ڈیٹا سینٹر؟\n'
-                        '2. Hybrid Law: اردو سوالوں کا ریاضی سے جواب',
+                        '2. Hybrid Law: اردو سوالوں کا ریاضی سے جواب\n'
+                        '3. Quantum Master: CPU+NPU+GPU مکمل انضمام',
                         style: TextStyle(color: Colors.teal[700]),
                       ),
                     ],
@@ -184,13 +243,13 @@ class HomeScreen extends StatelessWidget {
                     children: [
                       Column(
                         children: [
-                          Text('6', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.deepPurple)),
+                          Text('7', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.deepPurple)),
                           Text('تجربات', style: TextStyle(fontSize: 12)),
                         ],
                       ),
                       Column(
                         children: [
-                          Text('2', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.green)),
+                          Text('3', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.green)),
                           Text('نئے', style: TextStyle(fontSize: 12)),
                         ],
                       ),
@@ -198,6 +257,41 @@ class HomeScreen extends StatelessWidget {
                         children: [
                           Text('4', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.blue)),
                           Text('پرانے', style: TextStyle(fontSize: 12)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              
+              const SizedBox(height: 20),
+              
+              // Research Progress
+              Card(
+                color: Colors.orange[50],
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Text(
+                        '📈 تحقیق کی پیشرفت',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.orange[900],
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      LinearProgressIndicator(
+                        value: 0.85,
+                        backgroundColor: Colors.grey[300],
+                        color: Colors.orange,
+                      ),
+                      const SizedBox(height: 5),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('85% مکمل', style: TextStyle(fontSize: 12)),
+                          Text('دماغ فلسفہ', style: TextStyle(fontSize: 12)),
                         ],
                       ),
                     ],
@@ -239,20 +333,44 @@ class HomeScreen extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: color.withOpacity(0.3), width: 1),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                color.withOpacity(0.1),
+                color.withOpacity(0.05),
+              ],
+            ),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 30, color: color),
-              const SizedBox(height: 10),
+              Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, size: 28, color: color),
+              ),
+              const SizedBox(height: 12),
               Text(title, 
                 textAlign: TextAlign.center, 
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: color)
+                style: TextStyle(
+                  fontSize: 14, 
+                  fontWeight: FontWeight.bold, 
+                  color: color,
+                  height: 1.2,
+                )
               ),
-              const SizedBox(height: 5),
+              const SizedBox(height: 4),
               Text(subtitle, 
                 textAlign: TextAlign.center, 
-                style: TextStyle(fontSize: 10, color: Colors.grey[600])
+                style: TextStyle(
+                  fontSize: 10, 
+                  color: Colors.grey[700],
+                  height: 1.2,
+                )
               ),
             ],
           ),
