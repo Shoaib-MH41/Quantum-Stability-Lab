@@ -27,7 +27,7 @@ class MathToLanguageConverter {
         originalQuestion.contains('کتنے')) {
       response = 'جواب ہے: $resultInWords';
     } else if (originalQuestion.contains('ہے')) {
-      response = 'یہ $resultInwords ہے';
+      response = 'یہ $resultInWords ہے';
     } else {
       response = 'حساب کا نتیجہ $resultInWords ہے';
     }
