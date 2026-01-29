@@ -1,72 +1,69 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:sensors_plus/sensors_plus.dart'; // موبائل سینسرز کے لیے
+import 'package:sensors_plus/sensors_plus.dart';
 
 class RealQuantumParticle {
   final int id;
-  
-  // سوئچ: NPU (Cluster Logic) بمقابلہ GPU (Individual)
+
+  /// true = NPU (Bohr) | false = GPU (Einstein)
   static bool useClusterLogic = false;
-  
-  // تمام پارٹیکلز کی لسٹ (اجتماعی مشاہدے کے لیے)
-  static List<RealQuantumParticle> allParticles = [];
+
+  static final List<RealQuantumParticle> allParticles = [];
 
   double currentTime;
-  final double targetTime = 30.0; // آپ کا 30ms کا قانون
+  final double targetTime = 30.0;
+
   int stableCount = 0;
 
-  bool get isStable => (currentTime - targetTime).abs() <= 1.5;
-  bool get isFullyStable => stableCount >= 3;
-
-  double environmentalNoise = 0.0; // بیرونی شور (موبائل کی حرکت)
-  double quantumRandomness = 0.0; // کوانٹم رینڈم لہریں
+  // --- Environment ---
+  double environmentalNoise = 0.0;
+  double quantumRandomness = 0.0;
 
   StreamSubscription? _sensorSub;
   Timer? _randomTimer;
 
-  RealQuantumParticle(this.id) : currentTime = 18.0 + Random().nextDouble() * 4.0 {
-    _initializeSensors();
-    _startQuantumRandomness();
-    
-    if (!allParticles.contains(this)) {
-      allParticles.add(this);
-    }
+  RealQuantumParticle(this.id)
+      : currentTime = 18.0 + Random().nextDouble() * 24.0 {
+    _initSensors();
+    _initQuantumNoise();
+    allParticles.add(this);
   }
 
-  // سینسرز کو متحرک کرنا (ٹرین یا کار کے حادثے کا ڈیٹا یہاں سے شروع ہوتا ہے)
-  void _initializeSensors() {
-    try {
-      _sensorSub = accelerometerEvents.listen((AccelerometerEvent e) {
-        // موبائل کو ہلانے سے پیدا ہونے والی لہروں کا حساب
-        environmentalNoise = (e.x.abs() + e.y.abs() + e.z.abs()) * 0.1;
-      });
-    } catch (e) {
-      // اگر سینسر کام نہ کرے تو رینڈم ڈیٹا
-      environmentalNoise = Random().nextDouble() * 0.5;
-    }
-  }
+  // ------------------ Stability ------------------
 
-  void _startQuantumRandomness() {
-    _randomTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-      quantumRandomness = Random().nextDouble() * 1.0;
+  bool get isStable =>
+      (currentTime - targetTime).abs() <= 1.5;
+
+  bool get isFullyStable =>
+      stableCount >= 3;
+
+  // ------------------ Sensors ------------------
+
+  void _initSensors() {
+    _sensorSub = accelerometerEvents.listen((e) {
+      environmentalNoise =
+          (e.x.abs() + e.y.abs() + e.z.abs()) * 0.08;
     });
   }
 
-  // ⚛️ قانونِ تثبیت کا اطلاق (30ms Law)
-  void apply35msLaw() {
-    double step;
+  void _initQuantumNoise() {
+    _randomTimer = Timer.periodic(
+      const Duration(seconds: 1),
+      (_) => quantumRandomness = Random().nextDouble(),
+    );
+  }
 
-    if (useClusterLogic) {
-      // NPU: بوہر کا انداز (گروپ انٹیلی جنس)
-      step = _calculateNPUStep();
-    } else {
-      // GPU: آئنسٹائن کا انداز (انفرادی طاقت)
-      step = _calculateGPUStep();
-    }
+  // ------------------ Core Law ------------------
 
-    // جھٹکا (Jitter): سینسرز اور کوانٹم شور کا ملاپ
-    double jitter = (Random().nextDouble() - 0.5) * (quantumRandomness + environmentalNoise);
-    
+  void apply30msLaw() {
+    final step = useClusterLogic
+        ? _npuStep()
+        : _gpuStep();
+
+    final jitter =
+        (Random().nextDouble() - 0.5) *
+        (environmentalNoise + quantumRandomness);
+
     currentTime += step + jitter;
 
     if (isStable) {
@@ -76,43 +73,48 @@ class RealQuantumParticle {
     }
   }
 
-  // 🧠 NPU لاجک: پورے گروپ کا مشاہدہ
-  double _calculateNPUStep() {
-    if (allParticles.length < 2) {
+  // ------------------ GPU (Einstein) ------------------
+
+  double _gpuStep() {
+    final distance = targetTime - currentTime;
+
+    final factor =
+        distance.abs() > 8 ? 0.12 :
+        distance.abs() > 3 ? 0.18 : 0.25;
+
+    return distance * factor;
+  }
+
+  // ------------------ NPU (Bohr) ------------------
+
+  double _npuStep() {
+    if (allParticles.length < 3) {
       return (targetTime - currentTime) * 0.15;
     }
 
-    // 10 پارٹیکلز کے گروپ میں معلومات کا تبادلہ
-    int groupSize = min(10, allParticles.length);
-    int start = max(0, id - groupSize ~/ 2);
-    int end = min(allParticles.length, start + groupSize);
+    // 🔑 index-based neighborhood (NO ID BIAS)
+    final index = allParticles.indexOf(this);
+    final radius = 5;
 
-    double groupSum = 0;
-    int count = 0;
+    final start = max(0, index - radius);
+    final end = min(allParticles.length, index + radius + 1);
 
+    double sum = 0;
     for (int i = start; i < end; i++) {
-      groupSum += allParticles[i].currentTime;
-      count++;
+      sum += allParticles[i].currentTime;
     }
 
-    double groupAvg = count > 0 ? groupSum / count : currentTime;
-    double distance = (targetTime - groupAvg).abs();
-    
-    double factor = distance > 5 ? 0.1 : 
-                    distance > 2 ? 0.15 : 0.2;
+    final groupAvg = sum / (end - start);
+    final distance = targetTime - groupAvg;
 
-    return (targetTime - groupAvg) * factor;
+    final coherence =
+        distance.abs() > 6 ? 0.10 :
+        distance.abs() > 3 ? 0.16 : 0.22;
+
+    return distance * coherence;
   }
 
-  // ⚡ GPU لاجک: انفرادی بروٹ فورس
-  double _calculateGPUStep() {
-    double distance = (targetTime - currentTime).abs();
-    
-    double factor = distance > 5 ? 0.12 : 
-                    distance > 2 ? 0.18 : 0.25;
-
-    return (targetTime - currentTime) * factor;
-  }
+  // ------------------ Cleanup ------------------
 
   void dispose() {
     _sensorSub?.cancel();
