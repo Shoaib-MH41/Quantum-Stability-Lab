@@ -55,7 +55,7 @@ class RealQuantumParticle {
 
   // ------------------ Core Law ------------------
 
-  void apply30msLaw() {
+  applyStabilizationLaw();
     final step = useClusterLogic
         ? _npuStep()
         : _gpuStep();
