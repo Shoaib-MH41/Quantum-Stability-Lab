@@ -4,6 +4,7 @@ import 'ui/experiment_history.dart';
 import 'ui/real_sensor_dashboard.dart';
 import 'ui/intelligence_vs_strength_test.dart';
 import 'ui/philosophy_comparison.dart';
+import 'main_brain_experiments.dart';
 
 void main() {
   runApp(QuantumStabilityLabApp());
