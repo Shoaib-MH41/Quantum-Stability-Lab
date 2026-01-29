@@ -1,54 +1,75 @@
-
 import 'cpu_translator.dart';
 
 class MathToLanguageConverter {
-  // ✅ CPUTranslator کا ابجیکٹ یہاں درست طریقے سے بنایا گیا ہے
   final CPUTranslator cpuTranslator = CPUTranslator();
 
-  // 1. نمبرز کی ڈکشنری
-  final Map<String, String> numberWords = {
-    '0': 'صفر', '1': 'ایک', '2': 'دو', '3': 'تین', '4': 'چار',
-    '5': 'پانچ', '6': 'چھ', '7': 'سات', '8': 'آٹھ', '9': 'نو',
-    '10': 'دس', '11': 'گیارہ', '12': 'بارہ', '13': 'تیرہ',
-    '14': 'چودہ', '15': 'پندرہ', '16': 'سولہ', '17': 'سترہ',
-    '18': 'اٹھارہ', '19': 'انیس', '20': 'بیس',
+  // چھوٹے نمبرز کے لیے فاسٹ میپ
+  static final Map<int, String> numberWords = {
+    0: 'صفر',
+    1: 'ایک',
+    2: 'دو',
+    3: 'تین',
+    4: 'چار',
+    5: 'پانچ',
+    6: 'چھ',
+    7: 'سات',
+    8: 'آٹھ',
+    9: 'نو',
+    10: 'دس',
+    11: 'گیارہ',
+    12: 'بارہ',
+    13: 'تیرہ',
+    14: 'چودہ',
+    15: 'پندرہ',
+    16: 'سولہ',
+    17: 'سترہ',
+    18: 'اٹھارہ',
+    19: 'انیس',
+    20: 'بیس',
   };
-  
-  // 2. حساب کا نتیجہ اردو جواب میں بدلیں
+
+  /// 🧠 حساب → زبان
   String convert(num result, String originalQuestion) {
     print('🔤 حساب → زبان: $result');
-    
-    // عدد کو اردو الفاظ میں بدلنے کی کوشش کریں
-    String resultInWords = result.toInt().toString();
-    
-    if (numberWords.containsKey(resultInWords)) {
-      resultInWords = numberWords[resultInWords]!;
-    } else {
-      // اگر ڈکشنری میں نہیں ہے، تو CPU Translator کا استعمال کریں
-      resultInWords = cpuTranslator.translateToUrdu(result);
+
+    String resultInUrdu;
+
+    // 1️⃣ اگر integer ہے
+    if (result % 1 == 0) {
+      final intValue = result.toInt();
+
+      if (numberWords.containsKey(intValue)) {
+        resultInUrdu = numberWords[intValue]!;
+      } else {
+        resultInUrdu = cpuTranslator.translateToUrdu(intValue);
+      }
+    } 
+    // 2️⃣ decimal / فلسفیانہ / کوانٹم نتیجہ
+    else {
+      resultInUrdu = cpuTranslator.translateToUrdu(result);
     }
-    
-    // جواب کا جملہ بنانا (آپ کی لاجک اور فلسفے کے مطابق)
-    String response = '';
-    
-    if (originalQuestion.contains('کیا ہے') || 
-        originalQuestion.contains('کتنے')) {
-      response = 'جواب ہے: $resultInWords';
-    } else if (originalQuestion.contains('ہے')) {
-      response = 'یہ $resultInWords ہے';
+
+    // 3️⃣ جملہ سازی (واضح اصول)
+    String response;
+
+    if (originalQuestion.contains('کتنے') ||
+        originalQuestion.contains('کیا ہے')) {
+      response = 'جواب ہے: $resultInUrdu';
+    } else if (originalQuestion.trim().endsWith('ہے')) {
+      response = '$resultInUrdu';
     } else {
-      response = 'حساب کا نتیجہ $resultInWords ہے';
+      response = 'حساب کا نتیجہ $resultInUrdu ہے';
     }
-    
+
     print('✅ حتمی جواب: "$response"');
     return response;
   }
-  
-  // 3. ٹیسٹ فنکشن
+
+  // ٹیسٹ
   void test() {
-    print('🔤 ٹیسٹنگ شروع:');
     print(convert(4, 'دو جمع دو کیا ہے'));
     print(convert(12, 'تین ضرب چار کتنے'));
     print(convert(5, 'دس تفریق پانچ ہے'));
+    print(convert(1.618, 'سنہری تناسب کیا ہے'));
   }
 }
