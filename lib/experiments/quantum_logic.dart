@@ -86,7 +86,7 @@ class QuantumLogic {
     final states = quantumStates(qubits);
 
     return {
-      'solution': '$states ممکنہ کوانٹم حالتیں',
+      'solution': '$qubits کوانٹم بٹس → $states ممکنہ کوانٹم حالتیں',
       'explanation': 'n کوانٹم بٹس کے لیے 2ⁿ حالتیں ممکن ہوتی ہیں۔',
     };
   }
