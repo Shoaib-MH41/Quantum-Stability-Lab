@@ -11,7 +11,7 @@ import 'quantum_logic.dart';
 class HybridLawSystem {
   // ماڈیولز
   final LawBasedGPUCalculator gpuCalculator = LawBasedGPUCalculator();
-  final MathToLanguage mathToLanguage = MathToLanguage();
+  final LanguageToMathConverter mathToLanguage = LanguageToMathConverter();
   final enhancedLanguageToMath languageToMath = enhancedLanguageToMath();
 
   String answer(String urduQuestion) {
