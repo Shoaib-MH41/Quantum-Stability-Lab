@@ -1,28 +1,29 @@
 import 'language_to_math.dart';
 
 class EnhancedLanguageToMath {
-  // نئے الفاظ شامل کریں
-  
   static final Map<String, String> advancedDictionary = {
-    // بڑے اعداد
-    'کروڑ': '*10000000',
-    'لاکھ': '*100000',
-    'ہزار': '*1000',
-    'سو': '*100',
+    'کروڑ': '10000000',
+    'لاکھ': '100000',
+    'ہزار': '1000',
+    'سو': '100',
   };
-  
+
   static String convertAdvanced(String urduQuestion) {
-    String result = urduQuestion;
-    
-    // پہلے بنیادی تبدیلی
-    final converter = LanguageToMathConverter(); // ✅ درست
+    String result = urduQuestion.trim();
+
+    // 1️⃣ بنیادی تبدیلی
+    final converter = LanguageToMathConverter();
     result = converter.convert(result);
-    
-    // پھر ایڈوانسڈ تبدیلی
-    advancedDictionary.forEach((urdu, math) {
-      result = result.replaceAll(urdu, math);
+
+    // 2️⃣ ایڈوانسڈ عددی الفاظ
+    advancedDictionary.forEach((urdu, number) {
+      // صرف عدد replace کریں، operator نہیں
+      result = result.replaceAll(urdu, number);
     });
-    
+
+    // 3️⃣ صفائی: extra spaces
+    result = result.replaceAll(RegExp(r'\s+'), ' ').trim();
+
     return result;
   }
 }
