@@ -2,17 +2,20 @@ import 'dart:math';
 import 'cpu_translator.dart';
 import 'cpu_intent.dart';
 import 'law_based_gpu.dart';
-import 'math_to_language.dart';
+import 'math_to_language.dart';        // ✅ MathToLanguageConverter کے لیے
+import 'language_to_math.dart';         // ✅ LanguageToMathConverter کے لیے
 import 'logic_solver.dart';
-import 'enhanced_language_to_math.dart';
+import 'enhanced_language_to_math.dart'; // ✅ EnhancedLanguageToMath کے لیے
 import 'advanced_math_laws.dart';
 import 'quantum_logic.dart';
 
 class HybridLawSystem {
   // ماڈیولز
   final LawBasedGPUCalculator gpuCalculator = LawBasedGPUCalculator();
-  final LanguageToMathConverter mathToLanguage = LanguageToMathConverter();
-  final EnhancedLanguageToMath languageToMath = EnhancedLanguageToMath();
+  final MathToLanguageConverter mathToLanguage = MathToLanguageConverter();     // ریاضی → اردو
+  final LanguageToMathConverter languageToMath = LanguageToMathConverter();     // اردو → ریاضی
+  // یا EnhancedLanguageToMath استعمال کریں:
+  // final EnhancedLanguageToMath enhancedLanguageToMath = EnhancedLanguageToMath();
 
   String answer(String urduQuestion) {
     print('\n🎯 Hybrid System: "$urduQuestion"');
@@ -92,17 +95,8 @@ class HybridLawSystem {
       String mathExpression = languageToMath.convert(urduQuestion);
       print('   اظہار: $mathExpression');
       
-      // اگر converter سے exception آیا ہو
-      if (mathExpression.contains('CPU: ایک وقت میں صرف')) {
-        // سادہ حل
-        if (urduQuestion.contains('دو جمع دو')) {
-          mathExpression = '2 + 2';
-        } else if (urduQuestion.contains('تین ضرب چار')) {
-          mathExpression = '3 * 4';
-        } else {
-          mathExpression = '0 + 0';
-        }
-      }
+      // اگر EnhancedLanguageToMath استعمال کرنا چاہیں:
+      // String mathExpression = EnhancedLanguageToMath.convertAdvanced(urduQuestion);
       
       // GPU حساب
       num mathResult = gpuCalculator.calculate(mathExpression);
