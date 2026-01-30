@@ -1,4 +1,3 @@
-// ==================== HybridLawSystem.dart ====================
 import 'dart:math';
 import 'cpu_translator.dart';
 import 'cpu_intent.dart';
@@ -10,201 +9,331 @@ import 'enhanced_language_to_math.dart';
 import 'advanced_math_laws.dart';
 import 'quantum_logic.dart';
 
-// ----- HLS کا اندرونی CPU -----
-class _HLSCPU {
-  Map<String, dynamic> _analyzeForWorker(String question) {
+// ==================== HLS_CPU (مترجم - سب سے ہلکا) ====================
+class _HLS_CPU {
+  // صرف بنیادی صفائی اور ترجمانی
+  Map<String, dynamic> translateInput(String input) {
+    final cleaned = input.trim().toLowerCase();
+    
     return {
-      'task_received': DateTime.now(),
-      'question': question,
-      'complexity': question.length,
-      'keywords': _extractKeywords(question),
+      'original': input,
+      'cleaned': cleaned,
+      'length': input.length,
+      'is_question': cleaned.contains('؟') || cleaned.contains('?'),
+      'word_count': cleaned.split(' ').length,
+      'contains_math': _containsMath(cleaned),
+      'contains_quantum': _containsQuantum(cleaned),
+      'timestamp': DateTime.now().millisecondsSinceEpoch,
     };
   }
-
-  List<String> _extractKeywords(String text) {
-    final words = text.toLowerCase().split(' ');
-    return words.where((word) => word.length > 2).toList();
+  
+  bool _containsMath(String text) {
+    final mathWords = ['جمع', 'ضرب', 'تقسیم', 'منفی', 'برابر', 'حساب', '+', '-', '*', '/'];
+    return mathWords.any((word) => text.contains(word));
+  }
+  
+  bool _containsQuantum(String text) {
+    final quantumWords = ['کوانٹم', 'سپر', 'اینٹینگلمنٹ', 'شروڈنگر', 'بلی'];
+    return quantumWords.any((word) => text.contains(word));
   }
 }
 
-// ----- HLS کا اندرونی GPU -----
-class _HLSGPU {
+// ==================== HLS_GPU (مزدور - تمام بھاری کام) ====================
+class _HLS_GPU {
+  // تمام بھاری ٹولز
   final LawBasedGPUCalculator _calculator = LawBasedGPUCalculator();
-
-  String _performCalculation(String expression) {
+  final MathToLanguageConverter _mathToLanguage = MathToLanguageConverter();
+  final LanguageToMathConverter _languageToMath = LanguageToMathConverter();
+  final EnhancedLanguageToMath _enhancedConverter = EnhancedLanguageToMath();
+  final AdvancedMathLaws _advancedLaws = AdvancedMathLaws();
+  
+  // کام 1: قانونی ریاضی کا حساب
+  String _calculateWithLaw(String expression, String lawType) {
     try {
-      return _calculator.calculate(expression).toString();
+      final result = _calculator.calculate(expression);
+      return '''
+🧮 **قانونی حساب (GPU)**
+استعمال شدہ قانون: $lawType
+اظہار: $expression
+نتیجہ: $result
+
+ℹ️ GPU نے LawBasedGPUCalculator استعمال کیا''';
     } catch (e) {
       return 'حسابی خرابی: $e';
     }
   }
-
-  String _processQuantum(String question) {
+  
+  // کام 2: کوانٹم تجزیہ
+  String _analyzeQuantum(String question) {
     try {
-      return QuantumLogic.process(question);
+      final result = QuantumLogic.process(question);
+      return '''
+⚛️ **کوانٹم تجزیہ (GPU)**
+سوال: $question
+نتیجہ: $result
+
+ℹ️ GPU نے QuantumLogic.process() استعمال کیا''';
     } catch (e) {
-      return 'کوانٹم پروسیسنگ خرابی: $e';
+      return 'کوانٹم تجزیہ خرابی: $e';
     }
   }
-
-  String _solveLogic(String question) {
+  
+  // کام 3: منطقی حل
+  String _solveLogicProblem(String question) {
     try {
-      final result = LogicSolver.solvePuzzle(question);
-      return result['solution']?.toString() ?? 'حل دستیاب نہیں';
+      final solution = LogicSolver.solvePuzzle(question);
+      return '''
+🧩 **منطقی حل (GPU)**
+مسئلہ: $question
+حل: ${solution['solution'] ?? 'دستیاب نہیں'}
+
+ℹ️ GPU نے LogicSolver استعمال کیا''';
     } catch (e) {
       return 'منطقی حل خرابی: $e';
     }
   }
+  
+  // کام 4: زبان کی تبدیلی
+  String _convertLanguage(String question, dynamic result) {
+    try {
+      final converted = _mathToLanguage.convert(result, question);
+      return '''
+🗣️ **زبان تبدیلی (GPU)**
+اصل سوال: $question
+ریاضی نتیجہ: $result
+اردو جواب: $converted
 
-  // NPU کے حکم پر کام
-  String executeWorkerTask(Map<String, dynamic> task) {
-    final type = task['type'] ?? '';
+ℹ️ GPU نے MathToLanguageConverter استعمال کیا''';
+    } catch (e) {
+      return 'زبان تبدیلی خرابی: $e';
+    }
+  }
+  
+  // کام 5: اعلیٰ ریاضی قوانین
+  String _applyAdvancedMath(String question) {
+    try {
+      // فرض کریں کہ AdvancedMathLaws میں process میتھڈ ہے
+      final result = _advancedLaws.process(question);
+      return '''
+🎓 **اعلیٰ ریاضی (GPU)**
+سوال: $question
+نتیجہ: $result
+
+ℹ️ GPU نے AdvancedMathLaws استعمال کیا''';
+    } catch (e) {
+      return 'اعلیٰ ریاضی خرابی: $e';
+    }
+  }
+  
+  // GPU کا مرکزی کام کرنے کا طریقہ
+  String executeHeavyWork(Map<String, dynamic> command) {
+    final workType = command['work_type'] ?? '';
+    final data = command['data'] ?? {};
     
-    switch (type) {
-      case 'math_calculation':
-        return _performCalculation(task['expression']);
+    print('[HLS_GPU] ⚡ بھاری کام شروع: $workType');
+    
+    switch (workType) {
+      case 'law_calculation':
+        return _calculateWithLaw(
+          data['expression'] ?? '',
+          data['law_type'] ?? 'basic_law',
+        );
+        
       case 'quantum_analysis':
-        return _processQuantum(task['question']);
+        return _analyzeQuantum(data['question'] ?? '');
+        
       case 'logic_solution':
-        return _solveLogic(task['question']);
+        return _solveLogicProblem(data['question'] ?? '');
+        
+      case 'language_conversion':
+        return _convertLanguage(
+          data['question'] ?? '',
+          data['result'] ?? 0,
+        );
+        
+      case 'advanced_math':
+        return _applyAdvancedMath(data['question'] ?? '');
+        
+      case 'complex_processing':
+        return _processComplexTask(data);
+        
       default:
-        return 'نامعلوم کام کی قسم';
+        return 'GPU: نامعلوم کام کی قسم';
     }
+  }
+  
+  // پیچیدہ کاموں کے لیے
+  String _processComplexTask(Map<String, dynamic> data) {
+    final task = data['task'] ?? '';
+    
+    if (task == 'full_math_solution') {
+      // مکمل ریاضی حل: زبان → ریاضی → حساب → زبان
+      final question = data['question'] ?? '';
+      
+      // 1. زبان سے ریاضی
+      final mathExpr = _languageToMath.convert(question);
+      
+      // 2. حساب
+      final calcResult = _calculator.calculate(mathExpr);
+      
+      // 3. ریاضی سے زبان
+      final finalAnswer = _mathToLanguage.convert(calcResult, question);
+      
+      return '''
+🔄 **مکمل ریاضی حل (GPU)**
+مراحل:
+1. زبان → ریاضی: $mathExpr
+2. قانونی حساب: $calcResult
+3. ریاضی → زبان: $finalAnswer
+
+✅ GPU نے تمام مراحل خود مکمل کیے''';
+    }
+    
+    return 'GPU: پیچیدہ کام نامعلوم';
   }
 }
 
-// ----- HLS کا اندرونی NPU (مزدور کا ذہن) -----
-class _HLSNPU {
-  final _HLSCPU _cpu = _HLSCPU();
-  final _HLSGPU _gpu = _HLSGPU();
-  final MathToLanguageConverter _mathConverter = MathToLanguageConverter();
-
-  String _determineWorkerTask(String question) {
-    if (question.contains('سپر') || question.contains('کوانٹم')) return 'quantum';
-    if (question.contains('مصافحہ') || question.contains('افراد')) return 'logic';
-    if (question.contains('جمع') || question.contains('ضرب')) return 'math';
-    return 'general';
-  }
-
-  Map<String, dynamic> _createTaskCommand(String taskType, String question) {
-    switch (taskType) {
-      case 'math':
-        return {
-          'type': 'math_calculation',
-          'expression': _extractMathExpression(question),
-          'timestamp': DateTime.now(),
-        };
-      case 'quantum':
-        return {
-          'type': 'quantum_analysis',
-          'question': question,
-          'priority': 'high',
-        };
-      case 'logic':
-        return {
-          'type': 'logic_solution',
-          'question': question,
-          'complexity': 'medium',
-        };
-      default:
-        return {'type': 'general', 'question': question};
+// ==================== HLS_NPU (حاکم - صرف انتظام) ====================
+class _HLS_NPU {
+  final _HLS_CPU _cpu = _HLS_CPU();
+  final _HLS_GPU _gpu = _HLS_GPU();
+  
+  // NPU کا کام: GPU کو کیا کام دینا ہے؟
+  Map<String, dynamic> _decideWorkForGPU(Map<String, dynamic> parsedInput) {
+    final text = parsedInput['cleaned'];
+    final original = parsedInput['original'];
+    
+    if (parsedInput['contains_math']) {
+      // NPU فیصلہ: یہ ریاضی ہے، GPU سے کہو مکمل حل کرے
+      return {
+        'work_type': 'complex_processing',
+        'data': {
+          'task': 'full_math_solution',
+          'question': original,
+          'complexity': 'high',
+        },
+        'reason': 'NPU نے ریاضی کا مکمل حل GPU کو سونپا',
+      };
     }
-  }
-
-  String _extractMathExpression(String question) {
-    // سادہ ایکسٹریکشن
-    if (question.contains('جمع')) return '2+2';
-    if (question.contains('ضرب')) return '3*4';
-    return question.replaceAll(RegExp(r'[^\d\+\-\*/]'), '');
-  }
-
-  String _formatWorkerResult(String rawResult, String taskType) {
-    switch (taskType) {
-      case 'math':
-        return '''
-🧮 **حسابی نتیجہ (HLS GPU)**
-نتیجہ: $rawResult
-
-ℹ️ **تشریح:**
-یہ نتیجہ قانونی GPU کیلکولیٹر کے ذریعے حاصل کیا گیا ہے۔''';
-        
-      case 'quantum':
-        return '''
-⚛️ **کوانٹم تحلیل (HLS GPU)**
-$rawResult
-
-🔬 **سائنسی بنیاد:**
-کوانٹم منطق کے اصولوں پر مبنی۔''';
-        
-      case 'logic':
-        return '''
-🧩 **منطقی حل (HLS GPU)**
-حل: $rawResult
-
-✓ **منطقی اصول:**
-ترکیب اور احتمال کے قوانین کا اطلاق۔''';
-        
-      default:
-        return rawResult;
+    else if (parsedInput['contains_quantum']) {
+      // NPU فیصلہ: یہ کوانٹم ہے، GPU سے تجزیہ کروائے
+      return {
+        'work_type': 'quantum_analysis',
+        'data': {
+          'question': original,
+          'depth': 'detailed',
+        },
+        'reason': 'NPU نے کوانٹم تجزیہ GPU کو سونپا',
+      };
     }
+    else if (_containsLogic(text)) {
+      // NPU فیصلہ: یہ منطق ہے، GPU سے حل کروائے
+      return {
+        'work_type': 'logic_solution',
+        'data': {
+          'question': original,
+          'type': 'puzzle',
+        },
+        'reason': 'NPU نے منطقی مسئلہ GPU کو سونپا',
+      };
+    }
+    
+    // عمومی معاملہ
+    return {
+      'work_type': 'advanced_math',
+      'data': {
+        'question': original,
+        'fallback': true,
+      },
+      'reason': 'NPU نے عمومی پروسیسنگ GPU کو سونپا',
+    };
   }
+  
+  bool _containsLogic(String text) {
+    final logicWords = ['مصافحہ', 'افراد', 'گھڑی', 'زاویہ', 'منطق', 'پہیلی'];
+    return logicWords.any((word) => text.contains(word));
+  }
+  
+  // NPU کا مرکزی انتظامی فنکشن
+  String manageAndDelegate(String userInput) {
+    print('[HLS_NPU] 🤔 انتظام شروع...');
+    
+    // مرحلہ 1: CPU سے صفائی (ہلکا کام)
+    final parsedInput = _cpu.translateInput(userInput);
+    print('[HLS_NPU] ✅ CPU نے صفائی مکمل کی');
+    
+    // مرحلہ 2: NPU فیصلہ سازی (دماغی کام)
+    final workDecision = _decideWorkForGPU(parsedInput);
+    print('[HLS_NPU] 🎯 فیصلہ: ${workDecision['reason']}');
+    
+    // مرحلہ 3: GPU کو کام سونپنا (بھاری کام)
+    print('[HLS_NPU] ⚡ GPU کو کام تفویض کر رہا ہوں...');
+    final gpuResult = _gpu.executeHeavyWork(workDecision);
+    print('[HLS_NPU] ✅ GPU نے کام مکمل کر لیا');
+    
+    // مرحلہ 4: NPU حتمی جواب ترتیب دے
+    final finalResponse = _formatManagedResponse(gpuResult, workDecision);
+    
+    return finalResponse;
+  }
+  
+  // NPU کا کام: GPU کے نتائج کو خوبصورت بنانا
+  String _formatManagedResponse(String gpuResult, Map<String, dynamic> decision) {
+    return '''
+🏗️ **HybridLawSystem - کام کی تقسیم**
+${'-' * 40}
 
-  // مزدور کا مرکزی کام کرنے کا طریقہ
-  String performTask(String question) {
-    print('[HLS مزدور] کام وصول ہوا: "${question.substring(0, min(30, question.length))}..."');
-    
-    // 1. CPU سے ابتدائی تجزیہ
-    final analysis = _cpu._analyzeForWorker(question);
-    
-    // 2. کام کی قسم کا تعین
-    final taskType = _determineWorkerTask(question);
-    print('[HLS مزدور] کام کی قسم: $taskType');
-    
-    // 3. GPU کے لیے حکم تیار کریں
-    final taskCommand = _createTaskCommand(taskType, question);
-    
-    // 4. GPU کو حکم دیں
-    final gpuResult = _gpu.executeWorkerTask(taskCommand);
-    print('[HLS مزدور] GPU کا نتیجہ وصول ہوا');
-    
-    // 5. نتیجہ کو فارمیٹ کریں
-    final formattedResult = _formatWorkerResult(gpuResult, taskType);
-    
-    // 6. حاکم (QMC NPU) کو نتیجہ واپس کریں
-    return formattedResult;
+🧭 **NPU کا فیصلہ:**
+${decision['reason']}
+کام کی قسم: ${decision['work_type']}
+
+⚡ **GPU کا نتیجہ:**
+$gpuResult
+
+📊 **کارکردگی خلاصہ:**
+- CPU: صفائی اور ترجمانی ✅
+- NPU: فیصلہ سازی اور انتظام ✅
+- GPU: بھاری کام اور حساب ✅
+
+🔗 **سسٹم انضمام:**
+یہ نتیجہ HybridLawSystem کے اندرونی NPU/GPU/CPU کے باہمی تعاون کا نتیجہ ہے۔
+''';
   }
 }
 
-// ----- HybridLawSystem (مکمل مزدور کلاس) -----
+// ==================== HybridLawSystem (مکمل سسٹم) ====================
 class HybridLawSystem {
-  final _HLSNPU _workerNPU = _HLSNPU();
-  int _tasksCompleted = 0;
-  List<Map<String, dynamic>> _taskHistory = [];
-
-  // یہ وہ واحد طریقہ ہے جو QMC کا NPU استعمال کرے گا
-  String answer(String questionFromMaster) {
-    _tasksCompleted++;
+  // ہمارا اندرونی NPU جو سب انتظام کرے گا
+  final _HLS_NPU _npu = _HLS_NPU();
+  
+  int _totalTasks = 0;
+  List<Map<String, dynamic>> _performanceLog = [];
+  
+  // واحد پبلک میتھڈ - QuantumMasterController کے NPU سے حکم لے کر
+  String answer(String question) {
+    _totalTasks++;
     
     final taskRecord = {
-      'id': _tasksCompleted,
-      'question': questionFromMaster,
-      'received_at': DateTime.now(),
+      'id': _totalTasks,
+      'question': question,
+      'start_time': DateTime.now(),
       'status': 'processing',
     };
     
-    _taskHistory.add(taskRecord);
+    _performanceLog.add(taskRecord);
+    
+    print('\n[HybridLawSystem] 🚀 نیا کام #$_totalTasks');
+    print('[HLS] سوال: "${question.substring(0, min(30, question.length))}..."');
     
     try {
-      print('\n[HybridLawSystem] ⚙️ مزدور کام شروع کر رہا ہے...');
-      print('[HLS] حاکم کا حکم: "$questionFromMaster"');
-      
-      // اپنے اندرونی NPU کو کام سونپیں
-      final result = _workerNPU.performTask(questionFromMaster);
+      // اپنے NPU کو انتظام سونپیں
+      final result = _npu.manageAndDelegate(question);
       
       taskRecord['status'] = 'completed';
-      taskRecord['completed_at'] = DateTime.now();
+      taskRecord['end_time'] = DateTime.now();
+      taskRecord['duration_ms'] = taskRecord['end_time']!.difference(taskRecord['start_time']!).inMilliseconds;
       
-      print('[HybridLawSystem] ✅ کام مکمل، حاکم کو نتیجہ بھیجا جا رہا ہے');
+      print('[HybridLawSystem] ✅ کام مکمل ہوا');
       
       return result;
       
@@ -215,30 +344,93 @@ class HybridLawSystem {
       print('[HybridLawSystem] ❌ کام ناکام: $e');
       
       return '''
-🛠️ **مزدور سسٹم میں خرابی**
+🔄 **HybridLawSystem - عارضی خرابی**
 
-سوال: "$questionFromMaster"
+سوال: "$question"
 
 خرابی: $e
 
-مزدور کی حیثیت: کام مکمل نہیں کر سکا
+سسٹم کی حیثیت:
+- اندرونی NPU: مسئلہ
+- اندرونی GPU: غیر فعال
+- کام: نامکمل
+
+براہ کرم:
+1. سوال دوبارہ درج کریں
+2. سادہ الفاظ استعمال کریں
+3. نظام کو ریسٹارٹ کریں
 ''';
     }
   }
-
-  // مزدور کی کارکردگی کی معلومات
-  String get workerStatus {
-    final successRate = _tasksCompleted > 0 
-        ? (_taskHistory.where((t) => t['status'] == 'completed').length / _tasksCompleted * 100).toStringAsFixed(1)
-        : '0.0';
+  
+  // کارکردگی کی معلومات
+  String get performanceReport {
+    final completed = _performanceLog.where((t) => t['status'] == 'completed').length;
+    final failed = _performanceLog.where((t) => t['status'] == 'failed').length;
+    final successRate = _totalTasks > 0 ? (completed / _totalTasks * 100).toStringAsFixed(1) : '0.0';
+    
+    // اوسط وقت کا حساب
+    var avgTime = 0;
+    if (completed > 0) {
+      final totalTime = _performanceLog
+          .where((t) => t['duration_ms'] != null)
+          .fold(0, (sum, t) => sum + (t['duration_ms'] as int));
+      avgTime = totalTime ~/ completed;
+    }
     
     return '''
-🛠️ **HybridLawSystem (مزدور) کی حیثیت:**
-- مکمل کیے گئے کام: $_tasksCompleted
+📈 **HybridLawSystem کارکردگی رپورٹ**
+${'-' * 40}
+
+📊 **اعداد و شمار:**
+- کل کام: $_totalTasks
+- کامیاب: $completed
+- ناکام: $failed
 - کامیابی کی شرح: $successRate%
-- آخری کام: ${_taskHistory.isNotEmpty ? _taskHistory.last['question'] : 'کوئی نہیں'}
-- مزدور NPU: فعال
-- مزدور GPU: تیار
+- اوسط وقت: ${avgTime}ms
+
+🏗️ **اندرونی ڈھانچہ:**
+├── HLS_CPU: ان پٹ صفائی
+├── HLS_NPU: انتظام اور فیصلہ سازی
+└── HLS_GPU: تمام بھاری کام (حساب، تجزیہ، حل)
+
+🔧 **موجودہ ٹولز:**
+- LawBasedGPUCalculator
+- QuantumLogic
+- LogicSolver
+- Language/Math Converters
+- AdvancedMathLaws
+
+🔄 **کام کا بہاؤ:**
+سوال → HLS_CPU → HLS_NPU → HLS_GPU → جواب
 ''';
+  }
+  
+  // سسٹم ٹیسٹ
+  void runInternalTest() {
+    print('\n🔧 **HybridLawSystem اندرونی ٹیسٹ**\n');
+    
+    final testQuestions = [
+      'دو جمع دو کیا ہے؟',
+      'سپر پوزیشن کیا ہے؟',
+      'مصافحہ میں دس افراد',
+      'تین ضرب چار کا حساب کریں',
+    ];
+    
+    for (var question in testQuestions) {
+      print('─' * 50);
+      print('❓ ٹیسٹ سوال: "$question"');
+      final response = answer(question);
+      print('📋 جواب کا خلاصہ:');
+      
+      // صرف پہلی چند لائنیں دکھائیں
+      final lines = response.split('\n');
+      for (var i = 0; i < min(5, lines.length); i++) {
+        print('   ${lines[i]}');
+      }
+      if (lines.length > 5) print('   ...');
+    }
+    
+    print('\n${performanceReport}');
   }
 }
