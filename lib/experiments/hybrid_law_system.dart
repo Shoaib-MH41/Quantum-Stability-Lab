@@ -15,12 +15,11 @@ class HybridLawSystem {
   final MathToLanguageConverter mathToLanguage = MathToLanguageConverter();
   final LanguageToMathConverter languageToMath = LanguageToMathConverter();
   
-  // NPU (حاکم دماغ) ماڈیولز
+  // NPU (حاکم دماغ) ماڈیولز - درست ڈیکلئیریشن
   final CPUTranslator cpuTranslator = CPUTranslator();
-  final CPUIntent cpuIntent = CPUIntent();
-  final LogicSolver logicSolver = LogicSolver();
-  final QuantumLogic quantumLogic = QuantumLogic();
-
+  // CPUIntent enum ہے، instance نہیں بنائیں
+  // final CPUIntent cpuIntent = CPUIntent(); // ❌ ہٹا دیں
+  
   // سسٹم کے اعداد و شمار
   int _totalProcessed = 0;
   int _mathQuestions = 0;
@@ -34,7 +33,7 @@ class HybridLawSystem {
     print('🔢 کل پروسیسڈ سوالات: $_totalProcessed');
 
     // NULL چیک
-    if (urduQuestion == null || urduQuestion.isEmpty) {
+    if (urduQuestion.isEmpty) {
       return _npuGovernorError('براہ کرم سوال درج کریں');
     }
 
@@ -42,19 +41,22 @@ class HybridLawSystem {
     String question = urduQuestion.toLowerCase().trim();
     
     try {
-      // 1️⃣ پہلے CPU سے ارادہ سمجھیں (مترجم)
+      // 1️⃣ پہلے CPU مترجم سے ارادہ سمجھیں
       print('🧠 CPU مترجم: ارادہ سمجھ رہا ہوں...');
-      String intent = cpuTranslator.understandIntent(urduQuestion);
-      if (intent.isEmpty) {
-        intent = _detectIntent(question);
-      }
+      
+      // درست طریقہ: detectIntent استعمال کریں جو CPUIntent enum واپس کرتا ہے
+      CPUIntent detectedIntent = cpuTranslator.detectIntent(urduQuestion);
+      
+      // enum کو string میں تبدیل کریں
+      String intent = detectedIntent.toString().split('.').last;
+      
       print('🔍 سوال کی نوعیت: $intent');
       
       // اعداد و شمار اپڈیٹ کریں
       _updateStatistics(intent);
 
       // 2️⃣ NPU (حاکم) فیصلہ کرے کہ کس طرح پروسیس کریں
-      return _npuGovernorDecision(urduQuestion, intent);
+      return _npuGovernorDecision(urduQuestion, intent, detectedIntent);
       
     } catch (e) {
       print('❌ Hybrid System Error: $e');
@@ -67,7 +69,7 @@ class HybridLawSystem {
   // -------------------- NPU GOVERNOR METHODS --------------------
 
   /// NPU حاکم کا فیصلہ کرنے والا طریقہ
-  String _npuGovernorDecision(String urduQuestion, String intent) {
+  String _npuGovernorDecision(String urduQuestion, String intent, CPUIntent detectedIntent) {
     print('\n👑 NPU GOVERNOR ACTIVATED');
     print('📋 فیصلہ کی معلومات:');
     print('   سوال: "$urduQuestion"');
@@ -75,23 +77,24 @@ class HybridLawSystem {
     print('   NPU فیصلہ: مناسب طریقہ منتخب کر رہا ہوں...');
 
     // NPU کا فیصلہ - کون سا ماڈیول استعمال ہوگا
-    switch (intent) {
-      case 'math':
+    switch (detectedIntent) {
+      case CPUIntent.math:
         _mathQuestions++;
         print('   ➡️ ریاضی کے ماڈیول منتخب');
         return _npuSupervisedMath(urduQuestion);
         
-      case 'quantum':
+      case CPUIntent.quantum:
         _quantumQuestions++;
         print('   ➡️ کوانٹم ماڈیول منتخب');
         return _npuSupervisedQuantum(urduQuestion);
         
-      case 'philosophy':
-      case 'logic':
+      case CPUIntent.puzzle:
+      case CPUIntent.logic:
         _philosophyQuestions++;
-        print('   ➡️ منطق/فلسفہ ماڈیول منتخب');
+        print('   ➡️ منطق/پہیلی ماڈیول منتخب');
         return _npuSupervisedPhilosophy(urduQuestion);
         
+      case CPUIntent.general:
       default:
         print('   ➡️ عمومی ماڈیول منتخب');
         return _npuSupervisedGeneral(urduQuestion);
@@ -142,7 +145,7 @@ class HybridLawSystem {
 - GPU کی درستگی: ${_calculateGpuAccuracy(mathExpression, mathResult)}%
 
 **مرحلہ 3: NPU حاکم کا تجزیہ**
-${npuAnalysis}
+$npuAnalysis
 
 **مرحلہ 4: NPU کا حتمی فیصلہ**
 - اردو جواب: $urduAnswer
@@ -171,78 +174,15 @@ ${_npuResearchConclusion(mathResult, urduQuestion)}
     }
   }
 
-  /// NPU خود ریاضی حل کرے (GPU فیل ہونے پر)
-  String _npuDirectMathSolution(String question, String error) {
-    print('\n🔧 NPU ڈائریکٹ حل: GPU کے بغیر');
-    
-    // NPU کا اپنا منطقی تجزیہ
-    String npuAnalysis = '''
-🧠 **NPU ڈائریکٹ تجزیہ (GPU فیل)**
-
-⚠️ **GPU Error:** $error
-
-🔍 **NPU کا تجزیہ:**
-1. میں نے سوال سمجھا: "$question"
-2. GPU فیل ہو گیا، اس لیے میں خود منطق استعمال کرتا ہوں
-3. میں بنیادی ریاضی کے قوانین استعمال کر رہا ہوں
-''';
-    
-    // NPU کا منطقی حل
-    if (question.contains('دو جمع دو')) {
-      return '''
-$npuAnalysis
-
-📐 **NPU کا منطقی حل:**
-- تصور: دو چیزیں + دو چیزیں
-- منطق: اگر آپ کے پاس دو سیب ہیں اور دو اور سیب مل جائیں
-- نتیجہ: کل چار سیب ہوں گے
-- دلیل: جمع کا بنیادی قانون (1+1=2, 2+2=4)
-
-🧮 **حتمی جواب:** چار
-
-💡 **NPU کی وضاحت:**
-"میں نے GPU کے بغیر، صرف منطق اور قوانین سے حل کیا ہے۔"
-''';
-    } else if (question.contains('تین ضرب چار')) {
-      return '''
-$npuAnalysis
-
-📐 **NPU کا منطقی حل:**
-- تصور: تین گروہ، ہر گروہ میں چار چیزیں
-- منطق: تین کپ میں سے ہر کپ میں چار پھول
-- نتیجہ: 3 × 4 = 12
-- دلیل: ضرب کا بنیادی قانون (گروہ بنانا)
-
-🧮 **حتمی جواب:** بارہ
-''';
-    } else {
-      return '''
-$npuAnalysis
-
-❓ **NPU کا فیصلہ:**
-"یہ سوال میرے موجودہ قوانین میں نہیں آتا۔"
-
-🔧 **NPU تجاویز:**
-1. سوال کو مزید واضح کریں
-2. دوسری صورت میں سوال پوچھیں
-3. NPU کو مزید قوانین سیکھنے دیں
-
-📚 **NPU کی موجودہ صلاحیتیں:**
-- جمع (جمع)
-- تفریق (منفی)
-- ضرب (ضرب)
-- تقسیم (تقسیم)
-''';
-    }
-  }
-
   /// NPU کی نگرانی میں کوانٹم سوال
   String _npuSupervisedQuantum(String urduQuestion) {
     print('\n⚛️ NPU نگرانی: کوانٹم سوال');
     
     try {
       print('1️⃣ NPU → QuantumLogic: "اس کوانٹم سوال کا تجزیہ کرو"');
-      String quantumResult = quantumLogic.process(urduQuestion);
+      
+      // ✅ درست: QuantumLogic.process() static میتھڈ ہے
+      String quantumResult = QuantumLogic.process(urduQuestion);
       
       print('2️⃣ NPU حاکم: "میں کوانٹم نتیجہ پرکھتا ہوں"');
       String npuQuantumAnalysis = _npuQuantumAnalysis(quantumResult, urduQuestion);
@@ -272,11 +212,13 @@ ${_npuQuantumPhilosophy(urduQuestion)}
 
   /// NPU کی نگرانی میں فلسفیانہ سوال
   String _npuSupervisedPhilosophy(String urduQuestion) {
-    print('\n💭 NPU نگرانی: فلسفیانہ سوال');
+    print('\n💭 NPU نگرانی: فلسفیانہ/منطقی سوال');
     
     try {
       print('1️⃣ NPU → LogicSolver: "اس منطق کو حل کرو"');
-      Map<String, dynamic> puzzle = logicSolver.solvePuzzle(urduQuestion);
+      
+      // ✅ درست: LogicSolver.solvePuzzle() static میتھڈ ہے
+      Map<String, dynamic> puzzle = LogicSolver.solvePuzzle(urduQuestion);
       
       print('2️⃣ NPU حاکم: "میں منطقی حل پرکھتا ہوں"');
       String solution = puzzle.containsKey('solution') 
@@ -346,149 +288,7 @@ ${_npuWisdomGeneration(urduQuestion)}
 ''';
   }
 
-  // -------------------- NPU ANALYSIS METHODS --------------------
-
-  String _npuMathAnalysis(num result, String expression, String question) {
-    return '''
-🧮 **NPU ریاضی تجزیہ:**
-
-**منطقی جواز:**
-${_getMathLogicJustification(result, question)}
-
-**قانونی بنیاد:**
-${_getMathLaw(expression)}
-
-**تصدیقی مراحل:**
-1. اظہار درست ہے: ✅
-2. حساب درست ہے: ✅
-3. منطق درست ہے: ✅
-4. نتیجہ معقول ہے: ✅
-
-**NPU کا فیصلہ:** "یہ حساب منطقی طور پر درست ہے"
-''';
-  }
-
-  String _npuQuantumAnalysis(String quantumResult, String question) {
-    return '''
-⚛️ **NPU کوانٹم تجزیہ:**
-
-**سائنسی درستگی:** ${_checkQuantumAccuracy(quantumResult)}%
-
-**منطقی مطابقت:** ${_checkLogicConsistency(quantumResult)}%
-
-**فلسفیانہ گہرائی:** ${_checkPhilosophicalDepth(quantumResult)}%
-
-**NPU مشاہدہ:** "کوانٹم منطق کلاسیکل منطق سے مختلف ہے"
-''';
-  }
-
-  String _npuPhilosophicalAnalysis(String solution, String question) {
-    return '''
-💭 **NPU فلسفیانہ تجزیہ:**
-
-**منطق کی درستگی:** ${_checkLogicAccuracy(solution)}%
-
-**انسانی پہلو:** ${_checkHumanAspect(solution)}%
-
-**اخلاقی تجزیہ:** ${_checkEthicalAspect(solution)}%
-
-**عملی اطلاق:** ${_checkPracticalApplication(solution)}%
-
-**NPU مشاہدہ:** "فلسفہ صرف سوال نہیں، جواب ڈھونڈنے کا طریقہ ہے"
-''';
-  }
-
-  String _npuDirectQuantumAnalysis(String question, String error) {
-    return '''
-⚛️ **NPU ڈائریکٹ کوانٹم تجزیہ**
-
-⚠️ **QuantumLogic Error:** $error
-
-🧠 **NPU کا براہ راست تجزیہ:**
-
-**سوال:** "$question"
-
-**کوانٹم اصولوں کا اطلاق:**
-1. سپرپوزیشن: ہر چیز کئی حالات میں ہو سکتی ہے
-2. اینٹینگلمنٹ: سب کچھ جڑا ہوا ہے
-3. مشاہدہ کا اثر: دیکھنا چیز کو بدل دیتا ہے
-
-💡 **NPU کی سادہ تشریح:**
-"کوانٹم دنیا ہمیں سکھاتی ہے کہ امکان ہی حقیقت ہے"
-
-🔬 **NPU کا نتیجہ:**
-میں سمجھتا ہوں کہ کوانٹم منطق روایتی منطق سے مختلف ہے۔
-''';
-  }
-
-  String _npuDirectPhilosophy(String question, String error) {
-    return '''
-💭 **NPU ڈائریکٹ فلسفیانہ تجزیہ**
-
-⚠️ **LogicSolver Error:** $error
-
-🧠 **NPU کا براہ راست تجزیہ:**
-
-**سوال:** "$question"
-
-**منطقی مراحل:**
-1. سوال کو ٹکڑوں میں تقسیم کرو
-2. ہر ٹکڑے کا الگ تجزیہ کرو
-3. ان کو دوبارہ جوڑو
-4. منطقی نتیجہ اخذ کرو
-
-💡 **NPU کی حکمت:**
-"سچائی اکثر سوال میں ہی چھپی ہوتی ہے، جواب میں نہیں"
-
-🌟 **NPU کا پیغام:**
-"میں ہر سوال کو گہرائی سے سمجھنے کی کوشش کرتا ہوں"
-''';
-  }
-
   // -------------------- HELPER METHODS --------------------
-
-  String _detectIntent(String question) {
-    print('🧠 نیت کا تجزیہ: "$question"');
-
-    // ریاضی
-    List<String> mathWords = ['جمع', 'ضرب', 'تقسیم', 'منفی', 'برابر', 'کتنے', 'حساب'];
-    for (var word in mathWords) {
-      if (question.contains(word)) {
-        print(' ✅ ریاضی کا لفظ ملا: $word');
-        return 'math';
-      }
-    }
-    
-    // کوانٹم
-    List<String> quantumWords = ['کوانٹم', 'سپر پوزیشن', 'اینٹینگلمنٹ', 'شروڈنگر', 'بلی', 'طول موج'];
-    for (var word in quantumWords) {
-      if (question.contains(word)) {
-        print(' ⚛️ کوانٹم لفظ ملا: $word');
-        return 'quantum';
-      }
-    }
-    
-    // فلسفہ
-    List<String> philosophyWords = ['کائنات', 'راز', 'وجود', 'حقیقت', 'زندگی', 'موت', 'روح'];
-    for (var word in philosophyWords) {
-      if (question.contains(word)) {
-        print(' 💭 فلسفیانہ لفظ ملا: $word');
-        return 'philosophy';
-      }
-    }
-    
-    // منطق
-    List<String> logicWords = ['مصافحہ', 'افراد', 'گھڑی', 'زاویہ', 'منطق', 'پہیلی'];
-    for (var word in logicWords) {
-      if (question.contains(word)) {
-        print(' 🧩 منطقی لفظ ملا: $word');
-        return 'logic';
-      }
-    }
-    
-    print(' 🌟 عمومی سوال');
-    return 'general';
-  }
 
   void _updateStatistics(String intent) {
     // اعداد و شمار اپڈیٹ کریں
@@ -551,22 +351,167 @@ ${_getMathLaw(expression)}
     return 'منفرد وجود';
   }
 
-  String _npuResearchConclusion(num result, String question) {
+  // -------------------- NPU ANALYSIS METHODS --------------------
+
+  String _npuMathAnalysis(num result, String expression, String question) {
     return '''
-🔬 **NPU تحقیقی نتیجہ:**
+🧮 **NPU ریاضی تجزیہ:**
 
-**درستگی:** 99%
-**منطقی مطابقت:** 98%
-**فلسفیانہ گہرائی:** 85%
-**عملی اطلاق:** 92%
+**منطقی جواز:**
+${_getMathLogicJustification(result, question)}
 
-**NPU کا مشاہدہ:**
-"ریاضی صرف حساب نہیں، کائنات کی زبان ہے"
+**قانونی بنیاد:**
+${_getMathLaw(expression)}
+
+**تصدیقی مراحل:**
+1. اظہار درست ہے: ✅
+2. حساب درست ہے: ✅
+3. منطق درست ہے: ✅
+4. نتیجہ معقول ہے: ✅
+
+**NPU کا فیصلہ:** "یہ حساب منطقی طور پر درست ہے"
 ''';
   }
 
-  int _calculateNpuPerformance() {
-    return 90 + Random().nextInt(10);
+  String _npuQuantumAnalysis(String quantumResult, String question) {
+    return '''
+⚛️ **NPU کوانٹم تجزیہ:**
+
+**سائنسی درستگی:** ${_checkQuantumAccuracy(quantumResult)}%
+
+**منطقی مطابقت:** ${_checkLogicConsistency(quantumResult)}%
+
+**فلسفیانہ گہرائی:** ${_checkPhilosophicalDepth(quantumResult)}%
+
+**NPU مشاہدہ:** "کوانٹم منطق کلاسیکل منطق سے مختلف ہے"
+''';
+  }
+
+  String _npuPhilosophicalAnalysis(String solution, String question) {
+    return '''
+💭 **NPU فلسفیانہ تجزیہ:**
+
+**منطق کی درستگی:** ${_checkLogicAccuracy(solution)}%
+
+**انسانی پہلو:** ${_checkHumanAspect(solution)}%
+
+**اخلاقی تجزیہ:** ${_checkEthicalAspect(solution)}%
+
+**عملی اطلاق:** ${_checkPracticalApplication(solution)}%
+
+**NPU مشاہدہ:** "فلسفہ صرف سوال نہیں، جواب ڈھونڈنے کا طریقہ ہے"
+''';
+  }
+
+  String _npuDirectMathSolution(String question, String error) {
+    print('\n🔧 NPU ڈائریکٹ حل: GPU کے بغیر');
+    
+    // NPU کا اپنا منطقی تجزیہ
+    String npuAnalysis = '''
+🧠 **NPU ڈائریکٹ تجزیہ (GPU فیل)**
+
+⚠️ **GPU Error:** $error
+
+🔍 **NPU کا تجزیہ:**
+1. میں نے سوال سمجھا: "$question"
+2. GPU فیل ہو گیا، اس لیے میں خود منطق استعمال کرتا ہوں
+3. میں بنیادی ریاضی کے قوانین استعمال کر رہا ہوں
+''';
+    
+    // NPU کا منطقی حل
+    if (question.contains('دو جمع دو')) {
+      return '''
+$npuAnalysis
+
+📐 **NPU کا منطقی حل:**
+- تصور: دو چیزیں + دو چیزیں
+- منطق: اگر آپ کے پاس دو سیب ہیں اور دو اور سیب مل جائیں
+- نتیجہ: کل چار سیب ہوں گے
+- دلیل: جمع کا بنیادی قانون (1+1=2, 2+2=4)
+
+🧮 **حتمی جواب:** چار
+
+💡 **NPU کی وضاحت:**
+"میں نے GPU کے بغیر، صرف منطق اور قوانین سے حل کیا ہے۔"
+''';
+    } else if (question.contains('تین ضرب چار')) {
+      return '''
+$npuAnalysis
+
+📐 **NPU کا منطقی حل:**
+- تصور: تین گروہ، ہر گروہ میں چار چیزیں
+- منطق: تین کپ میں سے ہر کپ میں چار پھول
+- نتیجہ: 3 × 4 = 12
+- دلیل: ضرب کا بنیادی قانون (گروہ بنانا)
+
+🧮 **حتمی جواب:** بارہ
+''';
+    } else {
+      return '''
+$npuAnalysis
+
+❓ **NPU کا فیصلہ:**
+"یہ سوال میرے موجودہ قوانین میں نہیں آتا۔"
+
+🔧 **NPU تجاویز:**
+1. سوال کو مزید واضح کریں
+2. دوسری صورت میں سوال پوچھیں
+3. NPU کو مزید قوانین سیکھنے دیں
+
+📚 **NPU کی موجودہ صلاحیتیں:**
+- جمع (جمع)
+- تفریق (منفی)
+- ضرب (ضرب)
+- تقسیم (تقسیم)
+''';
+    }
+  }
+
+  String _npuDirectQuantumAnalysis(String question, String error) {
+    return '''
+⚛️ **NPU ڈائریکٹ کوانٹم تجزیہ**
+
+⚠️ **QuantumLogic Error:** $error
+
+🧠 **NPU کا براہ راست تجزیہ:**
+
+**سوال:** "$question"
+
+**کوانٹم اصولوں کا اطلاق:**
+1. سپرپوزیشن: ہر چیز کئی حالات میں ہو سکتی ہے
+2. اینٹینگلمنٹ: سب کچھ جڑا ہوا ہے
+3. مشاہدہ کا اثر: دیکھنا چیز کو بدل دیتا ہے
+
+💡 **NPU کی سادہ تشریح:**
+"کوانٹم دنیا ہمیں سکھاتی ہے کہ امکان ہی حقیقت ہے"
+
+🔬 **NPU کا نتیجہ:**
+میں سمجھتا ہوں کہ کوانٹم منطق روایتی منطق سے مختلف ہے۔
+''';
+  }
+
+  String _npuDirectPhilosophy(String question, String error) {
+    return '''
+💭 **NPU ڈائریکٹ فلسفیانہ تجزیہ**
+
+⚠️ **LogicSolver Error:** $error
+
+🧠 **NPU کا براہ راست تجزیہ:**
+
+**سوال:** "$question"
+
+**منطقی مراحل:**
+1. سوال کو ٹکڑوں میں تقسیم کرو
+2. ہر ٹکڑے کا الگ تجزیہ کرو
+3. ان کو دوبارہ جوڑو
+4. منطقی نتیجہ اخذ کرو
+
+💡 **NPU کی حکمت:**
+"سچائی اکثر سوال میں ہی چھپی ہوتی ہے، جواب میں نہیں"
+
+🌟 **NPU کا پیغام:**
+"میں ہر سوال کو گہرائی سے سمجھنے کی کوشش کرتا ہوں"
+''';
   }
 
   String _npuQuantumPhilosophy(String question) {
@@ -580,34 +525,6 @@ ${_getMathLaw(expression)}
 
 سوال "$question" انہی اصولوں پر مبنی ہے۔"
 ''';
-  }
-
-  int _checkQuantumAccuracy(String result) {
-    return 88 + Random().nextInt(12);
-  }
-
-  int _checkLogicConsistency(String result) {
-    return 85 + Random().nextInt(15);
-  }
-
-  int _checkPhilosophicalDepth(String result) {
-    return 90 + Random().nextInt(10);
-  }
-
-  int _checkLogicAccuracy(String solution) {
-    return 92 + Random().nextInt(8);
-  }
-
-  int _checkHumanAspect(String solution) {
-    return 80 + Random().nextInt(20);
-  }
-
-  int _checkEthicalAspect(String solution) {
-    return 85 + Random().nextInt(15);
-  }
-
-  int _checkPracticalApplication(String solution) {
-    return 75 + Random().nextInt(25);
   }
 
   String _npuDeepUnderstanding(String question) {
@@ -644,6 +561,52 @@ ${_getMathLaw(expression)}
     if (question.contains('زندگی')) return 'بائیولوجی، فلسفہ، معاشرہ';
     if (question.contains('دماغ')) return 'نیوروسائنس، کمپیوٹر، فلسفہ';
     return 'علم، تجربہ، سوچ';
+  }
+
+  String _npuResearchConclusion(num result, String question) {
+    return '''
+🔬 **NPU تحقیقی نتیجہ:**
+
+**درستگی:** 99%
+**منطقی مطابقت:** 98%
+**فلسفیانہ گہرائی:** 85%
+**عملی اطلاق:** 92%
+
+**NPU کا مشاہدہ:**
+"ریاضی صرف حساب نہیں، کائنات کی زبان ہے"
+''';
+  }
+
+  int _calculateNpuPerformance() {
+    return 90 + Random().nextInt(10);
+  }
+
+  int _checkQuantumAccuracy(String result) {
+    return 88 + Random().nextInt(12);
+  }
+
+  int _checkLogicConsistency(String result) {
+    return 85 + Random().nextInt(15);
+  }
+
+  int _checkPhilosophicalDepth(String result) {
+    return 90 + Random().nextInt(10);
+  }
+
+  int _checkLogicAccuracy(String solution) {
+    return 92 + Random().nextInt(8);
+  }
+
+  int _checkHumanAspect(String solution) {
+    return 80 + Random().nextInt(20);
+  }
+
+  int _checkEthicalAspect(String solution) {
+    return 85 + Random().nextInt(15);
+  }
+
+  int _checkPracticalApplication(String solution) {
+    return 75 + Random().nextInt(25);
   }
 
   String _npuGovernorError(String message, {String error = '', String question = ''}) {
@@ -686,7 +649,7 @@ ${error.isNotEmpty ? '🔧 **تکنیکی معلومات:**\n$error' : ''}
       'دو جمع دو',
       'تین ضرب چار',
       'کائنات کا راز کیا ہے',
-      'سپر پوزیشن کیا ہے',
+      'سپرپوزیشن کیا ہے',
       'مصافحہ میں پانچ افراد',
       'دماغ کی بورڈ ہے یا ڈیٹا سینٹر',
     ];
@@ -699,11 +662,8 @@ ${error.isNotEmpty ? '🔧 **تکنیکی معلومات:**\n$error' : ''}
       print('─' * 40);
     }
 
-    print('\n📊 NPU GOVERNOR ٹیسٹ کے اعداد و شمار:');
+    print('\n📊 NPU گورنر ٹیسٹ کے اعداد و شمار:');
     print('کل ٹیسٹ سوالات: ${tests.length}');
     print('کل پروسیسڈ سوالات: $_totalProcessed');
-    print('NPU فیصلے: 100%');
-    print('GPU استعمال: 67%');
-    print('NPU ڈائریکٹ حل: 33%');
   }
 }
