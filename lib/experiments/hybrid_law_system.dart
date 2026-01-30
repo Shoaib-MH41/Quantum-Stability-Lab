@@ -12,7 +12,7 @@ class HybridLawSystem {
   // ماڈیولز
   final LawBasedGPUCalculator gpuCalculator = LawBasedGPUCalculator();
   final LanguageToMathConverter mathToLanguage = LanguageToMathConverter();
-  final enhancedLanguageToMath languageToMath = enhancedLanguageToMath();
+  final EnhancedLanguageToMath languageToMath = EnhancedLanguageToMath();
 
   String answer(String urduQuestion) {
     print('\n🎯 Hybrid System: "$urduQuestion"');
