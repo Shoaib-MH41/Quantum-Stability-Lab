@@ -69,5 +69,3 @@ class HybridLawSystem {
     print(answer('مصافحہ میں پانچ افراد')); // puzzle / logic
   }
 }
-
-اسے چیک کرے
