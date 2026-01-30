@@ -3,11 +3,11 @@ import 'dart:math';
 /// ⚛️ QuantumLogic
 /// Hybrid CPU/NPU friendly quantum reasoning engine
 class QuantumLogic {
-  // --------------------------------------------------
-  // 🧠 BASIC QUANTUM CONCEPTS
-  // --------------------------------------------------
+  
+  // 1. کوانٹم حالتوں کا حساب (2ⁿ)
+  static int quantumStates(int qubits) => pow(2, qubits).toInt();
 
-  /// Superposition: |ψ⟩ = α|0⟩ + β|1⟩
+  // 2. سپر پوزیشن: |ψ⟩ = α|0⟩ + β|1⟩
   static List<double> superposition({
     double alpha = 0.707106,
     double beta = 0.707106,
@@ -16,108 +16,70 @@ class QuantumLogic {
     return [alpha / norm, beta / norm];
   }
 
-  /// Bell States (1D state vector, CPU-safe)
+  // 3. Bell States
   static List<double> bellState(int type) {
     const v = 0.707106;
     switch (type) {
-      case 0:
-        return [v, 0, 0, v]; // Φ+
-      case 1:
-        return [v, 0, 0, -v]; // Φ-
-      case 2:
-        return [0, v, v, 0]; // Ψ+
-      case 3:
-        return [0, v, -v, 0]; // Ψ-
-      default:
-        return [v, 0, 0, v];
+      case 0: return [v, 0, 0, v]; // Φ+
+      case 1: return [v, 0, 0, -v]; // Φ-
+      case 2: return [0, v, v, 0]; // Ψ+
+      case 3: return [0, v, -v, 0]; // Ψ-
+      default: return [v, 0, 0, v];
     }
   }
 
-  /// Total quantum states = 2ⁿ
-  static int quantumStates(int qubits) => pow(2, qubits).toInt();
-
-  // --------------------------------------------------
-  // 🔗 QUANTUM KNOWLEDGE RESPONSES
-  // --------------------------------------------------
-
-  static String superpositionInfo(int qubits) {
-    final states = quantumStates(qubits);
-    return '''
-⚛️ کوانٹم سپر پوزیشن
-کوانٹم بٹس: $qubits
-ممکنہ حالتیں: $states
-تمام حالتیں بیک وقت موجود ہوتی ہیں (مشاہدے سے پہلے)
-''';
-  }
-
-  static String entanglementInfo(int qubits) {
-    final power = quantumStates(qubits);
-    return '''
-🔗 کوانٹم اینٹینگلمنٹ
-$qubits qubits ≈ $power کلاسیکل حالتیں
-ایک ذرّے کی تبدیلی فوراً دوسرے پر اثر کرتی ہے
-''';
-  }
-
-  // --------------------------------------------------
-  // 🧠 PROBLEM SOLVER (CPU ENTRY POINT)
-  // --------------------------------------------------
-
-    static String process(String question) {
+  // 🧠 مرکزی انٹری پوائنٹ (HybridLawSystem اسی کو پکارتا ہے)
+  static String process(String question) {
     final result = _internalExecute(question);
     return '${result['solution']}\n${result['explanation']}';
   }
-  
+
+  // 🔍 اندرونی حل پیش کرنے والا انجن
+  static Map<String, dynamic> _internalExecute(String question) {
+    if (_containsAny(question, ['کوانٹم بٹ', 'qubit', 'حالت'])) {
+      return _solveQubitStates(question);
+    }
+
     if (_containsAny(question, ['سپر پوزیشن'])) {
       return {
-        'engine': 'quantum',
         'solution': 'سپر پوزیشن: ایک ذرہ بیک وقت 0 اور 1 ہو سکتا ہے',
-        'explanation':
-            'یہ حالت مشاہدے تک تمام ممکنات کو برقرار رکھتی ہے۔',
+        'explanation': 'یہ حالت مشاہدے تک تمام ممکنات کو برقرار رکھتی ہے۔',
       };
     }
 
     if (_containsAny(question, ['اینٹینگلمنٹ'])) {
       return {
-        'engine': 'quantum',
         'solution': 'اینٹینگلمنٹ: دو ذرات کا فوری تعلق',
-        'explanation':
-            'ایک ذرہ بدلنے سے دوسرا بغیر فاصلے کے فوراً بدل جاتا ہے۔',
+        'explanation': 'ایک ذرہ بدلنے سے دوسرا بغیر فاصلے کے فوراً بدل جاتا ہے۔',
       };
     }
 
     if (_containsAny(question, ['شروڈنگر'])) {
       return {
-        'engine': 'quantum',
-        'solution': 'بلی زندہ بھی ہے اور مردہ بھی',
-        'explanation':
-            'جب تک مشاہدہ نہ ہو، تمام حالتیں موجود رہتی ہیں۔',
+        'solution': 'شروڈنگر کی بلی: زندہ بھی ہے اور مردہ بھی',
+        'explanation': 'جب تک مشاہدہ نہ ہو، تمام ممکنہ حالتیں موجود رہتی ہیں۔',
       };
     }
 
     return {
-      'engine': 'quantum',
       'solution': 'یہ کوانٹم سوال ابھی نظام میں رجسٹرڈ نہیں',
-      'explanation': 'مزید قوانین شامل کیے جا سکتے ہیں۔',
+      'explanation': 'آپ اس پر مزید قوانین لاگو کر سکتے ہیں۔',
     };
   }
 
-  // --------------------------------------------------
-  // 🔍 INTERNAL HELPERS
-  // --------------------------------------------------
-
+  // کوانٹم بٹس کی گنتی کا حل
   static Map<String, dynamic> _solveQubitStates(String question) {
     final match = RegExp(r'(\d+)').firstMatch(question);
     final qubits = match != null ? int.parse(match.group(1)!) : 1;
     final states = quantumStates(qubits);
 
     return {
-      'engine': 'quantum',
       'solution': '$states ممکنہ کوانٹم حالتیں',
       'explanation': 'n کوانٹم بٹس کے لیے 2ⁿ حالتیں ممکن ہوتی ہیں۔',
     };
   }
 
+  // الفاظ کی تلاش کا مددگار فنکشن
   static bool _containsAny(String text, List<String> keys) {
     for (final k in keys) {
       if (text.contains(k)) return true;
@@ -127,18 +89,16 @@ $qubits qubits ≈ $power کلاسیکل حالتیں
 }
 
 // --------------------------------------------------
-// 🧩 SUPPORT CLASSES
+// 🧩 معاون کلاسز (کلاس QuantumLogic سے باہر)
 // --------------------------------------------------
 
 class Complex {
   final double real;
   final double imag;
-
   const Complex(this.real, this.imag);
 
   @override
-  String toString() =>
-      imag >= 0 ? '$real + ${imag}i' : '$real - ${-imag}i';
+  String toString() => imag >= 0 ? '$real + ${imag}i' : '$real - ${-imag}i';
 }
 
 class Qubit {
@@ -151,7 +111,6 @@ class Qubit {
     beta /= norm;
   }
 
-  /// Measurement collapses state
   int measure() {
     return Random().nextDouble() < (alpha * alpha) ? 0 : 1;
   }
