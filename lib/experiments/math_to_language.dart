@@ -1,75 +1,33 @@
-import 'cpu_translator.dart';
-
+/// ریاضی کے نتائج کو اردو میں تبدیل کرتا ہے
 class MathToLanguageConverter {
-  final CPUTranslator cpuTranslator = CPUTranslator();
-
-  // چھوٹے نمبرز کے لیے فاسٹ میپ
-  static final Map<int, String> numberWords = {
-    0: 'صفر',
-    1: 'ایک',
-    2: 'دو',
-    3: 'تین',
-    4: 'چار',
-    5: 'پانچ',
-    6: 'چھ',
-    7: 'سات',
-    8: 'آٹھ',
-    9: 'نو',
-    10: 'دس',
-    11: 'گیارہ',
-    12: 'بارہ',
-    13: 'تیرہ',
-    14: 'چودہ',
-    15: 'پندرہ',
-    16: 'سولہ',
-    17: 'سترہ',
-    18: 'اٹھارہ',
-    19: 'انیس',
-    20: 'بیس',
-  };
-
-  /// 🧠 حساب → زبان
-  String convert(num result, String originalQuestion) {
-    print('🔤 حساب → زبان: $result');
-
-    String resultInUrdu;
-
-    // 1️⃣ اگر integer ہے
-    if (result % 1 == 0) {
-      final intValue = result.toInt();
-
-      if (numberWords.containsKey(intValue)) {
-        resultInUrdu = numberWords[intValue]!;
-      } else {
-        resultInUrdu = cpuTranslator.translateToUrdu(intValue);
-      }
-    } 
-    // 2️⃣ decimal / فلسفیانہ / کوانٹم نتیجہ
-    else {
-      resultInUrdu = cpuTranslator.translateToUrdu(result);
+  String convert(num mathResult, String originalQuestion) {
+    print('🔤 MathToLanguage: $mathResult for "$originalQuestion"');
+    
+    String result = mathResult.toString();
+    
+    // اعداد کو اردو میں تبدیل کریں
+    result = result.replaceAll('0', 'صفر');
+    result = result.replaceAll('1', 'ایک');
+    result = result.replaceAll('2', 'دو');
+    result = result.replaceAll('3', 'تین');
+    result = result.replaceAll('4', 'چار');
+    result = result.replaceAll('5', 'پانچ');
+    result = result.replaceAll('6', 'چھ');
+    result = result.replaceAll('7', 'سات');
+    result = result.replaceAll('8', 'آٹھ');
+    result = result.replaceAll('9', 'نو');
+    
+    // سوال کی نوعیت کے مطابق جواب دیں
+    if (originalQuestion.contains('جمع') || originalQuestion.contains('+')) {
+      return "جواب: $result";
+    } else if (originalQuestion.contains('ضرب') || originalQuestion.contains('*')) {
+      return "حاصل ضرب: $result";
+    } else if (originalQuestion.contains('تقسیم') || originalQuestion.contains('/')) {
+      return "حاصل تقسیم: $result";
+    } else if (originalQuestion.contains('منفی') || originalQuestion.contains('-')) {
+      return "فرق: $result";
     }
-
-    // 3️⃣ جملہ سازی (واضح اصول)
-    String response;
-
-    if (originalQuestion.contains('کتنے') ||
-        originalQuestion.contains('کیا ہے')) {
-      response = 'جواب ہے: $resultInUrdu';
-    } else if (originalQuestion.trim().endsWith('ہے')) {
-      response = '$resultInUrdu';
-    } else {
-      response = 'حساب کا نتیجہ $resultInUrdu ہے';
-    }
-
-    print('✅ حتمی جواب: "$response"');
-    return response;
-  }
-
-  // ٹیسٹ
-  void test() {
-    print(convert(4, 'دو جمع دو کیا ہے'));
-    print(convert(12, 'تین ضرب چار کتنے'));
-    print(convert(5, 'دس تفریق پانچ ہے'));
-    print(convert(1.618, 'سنہری تناسب کیا ہے'));
+    
+    return "نتیجہ: $result";
   }
 }
