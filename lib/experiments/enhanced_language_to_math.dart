@@ -8,6 +8,11 @@ class EnhancedLanguageToMath {
     'سو': '100',
   };
 
+  // Instance method شامل کریں
+  String convert(String urduQuestion) {
+    return convertAdvanced(urduQuestion);
+  }
+
   static String convertAdvanced(String urduQuestion) {
     String result = urduQuestion.trim();
 
