@@ -67,6 +67,7 @@ $qubits qubits ≈ $power کلاسیکل حالتیں
     final result = _internalExecute(question);
     return '${result['solution']}\n${result['explanation']}';
   }
+  
     if (_containsAny(question, ['سپر پوزیشن'])) {
       return {
         'engine': 'quantum',
