@@ -109,7 +109,7 @@ class HybridLawSystem {
       print('   حساب: $mathResult');
       
       // اردو میں تبدیل
-      String urduAnswer = mathToLanguage.convert(mathResult.toString(), urduQuestion);
+      String urduAnswer = mathToLanguage.convert(mathResult, urduQuestion);
       print('   جواب: $urduAnswer');
       
       return urduAnswer;
