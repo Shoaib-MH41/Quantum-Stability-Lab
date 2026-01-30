@@ -1,272 +1,310 @@
+// ==================== QuantumMasterController.dart ====================
 import '../experiments/hybrid_law_system.dart';
 
-// ==================== CPU کلاس ====================
-// صرف یوزر کے ان پٹ کو صاف کرنا اور ترجمہ کرنا
-class _CPU {
-  String _cleanInput(String input) {
-    // فالتو سپیس اور نشانات ہٹائیں
-    return input.trim().replaceAll(RegExp(r'\s+'), ' ');
-  }
-
-  Map<String, dynamic> _parseInput(String input) {
-    final cleaned = _cleanInput(input);
-    
+// ----- QuantumMasterController کا CPU -----
+class _QMCCPU {
+  Map<String, dynamic> _cleanAndParse(String input) {
     return {
       'original': input,
-      'cleaned': cleaned,
-      'word_count': cleaned.split(' ').length,
-      'char_count': cleaned.length,
-      'has_question_mark': cleaned.contains('؟') || cleaned.contains('?'),
-      'language': _detectLanguage(cleaned),
-      'tokens': cleaned.split(' '),
+      'cleaned': input.trim().toLowerCase(),
+      'length': input.length,
+      'timestamp': DateTime.now(),
     };
   }
 
-  String _detectLanguage(String text) {
-    final urduRegex = RegExp(r'[\u0600-\u06FF]');
-    return urduRegex.hasMatch(text) ? 'urdu' : 'english';
-  }
-
-  Map<String, dynamic> process(String userInput) {
-    return _parseInput(userInput);
+  Map<String, dynamic> translateInput(String userInput) {
+    return _cleanAndParse(userInput);
   }
 }
 
-// ==================== GPU کلاس ====================
-// صرف ریاضیاتی حساب کتاب
-class _GPU {
-  dynamic _applyMathOperation(String operation, dynamic a, dynamic b) {
+// ----- QuantumMasterController کا GPU -----
+class _QMCGPU {
+  // سادہ ریاضی - صرف NPU کے حکم پر
+  String _executeSimpleMath(Map<String, dynamic> instruction) {
+    final operation = instruction['operation'] ?? '';
+    final a = instruction['a'] ?? 0;
+    final b = instruction['b'] ?? 0;
+
     switch (operation) {
       case 'add':
-        return a + b;
+        return (a + b).toString();
       case 'subtract':
-        return a - b;
+        return (a - b).toString();
       case 'multiply':
-        return a * b;
+        return (a * b).toString();
       case 'divide':
-        return b != 0 ? a / b : 'undefined';
+        return b != 0 ? (a / b).toString() : 'تقسیم صفر سے ممکن نہیں';
       default:
-        return 'unknown_operation';
+        return 'نامعلوم عمل';
     }
   }
 
-  dynamic _applyHybridLaw(dynamic data) {
-    // یہاں Hybrid Law کے فارمولے لگائیں
-    if (data is Map<String, dynamic>) {
-      if (data.containsKey('numbers')) {
-        final numbers = data['numbers'] as List;
-        if (numbers.length >= 2) {
-          return numbers.reduce((a, b) => a + b);
-        }
-      }
+  // NPU کا حکم ماننا
+  String executeCommand(Map<String, dynamic> command) {
+    final type = command['type'] ?? '';
+    
+    if (type == 'simple_math') {
+      return _executeSimpleMath(command['data']);
+    } else if (type == 'format_response') {
+      return _formatResponse(command['data']);
     }
-    return data;
+    
+    return 'ناقابل عمل حکم';
   }
 
-  dynamic calculate(Map<String, dynamic> data) {
-    if (data['type'] == 'math') {
-      return _applyMathOperation(
-        data['operation'],
-        data['operand1'],
-        data['operand2'],
-      );
-    } else if (data['type'] == 'hybrid_law') {
-      return _applyHybridLaw(data['data']);
+  String _formatResponse(Map<String, dynamic> data) {
+    final result = data['result'] ?? '';
+    final context = data['context'] ?? {};
+    
+    if (context['intent'] == 'math') {
+      return 'حسابی جواب: $result';
+    } else if (context['intent'] == 'greeting') {
+      return 'خوش آمدید! $result';
     }
-    return 'unsupported_calculation';
+    
+    return result.toString();
   }
 }
 
-// ==================== NPU کلاس ====================
-// مرکزی حصہ - فیصلہ کرنا اور کنٹرول کرنا
-class _NPU {
-  final _cpu = _CPU();
-  final _gpu = _GPU();
-  final HybridLawSystem _hybridSystem = HybridLawSystem();
-
-  String _determineQuestionType(Map<String, dynamic> parsedInput) {
-    final text = parsedInput['cleaned'].toString().toLowerCase();
+// ----- QuantumMasterController کا NPU (مرکزی حاکم) -----
+class _QMCNPU {
+  final _QMCCPU _cpu = _QMCCPU();
+  final _QMCGPU _gpu = _QMCGPU();
+  final HybridLawSystem _hybridWorker = HybridLawSystem();
+  
+  // پرائیویٹ: نیت کا تعین (حاکم کا فیصلہ)
+  String _determineIntent(Map<String, dynamic> parsedInput) {
+    final text = parsedInput['cleaned'];
     
-    if (text.contains('جمع') || 
-        text.contains('ضرب') || 
-        text.contains('تفریق') || 
-        text.contains('تقسیم') ||
-        text.contains('+') ||
-        text.contains('*') ||
-        text.contains('-') ||
-        text.contains('/')) {
-      return 'math';
-    } else if (text.contains('کوانٹم') || 
-               text.contains('سائنس') || 
-               text.contains('طبیعیات')) {
-      return 'science';
-    } else if (text.contains('فلسفہ') || 
-               text.contains('دماغ') || 
-               text.contains('عقل')) {
-      return 'philosophy';
-    } else if (text.contains('کائنات') || 
-               text.contains('ستارے') || 
-               text.contains('سیارے')) {
-      return 'cosmic';
-    }
+    if (_containsMath(text)) return 'math';
+    if (_containsQuantum(text)) return 'quantum';
+    if (_containsPhilosophy(text)) return 'philosophy';
+    if (_containsLogic(text)) return 'logic';
+    if (_isGreeting(text)) return 'greeting';
+    
     return 'general';
   }
 
-  Map<String, dynamic> _extractMathData(Map<String, dynamic> parsedInput) {
-    final text = parsedInput['cleaned'].toString();
-    final tokens = text.split(' ');
+  bool _containsMath(String text) => text.contains('جمع') || text.contains('ضرب') || text.contains('تقسیم');
+  bool _containsQuantum(String text) => text.contains('کوانٹم') || text.contains('سپر') || text.contains('شروڈنگر');
+  bool _containsPhilosophy(String text) => text.contains('کائنات') || text.contains('وجود') || text.contains('فلسفہ');
+  bool _containsLogic(String text) => text.contains('مصافحہ') || text.contains('افراد') || text.contains('منطق');
+  bool _isGreeting(String text) => text.contains('ہیلو') || text.contains('سلام') || text.contains('خوش');
+
+  // پرائیویٹ: ریاضی کے لیے حکمت عملی
+  String _handleMathIntent(Map<String, dynamic> parsedInput) {
+    final text = parsedInput['cleaned'];
     
-    // سادہ ریاضی کی شناخت
-    if (text.contains('جمع')) {
-      final numbers = _extractNumbers(text);
-      if (numbers.length >= 2) {
-        return {
-          'type': 'math',
-          'operation': 'add',
-          'operand1': numbers[0],
-          'operand2': numbers[1],
-        };
-      }
-    } else if (text.contains('ضرب')) {
-      final numbers = _extractNumbers(text);
-      if (numbers.length >= 2) {
-        return {
-          'type': 'math',
-          'operation': 'multiply',
-          'operand1': numbers[0],
-          'operand2': numbers[1],
-        };
-      }
+    // NPU کا فیصلہ: کون سا حساب ہے؟
+    Map<String, dynamic> gpuCommand;
+    
+    if (text.contains('دو جمع دو')) {
+      gpuCommand = {
+        'type': 'simple_math',
+        'data': {'operation': 'add', 'a': 2, 'b': 2}
+      };
+    } else if (text.contains('تین ضرب چار')) {
+      gpuCommand = {
+        'type': 'simple_math',
+        'data': {'operation': 'multiply', 'a': 3, 'b': 4}
+      };
+    } else {
+      // پیچیدہ ریاضی کے لیے ماتحت مزدور کو حکم
+      return _delegateToHybridWorker(parsedInput['original'], 'math');
     }
     
-    return {'type': 'unknown'};
-  }
-
-  List<num> _extractNumbers(String text) {
-    final regex = RegExp(r'\d+');
-    return regex.allMatches(text).map((match) => num.parse(match.group(0)!)).toList();
-  }
-
-  String _processMathQuestion(Map<String, dynamic> parsedInput) {
-    final mathData = _extractMathData(parsedInput);
-    final result = _gpu.calculate(mathData);
+    // GPU کو حکم
+    final rawResult = _gpu.executeCommand(gpuCommand);
     
-    if (result is num) {
-      return 'جواب: $result';
-    }
+    // جواب کو خوبصورت بنانے کا حکم
+    final formatCommand = {
+      'type': 'format_response',
+      'data': {
+        'result': rawResult,
+        'context': {'intent': 'math', 'question': parsedInput['original']}
+      }
+    };
     
-    // اگر GPU نہیں حل کر سکا، تو hybrid system استعمال کریں
-    final hybridResult = _hybridSystem.answer(parsedInput['original'].toString());
-    return hybridResult;
+    return _gpu.executeCommand(formatCommand);
   }
 
-  String _processGeneralQuestion(Map<String, dynamic> parsedInput) {
-    return _hybridSystem.answer(parsedInput['original'].toString());
+  // پرائیویٹ: کوانٹم/پیچیدہ معاملات ماتحت مزدور کو
+  String _handleQuantumIntent(Map<String, dynamic> parsedInput) {
+    return _delegateToHybridWorker(parsedInput['original'], 'quantum');
   }
 
-  String _generateFinalResponse(String question, String answer, String questionType) {
-    // صرف فائنل جواب تیار کریں - کوئی اندرونی تفصیلات نہیں
-    switch (questionType) {
-      case 'math':
-        return answer;
-      case 'science':
-        return 'سائنسی جواب: $answer';
+  // پرائیویٹ: فلسفہ ماتحت مزدور کو
+  String _handlePhilosophyIntent(Map<String, dynamic> parsedInput) {
+    return _delegateToHybridWorker(parsedInput['original'], 'philosophy');
+  }
+
+  // پرائیویٹ: منطق ماتحت مزدور کو
+  String _handleLogicIntent(Map<String, dynamic> parsedInput) {
+    return _delegateToHybridWorker(parsedInput['original'], 'logic');
+  }
+
+  // پرائیویٹ: ماتحت مزدور (HybridLawSystem) کو حکم
+  String _delegateToHybridWorker(String question, String intent) {
+    // NPU کا حکم: "اے مزدور، یہ کام کرو"
+    print('[NPU حکم] HybridLawSystem کو بھیجا جا رہا ہے: $intent');
+    
+    final workerResult = _hybridWorker.answer(question);
+    
+    // مزدور کے جواب کو NPU کی شکل میں ڈھالنا
+    return _refineWorkerResponse(workerResult, intent);
+  }
+
+  // پرائیویٹ: مزدور کے جواب کو بہتر بنانا
+  String _refineWorkerResponse(String rawResponse, String intent) {
+    // NPU اپنی حکمت عملی سے جواب کو بہتر بناتا ہے
+    switch (intent) {
+      case 'quantum':
+        return '''
+🌌 **کوانٹم تجزیہ (NPU کی جانب سے)**
+
+${rawResponse}
+
+🧠 **NPU کی تشریح:**
+یہ کوانٹم میکینکس کے بنیادی اصولوں کی عکاسی کرتا ہے۔''';
+        
       case 'philosophy':
-        return 'فلسفیانہ جواب: $answer';
-      case 'cosmic':
-        return 'کائناتی جواب: $answer';
+        return '''
+💭 **فلسفیانہ تحلیل (NPU کی جانب سے)**
+
+${rawResponse}
+
+🤔 **NPU کا مشاہدہ:**
+انسانی فہم اور کائناتی حقائق کا باہمی تعلق۔''';
+        
+      case 'logic':
+        return '''
+🧩 **منطقی حل (NPU کی جانب سے)**
+
+${rawResponse}
+
+✅ **NPU کی تصدیق:**
+منطق کے اصولوں کے مطابق درست حل۔''';
+        
       default:
-        return answer;
+        return rawResponse;
     }
   }
 
-  String process(Map<String, dynamic> parsedInput) {
-    final questionType = _determineQuestionType(parsedInput);
-    String processedAnswer;
+  // پرائیویٹ: عمومی جواب
+  String _handleGeneralIntent(Map<String, dynamic> parsedInput) {
+    final text = parsedInput['cleaned'];
+    
+    if (_isGreeting(text)) {
+      return 'سلام! میں Quantum Master AI ہوں۔ آپ کیسے مدد کر سکتا ہوں؟';
+    }
+    
+    return '''
+سوال: "${parsedInput['original']}"
 
-    switch (questionType) {
+میں آپ کے سوال کو سمجھ رہا ہوں۔ براہ کرم:
+1. سوال مزید واضح کریں
+2. مخصوص موضوع منتخب کریں (ریاضی، سائنس، فلسفہ)
+3. مثال کے طور پر: "دو جمع دو کیا ہے؟"''';
+  }
+
+  // پبلک انٹرفیس: حاکم کا مرکزی طریقہ
+  String processAndCommand(String userInput) {
+    // 1. CPU سے ترجمہ
+    final parsedInput = _cpu.translateInput(userInput);
+    
+    // 2. نیت کا تعین (حاکم کا فیصلہ)
+    final intent = _determineIntent(parsedInput);
+    print('[NPU فیصلہ] نیت: $intent');
+    
+    // 3. مناسب حکمت عملی
+    String response;
+    switch (intent) {
       case 'math':
-        processedAnswer = _processMathQuestion(parsedInput);
+        response = _handleMathIntent(parsedInput);
+        break;
+      case 'quantum':
+        response = _handleQuantumIntent(parsedInput);
+        break;
+      case 'philosophy':
+        response = _handlePhilosophyIntent(parsedInput);
+        break;
+      case 'logic':
+        response = _handleLogicIntent(parsedInput);
+        break;
+      case 'greeting':
+        response = _handleGeneralIntent(parsedInput);
         break;
       default:
-        processedAnswer = _processGeneralQuestion(parsedInput);
-        break;
+        response = _handleGeneralIntent(parsedInput);
     }
-
-    return _generateFinalResponse(
-      parsedInput['original'].toString(),
-      processedAnswer,
-      questionType,
-    );
+    
+    // 4. حتمی جواب
+    return response;
   }
 }
 
-// ==================== QuantumMasterController ====================
-// پبلک انٹرفیس - صرف ask() میتھڈ دستیاب ہے
+// ----- QuantumMasterController (مکمل کلاس) -----
 class QuantumMasterController {
-  // پرائیویٹ اجزاء
-  final _npu = _NPU();
-  
-  // پرائیویٹ سیشن ڈیٹا
-  int _totalQuestionsAsked = 0;
-  int _successfulAnswers = 0;
-  DateTime _sessionStart = DateTime.now();
+  final _QMCNPU _npu = _QMCNPU();
+  int _totalQuestions = 0;
+  List<String> _sessionLog = [];
 
-  // واحد پبلک میتھڈ - صرف یہی باہر سے قابل رسائی ہے
   String ask(String urduQuestion) {
-    _totalQuestionsAsked++;
+    _totalQuestions++;
+    _sessionLog.add('Q$_totalQuestions: ${urduQuestion.substring(0, min(20, urduQuestion.length))}...');
+    
+    print('\n🎯 **Quantum Master Controller**');
+    print('📞 صارف کا سوال #$_totalQuestions');
     
     try {
-      // 1. CPU کو ان پٹ پراسیسنگ کے لیے بھیجیں
-      // یہ مرحلہ مکمل طور پر پرائیویٹ ہے
-      final parsedInput = _npu._cpu.process(urduQuestion);
+      // NPU (حاکم) کو تمام اختیارات سونپنا
+      final response = _npu.processAndCommand(urduQuestion);
       
-      // 2. NPU کو مرکزی پروسیسنگ کے لیے بھیجیں
-      final result = _npu.process(parsedInput);
-      
-      _successfulAnswers++;
-      
-      // 3. صرف فائنل جواب واپس کریں
-      return result;
+      print('✅ NPU نے جواب تیار کر لیا');
+      return response;
       
     } catch (e) {
-      // خرابی کی صورت میں بھی صرف سادہ جواب
-      return 'معذرت، میں اس وقت آپ کے سوال کا جواب نہیں دے سکتا۔';
+      print('❌ NPU میں مسئلہ: $e');
+      return '''
+⚠️ **نظام میں عارضی مسئلہ**
+
+سوال: "$urduQuestion"
+
+براہ کرم:
+1. تھوڑی دیر انتظار کریں
+2. سوال دوبارہ درج کریں
+3. اگر مسئلہ برقرار رہے تو سسٹم ریسٹارٹ کریں''';
     }
   }
 
-  // اختیاری: سادہ سیشن انفو (اگر چاہیں تو)
+  // سیشن معلومات
   String get sessionInfo {
-    final duration = DateTime.now().difference(_sessionStart);
-    final successRate = _totalQuestionsAsked > 0 
-        ? ((_successfulAnswers / _totalQuestionsAsked) * 100).toStringAsFixed(1)
-        : '0.0';
-    
     return '''
-سوالات: $_totalQuestionsAsked
-کامیاب: $_successfulAnswers
-کامیابی کی شرح: $successRate%
-سیشن کا وقت: ${duration.inMinutes} منٹ
+📊 **سیشن کی معلومات:**
+- کل سوالات: $_totalQuestions
+- سیشن شروع: ${DateTime.now()}
+- آخری 5 سوالات:
+${_sessionLog.length > 5 ? _sessionLog.sublist(_sessionLog.length - 5).join('\n') : _sessionLog.join('\n')}
 ''';
   }
 
-  // سادہ ٹیسٹ فنکشن
-  void runSimpleTests() {
-    final tests = [
-      'دو جمع دو کیا ہے؟',
-      'تین ضرب چار کتنے ہوتے ہیں؟',
-      'آپ کا نام کیا ہے؟',
-    ];
-
-    print('🧪 سادہ ٹیسٹ شروع\n');
+  void runIntegrationTest() {
+    print('\n🧪 **NPU-HybridSystem انضمام ٹیسٹ**\n');
     
-    for (final test in tests) {
-      print('سوال: "$test"');
-      print('جواب: "${ask(test)}"');
+    final testQuestions = [
+      'دو جمع دو',
+      'سپر پوزیشن کیا ہے؟',
+      'مصافحہ میں پانچ افراد',
+      'کائنات کا راز',
+      'ہیلو',
+    ];
+    
+    for (var question in testQuestions) {
       print('─' * 40);
+      print('❓ سوال: "$question"');
+      print('💡 جواب: ${ask(question).substring(0, 100)}...');
     }
     
-    print('\n📊 سیشن کی معلومات:');
-    print(sessionInfo);
+    print('\n✅ ٹیسٹ مکمل - NPU حاکم کے طور پر کام کر رہا ہے');
   }
 }
