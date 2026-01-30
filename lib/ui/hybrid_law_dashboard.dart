@@ -9,143 +9,117 @@ class HybridLawDashboard extends StatefulWidget {
 class _HybridLawDashboardState extends State<HybridLawDashboard> {
   final HybridLawSystem system = HybridLawSystem();
   final TextEditingController controller = TextEditingController();
-  String result = '';
-  List<String> history = [];
-  
+
+  final List<_ChatMessage> messages = [];
+  bool isProcessing = false;
+
   void askQuestion() {
-    if (controller.text.isEmpty) return;
-    
+    final text = controller.text.trim();
+    if (text.isEmpty) return;
+
     setState(() {
-      final question = controller.text;
-      final answer = system.answer(question);
-      
-      result = answer;
-      history.add('سوال: $question\nجواب: $answer\n');
-      
+      isProcessing = true;
+      messages.add(_ChatMessage(text, true));
       controller.clear();
     });
+
+    Future.delayed(const Duration(milliseconds: 200), () {
+      final answer = system.answer(text);
+
+      setState(() {
+        messages.add(_ChatMessage(answer, false));
+        isProcessing = false;
+      });
+    });
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Text('🧠 ہائبرڈ قانونی نظام'),
+        title: const Text('Hybrid Law System'),
         backgroundColor: Colors.deepPurple,
+        centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // ان پٹ فیلڈ
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    TextField(
-                      controller: controller,
-                      decoration: InputDecoration(
-                        hintText: 'اردو میں سوال لکھیں...',
-                        border: OutlineInputBorder(),
-                        suffixIcon: Icon(Icons.question_answer),
-                      ),
-                      onSubmitted: (_) => askQuestion(),
-                    ),
-                    SizedBox(height: 10),
-                    ElevatedButton.icon(
-                      onPressed: askQuestion,
-                      icon: Icon(Icons.psychology),
-                      label: Text('سوال پوچھیں'),
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: Size(double.infinity, 50),
-                      ),
-                    ),
-                  ],
-                ),
+      body: Column(
+        children: [
+          // Chat area
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: messages.length,
+              itemBuilder: (context, index) {
+                final msg = messages[index];
+                return _bubble(msg.text, msg.isUser);
+              },
+            ),
+          ),
+
+          // Input
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.grey[900],
+              border: const Border(
+                top: BorderSide(color: Colors.white12),
               ),
             ),
-            
-            SizedBox(height: 20),
-            
-            // نتیجہ
-            Card(
-              color: Colors.green[900],
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    Text('نتیجہ:', style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    )),
-                    SizedBox(height: 10),
-                    Text(result, style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                    )),
-                  ],
-                ),
-              ),
-            ),
-            
-            SizedBox(height: 20),
-            
-            // مثالیں
-            Expanded(
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('مثالیں:', style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      )),
-                      SizedBox(height: 10),
-                      ...['دو جمع دو کیا ہے', 'تین ضرب چار کتنے', 'دس تفریق پانچ ہے']
-                          .map((example) => ListTile(
-                        title: Text(example),
-                        trailing: Icon(Icons.arrow_forward),
-                        onTap: () {
-                          controller.text = example;
-                          askQuestion();
-                        },
-                      )).toList(),
-                    ],
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: controller,
+                    onSubmitted: (_) => askQuestion(),
+                    style: const TextStyle(color: Colors.white),
+                    decoration: const InputDecoration(
+                      hintText: 'اردو میں سوال لکھیں…',
+                      hintStyle: TextStyle(color: Colors.white54),
+                      border: InputBorder.none,
+                    ),
                   ),
                 ),
-              ),
-            ),
-            
-            // ہسٹری
-            if (history.isNotEmpty) ...[
-              SizedBox(height: 20),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('سوالوں کی تاریخ:', style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      )),
-                      ...history.reversed.take(3).map((item) => 
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4.0),
-                          child: Text(item, style: TextStyle(fontSize: 12)),
-                        )).toList(),
-                    ],
+                IconButton(
+                  icon: Icon(
+                    isProcessing ? Icons.hourglass_bottom : Icons.send,
+                    color: Colors.deepPurpleAccent,
                   ),
+                  onPressed: isProcessing ? null : askQuestion,
                 ),
-              ),
-            ],
-          ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _bubble(String text, bool isUser) {
+    return Align(
+      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(12),
+        constraints: const BoxConstraints(maxWidth: 300),
+        decoration: BoxDecoration(
+          color: isUser ? Colors.blueGrey[800] : Colors.deepPurple[700],
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Text(
+          text,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 14,
+            height: 1.4,
+          ),
         ),
       ),
     );
   }
+}
+
+class _ChatMessage {
+  final String text;
+  final bool isUser;
+  _ChatMessage(this.text, this.isUser);
 }
