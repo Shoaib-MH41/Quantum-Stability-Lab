@@ -1,6 +1,7 @@
-// تمام اہم فائلوں کا امپورٹ
-import 'language_to_math.dart';
+
+import 'dart:math';
 import 'cpu_translator.dart';
+import 'cpu_intent.dart';
 import 'law_based_gpu.dart';
 import 'math_to_language.dart';
 import 'logic_solver.dart';
@@ -9,21 +10,21 @@ import 'advanced_math_laws.dart';
 import 'quantum_logic.dart';
 
 class HybridLawSystem {
-  // ماڈیولز
-  final LanguageToMathConverter languageToMath = LanguageToMathConverter();
+  // -------------------- ماڈیولز --------------------
+  final CPUTranslator cpu = CPUTranslator();
   final LawBasedGPUCalculator gpuCalculator = LawBasedGPUCalculator();
   final MathToLanguageConverter mathToLanguage = MathToLanguageConverter();
-  final CPUTranslator cpu = CPUTranslator(); // 🔑 اصل دماغ
 
+  // -------------------- سوال کا جواب --------------------
   String answer(String urduQuestion) {
     print('\n🧠 CPU نے سوال وصول کیا: "$urduQuestion"');
 
     try {
-      // 1️⃣ CPU فیصلہ کرے: سوال کی نوعیت کیا ہے؟
+      // 1️⃣ سوال کی نوعیت معلوم کریں
       final intent = cpu.detectIntent(urduQuestion);
       print('🔍 CPU فیصلہ: $intent');
 
-      // 2️⃣ اگر پہیلی / فلسفہ / عمومی سوال
+      // 2️⃣ پہیلی / فلسفیانہ سوال
       if (intent == CPUIntent.puzzle) {
         final puzzle = LogicSolver.solvePuzzle(urduQuestion);
         if (!puzzle.containsKey('error')) {
@@ -31,30 +32,23 @@ class HybridLawSystem {
         }
       }
 
-      // 3️⃣ اگر کوانٹم سوال ہے → NPU / Bohr logic
+      // 3️⃣ کوانٹم سوال → NPU logic
       if (intent == CPUIntent.quantum) {
         final quantumResult = QuantumLogic.process(urduQuestion);
-        if (quantumResult != null && quantumResult.isNotEmpty) {
-          return quantumResult;
-        }
+        return quantumResult;
       }
 
-      // 4️⃣ اگر ریاضی ہے → GPU / Einstein logic
+      // 4️⃣ ریاضیاتی سوال → GPU logic
       if (intent == CPUIntent.math) {
-        final mathExpression =
-            EnhancedLanguageToMath.convertAdvanced(urduQuestion);
-
+        final mathExpression = EnhancedLanguageToMath.convertAdvanced(urduQuestion);
         final mathResult = gpuCalculator.calculate(mathExpression);
 
-        // ⚠️ اگر نتیجہ null یا خالی ہو تو سوال واپس مت دو
-        if (mathResult == null) {
-          return '❌ حساب مکمل نہیں ہو سکا';
-        }
+        if (mathResult == null) return '❌ حساب مکمل نہیں ہو سکا';
 
         return mathToLanguage.convert(mathResult, urduQuestion);
       }
 
-      // 5️⃣ fallback (اگر CPU کنفیوز ہو)
+      // 5️⃣ fallback
       return '🤔 سوال سمجھ میں نہیں آیا، دوبارہ پوچھیں';
 
     } catch (e) {
@@ -62,13 +56,16 @@ class HybridLawSystem {
     }
   }
 
-  // ٹیسٹنگ
+  // -------------------- ٹیسٹنگ --------------------
   void test() {
     print('🧪 Hybrid System Test شروع');
 
-    print(answer('دو جمع دو'));
-    print(answer('پانچ لاکھ ضرب دو'));
-    print(answer('کائنات کا راز کیا ہے'));
-    print(answer('سپر پوزیشن کیا ہے'));
+    print(answer('دو جمع دو')); // math
+    print(answer('پانچ لاکھ ضرب دو')); // math
+    print(answer('کائنات کا راز کیا ہے')); // puzzle / logic
+    print(answer('سپر پوزیشن کیا ہے')); // quantum
+    print(answer('اینٹینگلمنٹ کی وضاحت کریں')); // quantum
+    print(answer('شروڈنگر کی بلی کیا ہے؟')); // quantum
+    print(answer('مصافحہ میں پانچ افراد')); // puzzle / logic
   }
 }
