@@ -1,5 +1,6 @@
 // ==================== QuantumMasterController.dart ====================
 import '../experiments/hybrid_law_system.dart';
+import 'dart:math';
 
 // ----- QuantumMasterController کا CPU -----
 class _QMCCPU {
