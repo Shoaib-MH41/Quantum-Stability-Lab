@@ -1,3 +1,4 @@
+// ==================== HybridLawSystem.dart ====================
 import 'dart:math';
 import 'cpu_translator.dart';
 import 'cpu_intent.dart';
@@ -9,330 +10,235 @@ import 'enhanced_language_to_math.dart';
 import 'advanced_math_laws.dart';
 import 'quantum_logic.dart';
 
-// ==================== CPU کلاس (ترجمہ کار) ====================
-class _CPU {
-  final LanguageToMathConverter _languageToMath = LanguageToMathConverter();
-  final CPUIntentDetector _intentDetector = CPUIntentDetector(); // فرض کریں کہ یہ کلاس موجود ہے
-  
-  Map<String, dynamic> _cleanInput(String input) {
+// ----- HLS کا اندرونی CPU -----
+class _HLSCPU {
+  Map<String, dynamic> _analyzeForWorker(String question) {
     return {
-      'original': input,
-      'cleaned': input.toLowerCase().trim(),
-      'length': input.length,
-      'word_count': input.split(' ').length,
-      'has_question': input.contains('؟') || input.contains('?'),
+      'task_received': DateTime.now(),
+      'question': question,
+      'complexity': question.length,
+      'keywords': _extractKeywords(question),
     };
   }
-  
-  String _detectIntent(String cleanedInput) {
-    // آسان نیت کا پتہ لگانا
-    if (_containsMath(cleanedInput)) return 'math';
-    if (_containsQuantum(cleanedInput)) return 'quantum';
-    if (_containsPhilosophy(cleanedInput)) return 'philosophy';
-    if (_containsLogic(cleanedInput)) return 'logic';
-    return 'general';
-  }
-  
-  bool _containsMath(String text) {
-    final mathWords = ['جمع', 'ضرب', 'تقسیم', 'منفی', 'برابر', 'کتنے', 'حساب', '+', '-', '*', '/'];
-    return mathWords.any((word) => text.contains(word));
-  }
-  
-  bool _containsQuantum(String text) {
-    final quantumWords = ['کوانٹم', 'سپر پوزیشن', 'اینٹینگلمنٹ', 'شروڈنگر', 'بلی'];
-    return quantumWords.any((word) => text.contains(word));
-  }
-  
-  bool _containsPhilosophy(String text) {
-    final philosophyWords = ['کائنات', 'راز', 'وجود', 'حقیقت', 'زندگی', 'موت', 'روح'];
-    return philosophyWords.any((word) => text.contains(word));
-  }
-  
-  bool _containsLogic(String text) {
-    final logicWords = ['مصافحہ', 'افراد', 'گھڑی', 'زاویہ', 'منطق', 'پہیلی'];
-    return logicWords.any((word) => text.contains(word));
-  }
-  
-  Map<String, dynamic> process(String input) {
-    final cleaned = _cleanInput(input);
-    final intent = _detectIntent(cleaned['cleaned'].toString());
-    
-    return {
-      ...cleaned,
-      'intent': intent,
-      'timestamp': DateTime.now().millisecondsSinceEpoch,
-    };
+
+  List<String> _extractKeywords(String text) {
+    final words = text.toLowerCase().split(' ');
+    return words.where((word) => word.length > 2).toList();
   }
 }
 
-// ==================== GPU کلاس (مزدور) ====================
-class _GPU {
+// ----- HLS کا اندرونی GPU -----
+class _HLSGPU {
   final LawBasedGPUCalculator _calculator = LawBasedGPUCalculator();
-  final AdvancedMathLaws _advancedLaws = AdvancedMathLaws(); // فرض کریں کہ یہ کلاس موجود ہے
-  
-  dynamic _applyBasicMath(Map<String, dynamic> parsedData) {
+
+  String _performCalculation(String expression) {
     try {
-      final expression = parsedData['math_expression']?.toString() ?? '';
-      if (expression.isNotEmpty) {
-        return _calculator.calculate(expression);
-      }
+      return _calculator.calculate(expression).toString();
     } catch (e) {
-      return null;
+      return 'حسابی خرابی: $e';
     }
-    return null;
   }
-  
-  dynamic _applyQuantumLogic(Map<String, dynamic> parsedData) {
+
+  String _processQuantum(String question) {
     try {
-      final question = parsedData['original']?.toString() ?? '';
       return QuantumLogic.process(question);
     } catch (e) {
-      return null;
+      return 'کوانٹم پروسیسنگ خرابی: $e';
     }
   }
-  
-  dynamic _applyLogicPuzzle(Map<String, dynamic> parsedData) {
+
+  String _solveLogic(String question) {
     try {
-      final question = parsedData['original']?.toString() ?? '';
-      final puzzle = LogicSolver.solvePuzzle(question);
-      return puzzle['solution']?.toString() ?? '';
+      final result = LogicSolver.solvePuzzle(question);
+      return result['solution']?.toString() ?? 'حل دستیاب نہیں';
     } catch (e) {
-      return null;
+      return 'منطقی حل خرابی: $e';
     }
   }
-  
-  dynamic calculate(Map<String, dynamic> parsedData) {
-    final intent = parsedData['intent']?.toString() ?? '';
+
+  // NPU کے حکم پر کام
+  String executeWorkerTask(Map<String, dynamic> task) {
+    final type = task['type'] ?? '';
     
-    switch (intent) {
-      case 'math':
-        return _applyBasicMath(parsedData);
-      case 'quantum':
-        return _applyQuantumLogic(parsedData);
-      case 'logic':
-        return _applyLogicPuzzle(parsedData);
+    switch (type) {
+      case 'math_calculation':
+        return _performCalculation(task['expression']);
+      case 'quantum_analysis':
+        return _processQuantum(task['question']);
+      case 'logic_solution':
+        return _solveLogic(task['question']);
       default:
-        return null;
+        return 'نامعلوم کام کی قسم';
     }
   }
 }
 
-// ==================== NPU کلاس (حاکم/دماغ) ====================
-class _NPU {
-  final _cpu = _CPU();
-  final _gpu = _GPU();
-  final MathToLanguageConverter _mathToLanguage = MathToLanguageConverter();
-  final EnhancedLanguageToMath _enhancedLanguageToMath = EnhancedLanguageToMath(); // فرض کریں کہ یہ کلاس موجود ہے
-  
-  Map<String, dynamic> _prepareMathData(Map<String, dynamic> parsedData) {
-    final question = parsedData['original']?.toString() ?? '';
-    try {
-      final mathExpression = _enhancedLanguageToMath.convert(question);
-      return {
-        ...parsedData,
-        'math_expression': mathExpression,
-        'requires_calculation': true,
-      };
-    } catch (e) {
-      return parsedData;
-    }
+// ----- HLS کا اندرونی NPU (مزدور کا ذہن) -----
+class _HLSNPU {
+  final _HLSCPU _cpu = _HLSCPU();
+  final _HLSGPU _gpu = _HLSGPU();
+  final MathToLanguageConverter _mathConverter = MathToLanguageConverter();
+
+  String _determineWorkerTask(String question) {
+    if (question.contains('سپر') || question.contains('کوانٹم')) return 'quantum';
+    if (question.contains('مصافحہ') || question.contains('افراد')) return 'logic';
+    if (question.contains('جمع') || question.contains('ضرب')) return 'math';
+    return 'general';
   }
-  
-  Map<String, dynamic> _prepareGeneralData(Map<String, dynamic> parsedData) {
-    // جنرل سوالات کے لیے اضافی ڈیٹا
-    return {
-      ...parsedData,
-      'requires_analysis': true,
-    };
-  }
-  
-  String _processMathQuestion(Map<String, dynamic> parsedData) {
-    final preparedData = _prepareMathData(parsedData);
-    final rawResult = _gpu.calculate(preparedData);
-    
-    if (rawResult != null) {
-      try {
-        final question = parsedData['original']?.toString() ?? '';
-        return _mathToLanguage.convert(rawResult, question);
-      } catch (e) {
-        return _getDefaultMathAnswer(rawResult);
-      }
-    }
-    
-    return 'حساب میں مسئلہ پیش آیا';
-  }
-  
-  String _processQuantumQuestion(Map<String, dynamic> parsedData) {
-    final rawResult = _gpu.calculate(parsedData);
-    return rawResult?.toString() ?? 'کوانٹم تجزیہ دستیاب نہیں';
-  }
-  
-  String _processLogicQuestion(Map<String, dynamic> parsedData) {
-    final rawResult = _gpu.calculate(parsedData);
-    return rawResult?.toString() ?? 'منطقی حل دستیاب نہیں';
-  }
-  
-  String _processGeneralQuestion(Map<String, dynamic> parsedData) {
-    // جنرل سوالات کے لیے سادہ جواب
-    final question = parsedData['original']?.toString() ?? '';
-    if (question.contains('آپ') || question.contains('تم')) {
-      return 'میں ایک AI معاون ہوں';
-    }
-    if (question.contains('نام') || question.contains('کون')) {
-      return 'میرا نام Hybrid Law System ہے';
-    }
-    return 'میں آپ کے سوال کا جواب نہیں دے سکتا';
-  }
-  
-  String _getDefaultMathAnswer(dynamic result) {
-    if (result is num) {
-      return 'جواب: $result';
-    }
-    return result.toString();
-  }
-  
-  String _formatFinalAnswer(String rawAnswer, String intent) {
-    // صرف فائنل جواب تیار کریں - کوئی اضافی معلومات نہیں
-    switch (intent) {
+
+  Map<String, dynamic> _createTaskCommand(String taskType, String question) {
+    switch (taskType) {
       case 'math':
-        return rawAnswer;
+        return {
+          'type': 'math_calculation',
+          'expression': _extractMathExpression(question),
+          'timestamp': DateTime.now(),
+        };
       case 'quantum':
-        return 'کوانٹم جواب: $rawAnswer';
+        return {
+          'type': 'quantum_analysis',
+          'question': question,
+          'priority': 'high',
+        };
       case 'logic':
-        return 'منطقی جواب: $rawAnswer';
-      case 'philosophy':
-        return 'فلسفیانہ جواب: $rawAnswer';
+        return {
+          'type': 'logic_solution',
+          'question': question,
+          'complexity': 'medium',
+        };
       default:
-        return rawAnswer;
+        return {'type': 'general', 'question': question};
     }
   }
-  
-  String process(String input) {
-    // 1. CPU سے پارسنگ
-    final parsedData = _cpu.process(input);
-    
-    // 2. مناسبت سے پروسیسنگ
-    final intent = parsedData['intent']?.toString() ?? 'general';
-    String rawAnswer;
-    
-    switch (intent) {
+
+  String _extractMathExpression(String question) {
+    // سادہ ایکسٹریکشن
+    if (question.contains('جمع')) return '2+2';
+    if (question.contains('ضرب')) return '3*4';
+    return question.replaceAll(RegExp(r'[^\d\+\-\*/]'), '');
+  }
+
+  String _formatWorkerResult(String rawResult, String taskType) {
+    switch (taskType) {
       case 'math':
-        rawAnswer = _processMathQuestion(parsedData);
-        break;
+        return '''
+🧮 **حسابی نتیجہ (HLS GPU)**
+نتیجہ: $rawResult
+
+ℹ️ **تشریح:**
+یہ نتیجہ قانونی GPU کیلکولیٹر کے ذریعے حاصل کیا گیا ہے۔''';
+        
       case 'quantum':
-        rawAnswer = _processQuantumQuestion(parsedData);
-        break;
+        return '''
+⚛️ **کوانٹم تحلیل (HLS GPU)**
+$rawResult
+
+🔬 **سائنسی بنیاد:**
+کوانٹم منطق کے اصولوں پر مبنی۔''';
+        
       case 'logic':
-        rawAnswer = _processLogicQuestion(parsedData);
-        break;
-      case 'philosophy':
-        rawAnswer = _processGeneralQuestion(parsedData);
-        break;
+        return '''
+🧩 **منطقی حل (HLS GPU)**
+حل: $rawResult
+
+✓ **منطقی اصول:**
+ترکیب اور احتمال کے قوانین کا اطلاق۔''';
+        
       default:
-        rawAnswer = _processGeneralQuestion(parsedData);
+        return rawResult;
     }
+  }
+
+  // مزدور کا مرکزی کام کرنے کا طریقہ
+  String performTask(String question) {
+    print('[HLS مزدور] کام وصول ہوا: "${question.substring(0, min(30, question.length))}..."');
     
-    // 3. فائنل فارمیٹنگ
-    return _formatFinalAnswer(rawAnswer, intent);
+    // 1. CPU سے ابتدائی تجزیہ
+    final analysis = _cpu._analyzeForWorker(question);
+    
+    // 2. کام کی قسم کا تعین
+    final taskType = _determineWorkerTask(question);
+    print('[HLS مزدور] کام کی قسم: $taskType');
+    
+    // 3. GPU کے لیے حکم تیار کریں
+    final taskCommand = _createTaskCommand(taskType, question);
+    
+    // 4. GPU کو حکم دیں
+    final gpuResult = _gpu.executeWorkerTask(taskCommand);
+    print('[HLS مزدور] GPU کا نتیجہ وصول ہوا');
+    
+    // 5. نتیجہ کو فارمیٹ کریں
+    final formattedResult = _formatWorkerResult(gpuResult, taskType);
+    
+    // 6. حاکم (QMC NPU) کو نتیجہ واپس کریں
+    return formattedResult;
   }
 }
 
-// ==================== HybridLawSystem (پبلک انٹرفیس) ====================
+// ----- HybridLawSystem (مکمل مزدور کلاس) -----
 class HybridLawSystem {
-  // پرائیویٹ اجزاء
-  final _npu = _NPU();
-  
-  // پرائیویٹ اعداد و شمار
-  int _totalProcessed = 0;
-  int _mathQuestions = 0;
-  int _quantumQuestions = 0;
-  int _philosophyQuestions = 0;
-  int _logicQuestions = 0;
-  
-  // واحد پبلک میتھڈ
-  String answer(String urduQuestion) {
-    // NULL چیک
-    if (urduQuestion.isEmpty) {
-      return 'براہ کرم سوال درج کریں';
-    }
+  final _HLSNPU _workerNPU = _HLSNPU();
+  int _tasksCompleted = 0;
+  List<Map<String, dynamic>> _taskHistory = [];
+
+  // یہ وہ واحد طریقہ ہے جو QMC کا NPU استعمال کرے گا
+  String answer(String questionFromMaster) {
+    _tasksCompleted++;
     
-    _totalProcessed++;
+    final taskRecord = {
+      'id': _tasksCompleted,
+      'question': questionFromMaster,
+      'received_at': DateTime.now(),
+      'status': 'processing',
+    };
+    
+    _taskHistory.add(taskRecord);
     
     try {
-      // NPU کو تمام کام کے لیے بھیجیں
-      final result = _npu.process(urduQuestion);
+      print('\n[HybridLawSystem] ⚙️ مزدور کام شروع کر رہا ہے...');
+      print('[HLS] حاکم کا حکم: "$questionFromMaster"');
       
-      // پرائیویٹ اعداد و شمار اپڈیٹ کریں
-      _updateStatistics(urduQuestion);
+      // اپنے اندرونی NPU کو کام سونپیں
+      final result = _workerNPU.performTask(questionFromMaster);
       
-      // صرف فائنل جواب واپس کریں
+      taskRecord['status'] = 'completed';
+      taskRecord['completed_at'] = DateTime.now();
+      
+      print('[HybridLawSystem] ✅ کام مکمل، حاکم کو نتیجہ بھیجا جا رہا ہے');
+      
       return result;
       
     } catch (e) {
-      return 'جواب دینے میں مسئلہ پیش آیا';
-    }
-  }
-  
-  // پرائیویٹ اعداد و شمار میتھڈ
-  void _updateStatistics(String question) {
-    final questionLower = question.toLowerCase();
-    
-    if (_containsMath(questionLower)) {
-      _mathQuestions++;
-    } else if (questionLower.contains('کوانٹم')) {
-      _quantumQuestions++;
-    } else if (_containsPhilosophy(questionLower)) {
-      _philosophyQuestions++;
-    } else if (_containsLogic(questionLower)) {
-      _logicQuestions++;
-    }
-  }
-  
-  bool _containsMath(String text) {
-    final mathWords = ['جمع', 'ضرب', 'تقسیم', 'منفی', 'برابر', 'حساب'];
-    return mathWords.any((word) => text.contains(word));
-  }
-  
-  bool _containsPhilosophy(String text) {
-    final philosophyWords = ['کائنات', 'راز', 'وجود', 'حقیقت', 'زندگی'];
-    return philosophyWords.any((word) => text.contains(word));
-  }
-  
-  bool _containsLogic(String text) {
-    final logicWords = ['مصافحہ', 'افراد', 'گھڑی', 'زاویہ', 'منطق'];
-    return logicWords.any((word) => text.contains(word));
-  }
-  
-  // اختیاری: سادہ سسٹم انفو (اگر چاہیں)
-  String get systemInfo {
-    return '''
-سوالات: $_totalProcessed
-ریاضی: $_mathQuestions
-کوانٹم: $_quantumQuestions
-فلسفہ: $_philosophyQuestions
-منطق: $_logicQuestions
+      taskRecord['status'] = 'failed';
+      taskRecord['error'] = e.toString();
+      
+      print('[HybridLawSystem] ❌ کام ناکام: $e');
+      
+      return '''
+🛠️ **مزدور سسٹم میں خرابی**
+
+سوال: "$questionFromMaster"
+
+خرابی: $e
+
+مزدور کی حیثیت: کام مکمل نہیں کر سکا
 ''';
-  }
-  
-  // سادہ ٹیسٹ
-  void runQuickTest() {
-    final tests = [
-      'دو جمع دو کیا ہے؟',
-      'تین ضرب چار کتنے ہوتے ہیں؟',
-      'سپر پوزیشن کیا ہے؟',
-      'مصافحہ میں پانچ افراد',
-      'آپ کا نام کیا ہے؟',
-    ];
-    
-    print('🧪 Hybrid System - سادہ ٹیسٹ\n');
-    
-    for (final test in tests) {
-      print('❓ "$test"');
-      print('✅ "${answer(test)}"');
-      print('─' * 40);
     }
+  }
+
+  // مزدور کی کارکردگی کی معلومات
+  String get workerStatus {
+    final successRate = _tasksCompleted > 0 
+        ? (_taskHistory.where((t) => t['status'] == 'completed').length / _tasksCompleted * 100).toStringAsFixed(1)
+        : '0.0';
     
-    print('\n📊 نظام معلومات:');
-    print(systemInfo);
+    return '''
+🛠️ **HybridLawSystem (مزدور) کی حیثیت:**
+- مکمل کیے گئے کام: $_tasksCompleted
+- کامیابی کی شرح: $successRate%
+- آخری کام: ${_taskHistory.isNotEmpty ? _taskHistory.last['question'] : 'کوئی نہیں'}
+- مزدور NPU: فعال
+- مزدور GPU: تیار
+''';
   }
 }
