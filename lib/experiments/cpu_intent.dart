@@ -1,2 +1,8 @@
-// lib/experiments/cpu_intent.dart
-enum CPUIntent { math, puzzle, quantum, logic, general }
+/// CPU ارادوں کی قسمیں (enum)
+enum CPUIntent {
+  math,      // ریاضی
+  puzzle,    // پہیلی/منطق
+  quantum,   // کوانٹم
+  logic,     // منطقی
+  general    // عمومی
+}
