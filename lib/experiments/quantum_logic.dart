@@ -63,7 +63,7 @@ $qubits qubits ≈ $power کلاسیکل حالتیں
   // 🧠 PROBLEM SOLVER (CPU ENTRY POINT)
   // --------------------------------------------------
 
-  static Map<String, dynamic> execute(String question) {
+  static Map<String, dynamic> process (String question) {
     if (_containsAny(question, ['کوانٹم بٹ', 'qubit', 'حالت'])) {
       return _solveQubitStates(question);
     }
