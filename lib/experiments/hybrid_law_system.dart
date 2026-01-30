@@ -30,13 +30,16 @@ class HybridLawSystem {
         if (!puzzle.containsKey('error')) {
           return puzzle['solution'];
         }
+
+        if (intent == CPUIntent.quantum) {
+        final quantumResult = QuantumLogic.process(urduQuestion);
+
+        if (quantumResult == null || quantumResult.isEmpty) {
+         return '❌ کوانٹم جواب دستیاب نہیں';
       }
 
-      // 3️⃣ کوانٹم سوال → NPU logic
-      if (intent == CPUIntent.quantum) {
-        final quantumResult = QuantumLogic.process(urduQuestion);
-        return quantumResult;
-      }
+          return quantumResult;
+    }
 
       // 4️⃣ ریاضیاتی سوال → GPU logic
       if (intent == CPUIntent.math) {
