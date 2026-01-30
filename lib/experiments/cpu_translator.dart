@@ -1,106 +1,43 @@
-// ہم نے یہاں CPUIntent کو امپورٹ نہیں کیا کیونکہ وہ ایک الگ فائل میں ہے، 
-// لیکن فنکشن میں اس کا استعمال درست طریقے سے کیا گیا ہے۔
-import 'cpu_intent.dart'; 
+import 'cpu_intent.dart';
 
+/// CPU مترجم - سوال کی نوعیت پہچاننے والا
 class CPUTranslator {
-  // 🧠 نئے فنکشن کا اضافہ: سوال کی نوعیت پہچاننا
+  
+  // 🧠 سوال کی نوعیت پہچاننا
   CPUIntent detectIntent(String question) {
-    // 1. کوانٹم چیک (سپر پوزیشن، اینٹینگلمنٹ وغیرہ)
-    if (question.contains('کوانٹم') || 
-        question.contains('سپر پوزیشن') || 
-        question.contains('اینٹینگلمنٹ') ||
-        question.contains('شروڈنگر')) {
-      return CPUIntent.quantum;
-    }
+    final q = question.toLowerCase().trim();
     
-    // 2. پہیلی اور کائناتی راز چیک
-    if (question.contains('راز') || 
-        question.contains('کائنات') || 
-        question.contains('پہیلی') ||
-        question.contains('مصافحہ')) {
-      return CPUIntent.puzzle;
-    }
-    
-    // 3. ریاضیاتی چیک
-    if (question.contains('جمع') || 
-        question.contains('ضرب') || 
-        question.contains('تقسیم') || 
-        question.contains('منفی') ||
-        question.contains('کتنے') ||
-        question.contains('لاکھ') ||
-        question.contains('کروڑ')) {
+    // ریاضی
+    if (_containsAny(q, ['جمع', 'ضرب', 'تقسیم', 'منفی', 'برابر', 'کتنے', 'حساب', 'دو جمع دو', 'تین ضرب چار'])) {
       return CPUIntent.math;
     }
     
-    // ڈیفالٹ
+    // کوانٹم
+    if (_containsAny(q, ['کوانٹم', 'سپر پوزیشن', 'اینٹینگلمنٹ', 'شروڈنگر', 'بلی', 'طول موج', 'qubit'])) {
+      return CPUIntent.quantum;
+    }
+    
+    // منطق/پہیلی
+    if (_containsAny(q, ['مصافحہ', 'افراد', 'گھڑی', 'زاویہ', 'منطق', 'پہیلی', 'حل کریں'])) {
+      return CPUIntent.puzzle;
+    }
+    
+    // فلسفہ/منطق
+    if (_containsAny(q, ['کائنات', 'راز', 'وجود', 'حقیقت', 'زندگی', 'موت', 'روح', 'دماغ', 'عقل'])) {
+      return CPUIntent.logic;
+    }
+    
+    // عمومی
     return CPUIntent.general;
   }
-
-  // -------------------- اردو عدد --------------------
-  static final Map<int, String> numberToUrdu = {
-    0: 'صفر', 1: 'ایک', 2: 'دو', 3: 'تین', 4: 'چار',
-    5: 'پانچ', 6: 'چھ', 7: 'سات', 8: 'آٹھ', 9: 'نو',
-    10: 'دس', 11: 'گیارہ', 12: 'بارہ', 13: 'تیرہ',
-    14: 'چودہ', 15: 'پندرہ', 16: 'سولہ', 17: 'سترہ',
-    18: 'اٹھارہ', 19: 'انیس', 20: 'بیس',
-    30: 'تیس', 40: 'چالیس', 50: 'پچاس', 60: 'ساٹھ',
-    70: 'ستر', 80: 'اسی', 90: 'نوے', 100: 'سو',
-    1000: 'ہزار', 100000: 'لاکھ', 10000000: 'کروڑ',
-  };
-
-  // -------------------- اردو عدد بنانا --------------------
-  String translateNumberToUrdu(int number) {
-    if (numberToUrdu.containsKey(number)) {
-      return numberToUrdu[number]!;
+  
+  // 🔧 ہیلپر فنکشن
+  bool _containsAny(String text, List<String> keys) {
+    for (final key in keys) {
+      if (text.contains(key)) {
+        return true;
+      }
     }
-
-    if (number < 100) {
-      final tens = (number ~/ 10) * 10;
-      final ones = number % 10;
-      return ones == 0
-          ? numberToUrdu[tens]!
-          : '${numberToUrdu[tens]!} ${numberToUrdu[ones]!}';
-    }
-
-    if (number < 1000) {
-      final hundreds = number ~/ 100;
-      final rest = number % 100;
-      final h = hundreds == 1 ? 'سو' : '${numberToUrdu[hundreds]!} سو';
-      return rest == 0 ? h : '$h ${translateNumberToUrdu(rest)}';
-    }
-
-    return number.toString();
-  }
-
-  // -------------------- کائناتی معنی --------------------
-  String findCosmicMeaning(double value) {
-    if (_near(value, 1.618, 0.01)) return 'کائنات عظیم توازن (Golden Ratio) پر قائم ہے۔';
-    if (_near(value, 3.14159, 0.001)) return 'کائناتی ساخت کا بنیادی مستقل (π)';
-    if (_near(value, 2.71828, 0.001)) return 'قدرتی ترقی کا قانون (e)';
-    if (_near(value, 30.0, 0.5)) return 'تثبیت کا قانون (30ms Law) فعال ہے۔';
-    if (_near(value, 35.0, 0.5)) return 'پانچواں قانون (35ms Law) فعال ہے۔';
-
-    if (value == 0) return 'عدم — ہر شے خاموش';
-    if (value == 1) return 'وحدانیت — سب ایک';
-
-    return 'حسابی نتیجہ: $value';
-  }
-
-  bool _near(double a, double b, double tolerance) => (a - b).abs() <= tolerance;
-
-  // -------------------- عمومی ترجمہ --------------------
-  String translateToUrdu(dynamic result) {
-    if (result == null) return 'کوئی نتیجہ حاصل نہیں ہوا';
-    if (result is int) return 'جواب ہے: ${translateNumberToUrdu(result)}';
-    if (result is double) return findCosmicMeaning(result);
-    return 'نتیجہ: $result';
-  }
-
-  // -------------------- ریورس میپ --------------------
-  int? translateUrduToNumber(String urduWord) {
-    for (final e in numberToUrdu.entries) {
-      if (e.value == urduWord.trim()) return e.key;
-    }
-    return null;
+    return false;
   }
 }
