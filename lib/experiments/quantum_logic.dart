@@ -3,11 +3,11 @@ import 'dart:math';
 /// ⚛️ QuantumLogic
 /// Hybrid CPU/NPU friendly quantum reasoning engine
 class QuantumLogic {
-  
+
   // 1. کوانٹم حالتوں کا حساب (2ⁿ)
   static int quantumStates(int qubits) => pow(2, qubits).toInt();
 
-  // 2. سپر پوزیشن: |ψ⟩ = α|0⟩ + β|1⟩
+  // 2. سپر پوزیشن
   static List<double> superposition({
     double alpha = 0.707106,
     double beta = 0.707106,
@@ -20,21 +20,33 @@ class QuantumLogic {
   static List<double> bellState(int type) {
     const v = 0.707106;
     switch (type) {
-      case 0: return [v, 0, 0, v]; // Φ+
-      case 1: return [v, 0, 0, -v]; // Φ-
-      case 2: return [0, v, v, 0]; // Ψ+
-      case 3: return [0, v, -v, 0]; // Ψ-
+      case 0: return [v, 0, 0, v];
+      case 1: return [v, 0, 0, -v];
+      case 2: return [0, v, v, 0];
+      case 3: return [0, v, -v, 0];
       default: return [v, 0, 0, v];
     }
   }
 
-  // 🧠 مرکزی انٹری پوائنٹ (HybridLawSystem اسی کو پکارتا ہے)
+  // 🧠 مرکزی انٹری پوائنٹ
   static String process(String question) {
     final result = _internalExecute(question);
-    return '${result['solution']}\n${result['explanation']}';
+
+    final solution = result['solution'];
+    final explanation = result['explanation'];
+
+    if (solution == null || solution.toString().trim().isEmpty) {
+      return '❌ کوانٹم جواب دستیاب نہیں';
+    }
+
+    if (explanation == null || explanation.toString().trim().isEmpty) {
+      return solution.toString();
+    }
+
+    return '${solution.toString()}\n${explanation.toString()}';
   }
 
-  // 🔍 اندرونی حل پیش کرنے والا انجن
+  // 🔍 اندرونی انجن
   static Map<String, dynamic> _internalExecute(String question) {
     if (_containsAny(question, ['کوانٹم بٹ', 'qubit', 'حالت'])) {
       return _solveQubitStates(question);
@@ -62,12 +74,12 @@ class QuantumLogic {
     }
 
     return {
-      'solution': 'یہ کوانٹم سوال ابھی نظام میں رجسٹرڈ نہیں',
-      'explanation': 'آپ اس پر مزید قوانین لاگو کر سکتے ہیں۔',
+      'solution': 'یہ کوانٹم سوال ابھی نظام میں موجود نہیں',
+      'explanation': '',
     };
   }
 
-  // کوانٹم بٹس کی گنتی کا حل
+  // کوانٹم بٹس
   static Map<String, dynamic> _solveQubitStates(String question) {
     final match = RegExp(r'(\d+)').firstMatch(question);
     final qubits = match != null ? int.parse(match.group(1)!) : 1;
@@ -79,39 +91,10 @@ class QuantumLogic {
     };
   }
 
-  // الفاظ کی تلاش کا مددگار فنکشن
   static bool _containsAny(String text, List<String> keys) {
     for (final k in keys) {
       if (text.contains(k)) return true;
     }
     return false;
-  }
-}
-
-// --------------------------------------------------
-// 🧩 معاون کلاسز (کلاس QuantumLogic سے باہر)
-// --------------------------------------------------
-
-class Complex {
-  final double real;
-  final double imag;
-  const Complex(this.real, this.imag);
-
-  @override
-  String toString() => imag >= 0 ? '$real + ${imag}i' : '$real - ${-imag}i';
-}
-
-class Qubit {
-  double alpha;
-  double beta;
-
-  Qubit([this.alpha = 0.707106, this.beta = 0.707106]) {
-    final norm = sqrt(alpha * alpha + beta * beta);
-    alpha /= norm;
-    beta /= norm;
-  }
-
-  int measure() {
-    return Random().nextDouble() < (alpha * alpha) ? 0 : 1;
   }
 }
