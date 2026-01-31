@@ -1,29 +1,26 @@
 import 'package:flutter/material.dart';
 import 'ui/dashboard.dart';
 import 'ui/experiment_history.dart';
+
+import 'package:flutter/material.dart';
+import 'ui/dashboard.dart';
+import 'ui/experiment_history.dart';
 import 'ui/real_sensor_dashboard.dart';
 import 'ui/intelligence_vs_strength_test.dart';
 import 'ui/philosophy_comparison.dart';
-import 'ui/main_brain_experiments.dart'; // Brain Experiment
+import 'ui/main_brain_experiments.dart';
 import 'ui/hybrid_law_dashboard.dart';
-import 'ui/quantum_master_dashboard.dart'; // ✨ نیا Quantum Master
+import 'ui/quantum_master_dashboard.dart';
+
+// ===== نیا امپورٹ =====
+import 'experiments/law_experiment.dart'; // علیحدہ تجربہ فائل
 
 void main() {
   runApp(QuantumStabilityLabApp());
-  // تجربہ 1: GPU=بوہر, NPU=آئن سٹائن
-  print('🚀 تجربہ شروع: پہلا سیٹ اپ');
-  LawSwapExperiment.runExperiment1(particles: 2000, iterations: 100);
   
-  // تھوڑا وقفہ
+  // صرف ایک کمانڈ سے تجربہ چلائیں
   Future.delayed(Duration(seconds: 2), () {
-    // تجربہ 2: GPU=آئن سٹائن, NPU=بوہر
-    print('\n\n🚀 تجربہ شروع: دوسرا سیٹ اپ (قوانین تبدیل)');
-    LawSwapExperiment.runExperiment2(particles: 2000, iterations: 100);
-    
-    print('\n🎯 دونوں تجربوں کا خلاصہ:');
-    print('تجربہ 1: GPU بوہر، NPU آئن سٹائن');
-    print('تجربہ 2: GPU آئن سٹائن، NPU بوہر');
-    print('\nنتائج سے پتہ چلتا ہے کہ کون سا پراسیسر کس قسم کے قانون پر بہتر کام کرتا ہے!');
+    LawExperiment.runSimpleTest(); // ✅ اب کوئی ارر نہیں آئے گا
   });
 }
 
