@@ -91,7 +91,7 @@ class HybridLawSystem {
       return _npuSupervisedQuantum(urduQuestion);
 
     // 3. پیچیدہ فلسفیانہ ماڈیول (نیا شامل کیا گیا حصہ)
-    case CPUIntent.complex_philosophy:
+    case CPUIntent.philosophy:
       _philosophyQuestions++;
       print('   ➡️ پیچیدہ فلسفیانہ ماڈیول منتخب');
       return _npuSupervisedPhilosophy(urduQuestion);
