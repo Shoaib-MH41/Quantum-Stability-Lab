@@ -10,6 +10,21 @@ import 'ui/quantum_master_dashboard.dart'; // ✨ نیا Quantum Master
 
 void main() {
   runApp(QuantumStabilityLabApp());
+  // تجربہ 1: GPU=بوہر, NPU=آئن سٹائن
+  print('🚀 تجربہ شروع: پہلا سیٹ اپ');
+  LawSwapExperiment.runExperiment1(particles: 2000, iterations: 100);
+  
+  // تھوڑا وقفہ
+  Future.delayed(Duration(seconds: 2), () {
+    // تجربہ 2: GPU=آئن سٹائن, NPU=بوہر
+    print('\n\n🚀 تجربہ شروع: دوسرا سیٹ اپ (قوانین تبدیل)');
+    LawSwapExperiment.runExperiment2(particles: 2000, iterations: 100);
+    
+    print('\n🎯 دونوں تجربوں کا خلاصہ:');
+    print('تجربہ 1: GPU بوہر، NPU آئن سٹائن');
+    print('تجربہ 2: GPU آئن سٹائن، NPU بوہر');
+    print('\nنتائج سے پتہ چلتا ہے کہ کون سا پراسیسر کس قسم کے قانون پر بہتر کام کرتا ہے!');
+  });
 }
 
 class QuantumStabilityLabApp extends StatelessWidget {
