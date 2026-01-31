@@ -221,65 +221,83 @@ ${_npuQuantumPhilosophy(urduQuestion)}
     }
   }
 
-  /// NPU کی نگرانی میں فلسفیانہ سوال
-  /// NPU کی نگرانی میں فلسفیانہ سوال - درست ورژن
-String _npuSupervisedPhilosophy(String urduQuestion) {
-  print('\n💭 NPU نگرانی: فلسفیانہ/منطقی سوال');
+  /// NPU کی نگرانی میں فلسفیانہ اور پیچیدہ سوالات کا مکمل حل
+
+  String _npuSupervisedPhilosophy(String urduQuestion) {
+  print('\n🧠🌌 NPU نگرانی: فلسفیانہ اور پیچیدہ تجزیہ شروع');
   
   try {
-    // 1️⃣ NPU پہلا فیصلہ: کون سے ماڈیولز استعمال کروں؟
-    print('1️⃣ NPU فیصلہ: "یہ گہرا سوال ہے، تمام ماڈیولز استعمال کروں"');
+    // 1️⃣ NPU تجزیہ: فیصلہ کرنا کہ کن وسائل کی ضرورت ہے
+    print('1️⃣ NPU فیصلہ: "سوال کی گہرائی کے مطابق تمام ماڈیولز فعال کر رہا ہوں"');
     
-    // 2️⃣ NPU مختلف ماڈیولز کو حکم دے
+    List<String> activeModules = [];
+    if (urduQuestion.contains('راز') || urduQuestion.contains('کائنات') || urduQuestion.contains('کیوں')) {
+      activeModules.addAll(['QUANTUM', 'LOGIC', 'SCIENTIFIC']);
+    } else {
+      activeModules.add('LOGIC');
+    }
+    print('   فعال ماڈیولز: ${activeModules.join(", ")}');
+
+    // 2️⃣ NPU کا مختلف ماڈیولز کو حکم دینا (Data Gathering)
+    
+    // کوانٹم تجزیہ
     print('2️⃣ NPU → QuantumLogic: "کوانٹم تجزیہ کرو"');
     String quantumAnalysis = QuantumLogic.process(urduQuestion);
     
-    print('3️⃣ NPU → LogicSolver: "منطقی حل کرو"');
+    // منطقی پہیلی کا حل
+    print('3️⃣ NPU → LogicSolver: "منطقی حل تلاش کرو"');
     Map<String, dynamic> logicPuzzle = LogicSolver.solvePuzzle(urduQuestion);
     String logicSolution = logicPuzzle.containsKey('solution') 
         ? logicPuzzle['solution'].toString() 
-        : 'منطقی تجزیہ زیرِ غور';
+        : 'منطقی تجزیہ زیرِ غور ہے';
     
+    // سائنسی پہلو (GPU)
     print('4️⃣ NPU → GPU: "سائنسی پہلو کا حساب کرو"');
     String scientificAnalysis = _getScientificAspect(urduQuestion);
     
-    // 3️⃣ NPU تمام جوابات کو جوڑے اور تجزیہ کرے
-    print('5️⃣ NPU حاکم: "میں تمام تجزیے جوڑ رہا ہوں"');
+    // 3️⃣ NPU حاکم کا تمام جوابات کو جوڑنا اور ترتیب دینا (Synthesis)
+    print('5️⃣ NPU حاکم: "میں تمام علمی تجزیوں کو یکجا کر رہا ہوں"');
     String npuSynthesis = _npuSynthesizePhilosophy(
       quantumAnalysis, 
       logicSolution, 
       scientificAnalysis, 
       urduQuestion
     );
-    
+
+    // 4️⃣ حتمی جواب (جو یوزر کو نظر آئے گا)
+    // نوٹ: اگر آپ صرف مطلوبہ جواب دکھانا چاہتے ہیں تو اسے سادہ رکھیں
     return '''
-💭 **NPU GOVERNED PHILOSOPHICAL ANALYSIS** 👑
+🌌 **NPU GOVERNED PHILOSOPHICAL REPORT** 👑
 
-📋 **سوال:** "$urduQuestion"
+🔍 **اصل سوال:** "$urduQuestion"
 
-⚛️ **کوانٹم تجزیہ (QuantumLogic):**
+⚛️ **کوانٹم منطق (Quantum Logic):**
 $quantumAnalysis
 
-🧩 **منطقی حل (LogicSolver):**
+🧩 **منطقی گتھی (Logic Solution):**
 $logicSolution
 
-🔬 **سائنسی پہلو (GPU تحلیل):**
+🔬 **سائنسی پہلو (Scientific Analysis):**
 $scientificAnalysis
 
-🧠 **NPU کا حتمی تجزیہ و ترکیب:**
+🧠 **حکمت اور خلاصہ (NPU Synthesis):**
 $npuSynthesis
 
-🌟 **NPU کا آخری فیصلہ:**
-"میں نے کوانٹم منطق، سائنسی حساب اور فلسفیانہ استدلال کو ملا کر یہ نتیجہ اخذ کیا ہے۔"
+🌟 **حتمی فیصلہ:**
+"منطق، سائنس اور کوانٹم اصولوں کے اشتراک سے یہ نتیجہ اخذ کیا گیا ہے۔"
 ''';
     
   } catch (e) {
-    print('❌ فلسفیانہ تجزیہ میں خرابی: $e');
-    return _npuGovernorError('فلسفیانہ تجزیہ میں مسئلہ', 
-                             error: e.toString(),
-                             question: urduQuestion);
+    print('❌ NPU فلسفیانہ تجزیہ میں خرابی: $e');
+    // ایرر ہینڈلنگ کا وہی طریقہ جو آپ نے تجویز کیا
+    return _npuGovernorError(
+      'فلسفیانہ تجزیہ میں تکنیکی رکاوٹ آئی', 
+      error: e.toString(),
+      question: urduQuestion
+    );
   }
 }
+
 
 /// NPU کا تجزیوں کو جوڑنے کا طریقہ
 String _npuSynthesizePhilosophy(String quantum, String logic, String science, String question) {
