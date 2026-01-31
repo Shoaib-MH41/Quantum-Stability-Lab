@@ -94,7 +94,7 @@ class HybridLawSystem {
     case CPUIntent.complex_philosophy:
       _philosophyQuestions++;
       print('   ➡️ پیچیدہ فلسفیانہ ماڈیول منتخب');
-      return _npuSupervisedComplexPhilosophy(urduQuestion);
+      return _npuSupervisedPhilosophy(urduQuestion);
       
     // 4. منطق یا پہیلی کا ماڈیول
     case CPUIntent.puzzle:
