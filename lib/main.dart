@@ -13,7 +13,7 @@ import 'ui/hybrid_law_dashboard.dart';
 import 'ui/quantum_master_dashboard.dart';
 
 // ===== نیا امپورٹ =====
-import 'experiments/law_experiment.dart'; // علیحدہ تجربہ فائل
+import 'law_experiment.dart'; // علیحدہ تجربہ فائل
 
 void main() {
   runApp(QuantumStabilityLabApp());
