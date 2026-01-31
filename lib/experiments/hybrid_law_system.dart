@@ -67,39 +67,50 @@ class HybridLawSystem {
   }
 
   // -------------------- NPU GOVERNOR METHODS --------------------
-
-  /// NPU حاکم کا فیصلہ کرنے والا طریقہ
+    
   String _npuGovernorDecision(String urduQuestion, String intent, CPUIntent detectedIntent) {
-    print('\n👑 NPU GOVERNOR ACTIVATED');
-    print('📋 فیصلہ کی معلومات:');
-    print('   سوال: "$urduQuestion"');
-    print('   نوعیت: $intent');
-    print('   NPU فیصلہ: مناسب طریقہ منتخب کر رہا ہوں...');
+  print('\n👑 NPU GOVERNOR ACTIVATED');
+  print('📋 فیصلہ کی معلومات:');
+  print('   سوال: "$urduQuestion"');
+  print('   نوعیت: $intent');
+  print('   NPU فیصلہ: مناسب طریقہ منتخب کر رہا ہوں...');
 
-    // NPU کا فیصلہ - کون سا ماڈیول استعمال ہوگا
-    switch (detectedIntent) {
-      case CPUIntent.math:
-        _mathQuestions++;
-        print('   ➡️ ریاضی کے ماڈیول منتخب');
-        return _npuSupervisedMath(urduQuestion);
-        
-      case CPUIntent.quantum:
-        _quantumQuestions++;
-        print('   ➡️ کوانٹم ماڈیول منتخب');
-        return _npuSupervisedQuantum(urduQuestion);
-        
-      case CPUIntent.puzzle:
-      case CPUIntent.logic:
-        _philosophyQuestions++;
-        print('   ➡️ منطق/پہیلی ماڈیول منتخب');
-        return _npuSupervisedPhilosophy(urduQuestion);
-        
-      case CPUIntent.general:
-      default:
-        print('   ➡️ عمومی ماڈیول منتخب');
-        return _npuSupervisedGeneral(urduQuestion);
-    }
+  // NPU کا فیصلہ - یہاں تمام کیسز کو ترتیب سے رکھا گیا ہے
+  switch (detectedIntent) {
+    
+    // 1. ریاضی کا ماڈیول
+    case CPUIntent.math:
+      _mathQuestions++;
+      print('   ➡️ ریاضی کے ماڈیول منتخب');
+      return _npuSupervisedMath(urduQuestion);
+      
+    // 2. کوانٹم ماڈیول
+    case CPUIntent.quantum:
+      _quantumQuestions++;
+      print('   ➡️ کوانٹم ماڈیول منتخب');
+      return _npuSupervisedQuantum(urduQuestion);
+
+    // 3. پیچیدہ فلسفیانہ ماڈیول (نیا شامل کیا گیا حصہ)
+    case CPUIntent.complex_philosophy:
+      _philosophyQuestions++;
+      print('   ➡️ پیچیدہ فلسفیانہ ماڈیول منتخب');
+      return _npuSupervisedComplexPhilosophy(urduQuestion);
+      
+    // 4. منطق یا پہیلی کا ماڈیول
+    case CPUIntent.puzzle:
+    case CPUIntent.logic:
+      _philosophyQuestions++;
+      print('   ➡️ منطق/پہیلی ماڈیول منتخب');
+      return _npuSupervisedPhilosophy(urduQuestion);
+      
+    // 5. عمومی ماڈیول (Default)
+    case CPUIntent.general:
+    default:
+      print('   ➡️ عمومی ماڈیول منتخب');
+      return _npuSupervisedGeneral(urduQuestion);
   }
+}
+
 
   /// NPU کی نگرانی میں ریاضی کا حل
   String _npuSupervisedMath(String urduQuestion) {
