@@ -4,6 +4,6 @@ enum CPUIntent {
   puzzle,     // پہیلی/منطق  
   quantum,    // کوانٹم
   logic,      // منطقی
-  complex_philosophy, // پیچیدہ فلسفہ (نیا)
+  philosophy, // پیچیدہ فلسفہ (نیا)
   general     // عمومی
 }
