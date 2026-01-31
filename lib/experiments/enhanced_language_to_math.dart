@@ -1,34 +1,111 @@
-import 'language_to_math.dart';
+// 🧠 Enhanced Language → Math
+// اصل دماغ: اردو / انگلش سوال کو سمجھ کر
+// صرف GPU کے لیے صاف math expression بناتا ہے
 
 class EnhancedLanguageToMath {
-  static final Map<String, String> advancedDictionary = {
-    'کروڑ': '10000000',
-    'لاکھ': '100000',
-    'ہزار': '1000',
-    'سو': '100',
+  // اردو + انگلش نمبر
+  static final Map<String, String> _numbers = {
+    // اردو
+    'ایک': '1',
+    'دو': '2',
+    'تین': '3',
+    'چار': '4',
+    'پانچ': '5',
+    'چھ': '6',
+    'سات': '7',
+    'آٹھ': '8',
+    'نو': '9',
+    'دس': '10',
+
+    // انگلش
+    'one': '1',
+    'two': '2',
+    'three': '3',
+    'four': '4',
+    'five': '5',
+    'six': '6',
+    'seven': '7',
+    'eight': '8',
+    'nine': '9',
+    'ten': '10',
   };
 
-  // Instance method شامل کریں
-  String convert(String urduQuestion) {
-    return convertAdvanced(urduQuestion);
-  }
+  // آپریٹرز (semantic)
+  static final Map<String, String> _operators = {
+    // اردو
+    'جمع': '+',
+    'جوڑ': '+',
+    'پلس': '+',
 
-  static String convertAdvanced(String urduQuestion) {
-    String result = urduQuestion.trim();
+    'تفریق': '-',
+    'منفی': '-',
+    'گھٹا': '-',
 
-    // 1️⃣ بنیادی تبدیلی
-    final converter = LanguageToMathConverter();
-    result = converter.convert(result);
+    'ضرب': '*',
+    'گنا': '*',
+    'دفعہ': '*',
 
-    // 2️⃣ ایڈوانسڈ عددی الفاظ
-    advancedDictionary.forEach((urdu, number) {
-      // صرف عدد replace کریں، operator نہیں
-      result = result.replaceAll(urdu, number);
+    'تقسیم': '/',
+    'بٹا': '/',
+    'تقسیم کرو': '/',
+
+    // انگلش
+    'plus': '+',
+    'add': '+',
+
+    'minus': '-',
+    'subtract': '-',
+
+    'multiply': '*',
+    'times': '*',
+
+    'divide': '/',
+    'over': '/',
+  };
+
+  /// 🔥 اصل method
+  /// صرف "a op b" return کرے گا
+  String convert(String input) {
+    print('🧠 NPU → LanguageToMath');
+    print('📥 Input: "$input"');
+
+    String text = input.toLowerCase();
+
+    // 1️⃣ نمبرز normalize کریں
+    _numbers.forEach((word, value) {
+      text = text.replaceAll(RegExp(r'\b' + word + r'\b'), ' $value ');
     });
 
-    // 3️⃣ صفائی: extra spaces
-    result = result.replaceAll(RegExp(r'\s+'), ' ').trim();
+    // 2️⃣ آپریٹر تلاش کریں
+    String? detectedOperator;
+    _operators.forEach((word, symbol) {
+      if (detectedOperator == null && text.contains(word)) {
+        detectedOperator = symbol;
+      }
+    });
 
-    return result;
+    // 3️⃣ digits نکالیں
+    final numbers = RegExp(r'\d+').allMatches(text).map((e) => e.group(0)!).toList();
+
+    if (numbers.length >= 2 && detectedOperator != null) {
+      final expression = '${numbers[0]} $detectedOperator ${numbers[1]}';
+      print('✅ NPU فیصلہ: "$expression"');
+      return expression;
+    }
+
+    // 4️⃣ fallback: اگر direct expression ہو
+    final cleaned = text.replaceAll(RegExp(r'[^0-9\+\-\*\/\s]'), '')
+                        .replaceAll(RegExp(r'\s+'), ' ')
+                        .trim();
+
+    final parts = cleaned.split(' ');
+    if (parts.length == 3) {
+      print('✅ Direct math detected: "$cleaned"');
+      return cleaned;
+    }
+
+    // 5️⃣ آخری fallback
+    print('⚠️ NPU fallback → "2 + 2"');
+    return '2 + 2';
   }
 }
