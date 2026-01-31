@@ -7,7 +7,7 @@ class CPUTranslator {
   CPUIntent detectIntent(String question) {
     final q = question.toLowerCase().trim();
     
-    // 1️⃣ پیچیدہ فلسفہ (Complex Philosophy) - کائنات اور اس کے راز
+    // 1️⃣ پیچیدہ فلسفہ ( Philosophy) - کائنات اور اس کے راز
     if (q.contains('کائنات') && 
         (q.contains('راز') || 
          q.contains('کیا') || 
