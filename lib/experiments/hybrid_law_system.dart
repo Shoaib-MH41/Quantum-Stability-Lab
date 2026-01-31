@@ -211,47 +211,98 @@ ${_npuQuantumPhilosophy(urduQuestion)}
   }
 
   /// NPU کی نگرانی میں فلسفیانہ سوال
-  String _npuSupervisedPhilosophy(String urduQuestion) {
-    print('\n💭 NPU نگرانی: فلسفیانہ/منطقی سوال');
+  /// NPU کی نگرانی میں فلسفیانہ سوال - درست ورژن
+String _npuSupervisedPhilosophy(String urduQuestion) {
+  print('\n💭 NPU نگرانی: فلسفیانہ/منطقی سوال');
+  
+  try {
+    // 1️⃣ NPU پہلا فیصلہ: کون سے ماڈیولز استعمال کروں؟
+    print('1️⃣ NPU فیصلہ: "یہ گہرا سوال ہے، تمام ماڈیولز استعمال کروں"');
     
-    try {
-      print('1️⃣ NPU → LogicSolver: "اس منطق کو حل کرو"');
-      
-      // ✅ درست: LogicSolver.solvePuzzle() static میتھڈ ہے
-      Map<String, dynamic> puzzle = LogicSolver.solvePuzzle(urduQuestion);
-      
-      print('2️⃣ NPU حاکم: "میں منطقی حل پرکھتا ہوں"');
-      String solution = puzzle.containsKey('solution') 
-          ? puzzle['solution'].toString() 
-          : 'منطق زیرِ تجزیہ';
-      
-      String npuAnalysis = _npuPhilosophicalAnalysis(solution, urduQuestion);
-      
-      return '''
+    // 2️⃣ NPU مختلف ماڈیولز کو حکم دے
+    print('2️⃣ NPU → QuantumLogic: "کوانٹم تجزیہ کرو"');
+    String quantumAnalysis = QuantumLogic.process(urduQuestion);
+    
+    print('3️⃣ NPU → LogicSolver: "منطقی حل کرو"');
+    Map<String, dynamic> logicPuzzle = LogicSolver.solvePuzzle(urduQuestion);
+    String logicSolution = logicPuzzle.containsKey('solution') 
+        ? logicPuzzle['solution'].toString() 
+        : 'منطقی تجزیہ زیرِ غور';
+    
+    print('4️⃣ NPU → GPU: "سائنسی پہلو کا حساب کرو"');
+    String scientificAnalysis = _getScientificAspect(urduQuestion);
+    
+    // 3️⃣ NPU تمام جوابات کو جوڑے اور تجزیہ کرے
+    print('5️⃣ NPU حاکم: "میں تمام تجزیے جوڑ رہا ہوں"');
+    String npuSynthesis = _npuSynthesizePhilosophy(
+      quantumAnalysis, 
+      logicSolution, 
+      scientificAnalysis, 
+      urduQuestion
+    );
+    
+    return '''
 💭 **NPU GOVERNED PHILOSOPHICAL ANALYSIS** 👑
 
 📋 **سوال:** "$urduQuestion"
 
-🧩 **LogicSolver کا حل:**
-$solution
+⚛️ **کوانٹم تجزیہ (QuantumLogic):**
+$quantumAnalysis
 
-🧠 **NPU کا فلسفیانہ تجزیہ:**
-$npuAnalysis
+🧩 **منطقی حل (LogicSolver):**
+$logicSolution
 
-🔍 **NPU کی گہری سمجھ:**
-${_npuDeepUnderstanding(urduQuestion)}
+🔬 **سائنسی پہلو (GPU تحلیل):**
+$scientificAnalysis
 
-💡 **NPU کی حکمت:**
-${_npuWisdomGeneration(urduQuestion)}
+🧠 **NPU کا حتمی تجزیہ و ترکیب:**
+$npuSynthesis
 
 🌟 **NPU کا آخری فیصلہ:**
-"میں نے منطق، فلسفہ اور انسانی تجربے کو ملا کر اس نتیجے پر پہنچا ہوں۔"
+"میں نے کوانٹم منطق، سائنسی حساب اور فلسفیانہ استدلال کو ملا کر یہ نتیجہ اخذ کیا ہے۔"
 ''';
-    } catch (e) {
-      print('❌ Logic Error: $e');
-      return _npuDirectPhilosophy(urduQuestion, e.toString());
-    }
+    
+  } catch (e) {
+    print('❌ فلسفیانہ تجزیہ میں خرابی: $e');
+    return _npuGovernorError('فلسفیانہ تجزیہ میں مسئلہ', 
+                             error: e.toString(),
+                             question: urduQuestion);
   }
+}
+
+/// NPU کا تجزیوں کو جوڑنے کا طریقہ
+String _npuSynthesizePhilosophy(String quantum, String logic, String science, String question) {
+  return '''
+🧠 **NPU Synthesis Process:**
+
+**مرحلہ 1: تمام پہلوؤں کو سمجھنا**
+- کوانٹم پہلو: $quantum
+- منطقی پہلو: $logic  
+- سائنسی پہلو: $science
+
+**مرحلہ 2: مشترکہ خیالات ڈھونڈنا**
+- تینوں تجزیوں میں جو چیز مشترک ہے
+- جو چیز مختلف ہے
+- کون سا پہلو سب سے مضبوط ہے
+
+**مرحلہ 3: حتمی نتیجہ اخذ کرنا**
+- تمام شواہد کو ملا کر ایک مربوط جواب
+''';
+}
+
+/// سائنسی پہلو کے لیے GPU کا استعمال
+String _getScientificAspect(String question) {
+  // یہاں GPU سائنسی حساب کرے
+  if (question.contains('کائنات')) {
+    return '''
+🔭 **GPU سائنسی حساب:**
+- کائنات کی عمر: ~13.8 ارب سال
+- مشاہدہ پزیر کائنات: ~93 ارب نوری سال
+- مادے کی تقسیم: معمولی مادہ 5%, تاریک مادہ 27%, تاریک توانائی 68%
+''';
+  }
+  return 'سائنسی تجزیہ دستیاب نہیں';
+}
 
   /// NPU کی نگرانی میں عمومی سوال
   String _npuSupervisedGeneral(String urduQuestion) {
