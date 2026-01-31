@@ -12,7 +12,7 @@ class CPUTranslator {
         (q.contains('راز') || 
          q.contains('کیا') || 
          q.contains('کیوں'))) {
-      return CPUIntent.complex_philosophy;
+      return CPUIntent.philosophy;
     }
     
     // 2️⃣ ریاضی (Math)
