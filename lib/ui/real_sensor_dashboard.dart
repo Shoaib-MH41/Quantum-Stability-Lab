@@ -20,7 +20,7 @@ class _RealSensorDashboardState
   bool isGPUMode = false;
   int attempts = 0;
 
-  String status = "2,000 پارٹیکل سپر ٹیسٹ تیار";
+  String status = "آئن سٹائن بمقابلہ بوہر: 2000 پارٹیکل ٹیسٹ";
   final Stopwatch stopwatch = Stopwatch();
   Timer? _timer;
 
@@ -29,7 +29,7 @@ class _RealSensorDashboardState
 
   void start() {
     setState(() {
-      // 🔑 اہم: ٹیسٹ شروع ہونے پر کلسٹر لاجک سیٹ کریں
+      // ہارڈویئر اور لاجک سنکرونائزیشن
       RealQuantumParticle.useClusterLogic = !isGPUMode;
       
       attempts = 0;
@@ -38,8 +38,8 @@ class _RealSensorDashboardState
       stopwatch..reset()..start();
 
       status = isGPUMode
-          ? "GPU: Extreme Stress (500k Load)"
-          : "NPU: Quantum Pattern Logic";
+          ? "آئن سٹائن قانون (GPU): انفرادی حقیقت"
+          : "نیلز بوہر قانون (NPU): کوانٹم انٹیگلمنٹ";
     });
 
     _timer = Timer.periodic(
@@ -53,15 +53,16 @@ class _RealSensorDashboardState
       attempts++;
       bool allStable = true;
 
+      // GPU موڈ میں شدید بوجھ (Stress Test)
       if (isGPUMode) {
-        // GPU بوجھ: 12GB RAM کا امتحان
         for (int i = 0; i < 500000; i++) {
           double x = i * 0.0001;
         }
       }
 
       for (final p in particles) {
-        p.apply35msLaw();
+        // نئے 'applyLaw' میتھڈ کا استعمال
+        p.applyLaw(); 
         if (!p.isFullyStable) allStable = false;
       }
 
@@ -75,8 +76,10 @@ class _RealSensorDashboardState
         _timer?.cancel();
         stopwatch.stop();
         isRunning = false;
-        status =
-            "🏆 2000 پارٹیکلز مستحکم!\nوقت: ${stopwatch.elapsed.inSeconds}s | کوششیں: $attempts";
+        
+        String lawName = isGPUMode ? "آئن سٹائن" : "نیلز بوہر";
+        status = "🏆 $lawName قانون کامیاب!\n"
+                 "وقت: ${stopwatch.elapsed.inSeconds}s | کوششیں: $attempts";
       }
     });
   }
@@ -86,22 +89,22 @@ class _RealSensorDashboardState
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text("Quantum Stress Lab: 2000"),
+        title: const Text("Quantum Core: Bohr vs Einstein"),
         backgroundColor: Colors.indigo[900],
       ),
       body: Column(
         children: [
           _buildModeSelector(),
+          _buildLawInfoBar(), // نیا: قانون کی تفصیل
           _buildMetricsBar(),
 
           Expanded(
             child: Container(
               padding: const EdgeInsets.all(2),
-              color: Colors.white.withOpacity(0.05),
+              color: Colors.white10,
               child: GridView.builder(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 40,
-                  childAspectRatio: 1.0, 
                   mainAxisSpacing: 1,
                   crossAxisSpacing: 1,
                 ),
@@ -119,14 +122,14 @@ class _RealSensorDashboardState
 
   Widget _buildModeSelector() {
     return SwitchListTile(
-      tileColor: Colors.white10,
-      title: Text(isGPUMode ? "GPU: Extreme Stress" : "NPU: Smart Pattern",
-          style: TextStyle(color: isGPUMode ? Colors.redAccent : Colors.blueAccent, fontWeight: FontWeight.bold, fontSize: 13)),
+      tileColor: Colors.white.withOpacity(0.05),
+      title: Text(isGPUMode ? "آئن سٹائن موڈ (Individual)" : "نیلز بوہر موڈ (Cluster)",
+          style: TextStyle(color: isGPUMode ? Colors.redAccent : Colors.blueAccent, fontWeight: FontWeight.bold, fontSize: 14)),
+      subtitle: Text(isGPUMode ? "ہر ذرہ اپنی حقیقت رکھتا ہے" : "ذرات ایک مربوط نظام ہیں", style: const TextStyle(color: Colors.grey, fontSize: 10)),
       value: isGPUMode,
       onChanged: isRunning ? null : (v) {
         setState(() {
           isGPUMode = v;
-          // 👈 سوئچ بدلتے ہی لاجک موڈ بھی بدل دیں
           RealQuantumParticle.useClusterLogic = !isGPUMode;
         });
       },
@@ -135,15 +138,28 @@ class _RealSensorDashboardState
     );
   }
 
-  Widget _buildMetricsBar() {
+  Widget _buildLawInfoBar() {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 15),
+      width: double.infinity,
+      padding: const EdgeInsets.all(8),
+      color: Colors.indigo.withOpacity(0.2),
+      child: Text(
+        "موجودہ ٹارگٹ: ${isGPUMode ? RealQuantumParticle.gpuLaw : RealQuantumParticle.npuLaw}ms",
+        textAlign: TextAlign.center,
+        style: const TextStyle(color: Colors.cyanAccent, fontSize: 12, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
+  Widget _buildMetricsBar() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           _metricColumn("کوششیں", "$attempts"),
           _metricColumn("وقت", "${stopwatch.elapsed.inSeconds}s"),
-          _metricColumn("Status", "$stableFrames/6 Stable"),
+          _metricColumn("استحکام", "$stableFrames/6"),
         ],
       ),
     );
@@ -152,8 +168,8 @@ class _RealSensorDashboardState
   Widget _metricColumn(String label, String value) {
     return Column(
       children: [
-        Text(label, style: const TextStyle(color: Colors.grey, fontSize: 10)),
-        Text(value, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+        Text(label, style: const TextStyle(color: Colors.grey, fontSize: 11)),
+        Text(value, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
       ],
     );
   }
@@ -161,7 +177,7 @@ class _RealSensorDashboardState
   Widget _buildNanoTile(RealQuantumParticle p) {
     return Container(
       decoration: BoxDecoration(
-        color: p.isFullyStable ? Colors.green : Colors.red.withOpacity(0.4),
+        color: p.isFullyStable ? Colors.green : Colors.red.withOpacity(0.3),
         borderRadius: BorderRadius.circular(0.5),
       ),
     );
@@ -169,19 +185,33 @@ class _RealSensorDashboardState
 
   Widget _buildBottomPanel() {
     return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: const BoxDecoration(color: Colors.white10),
+      padding: const EdgeInsets.all(15),
+      color: Colors.white10,
       child: Column(
         children: [
-          Text(status, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70, fontSize: 11)),
-          const SizedBox(height: 8),
-          ElevatedButton(
-            onPressed: isRunning ? null : start,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: isGPUMode ? Colors.red : Colors.blue,
-              minimumSize: const Size(double.infinity, 45),
-            ),
-            child: Text(isRunning ? "انٹیلی جنس پروسیسنگ جاری..." : "2000 پارٹیکل ٹیسٹ شروع کریں"),
+          Text(status, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 12)),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: isRunning ? null : start,
+                  style: ElevatedButton.styleFrom(backgroundColor: isGPUMode ? Colors.red : Colors.blue),
+                  child: const Text("ٹیسٹ شروع کریں"),
+                ),
+              ),
+              const SizedBox(width: 10),
+              // 🔄 قانون بدلنے کا نیا بٹن
+              IconButton(
+                onPressed: isRunning ? null : () {
+                  setState(() {
+                    RealQuantumParticle.swapLaws();
+                  });
+                },
+                icon: const Icon(Icons.swap_calls, color: Colors.orangeAccent),
+                tooltip: "قانون تبدیل کریں",
+              ),
+            ],
           ),
         ],
       ),
