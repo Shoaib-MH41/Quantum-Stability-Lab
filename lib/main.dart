@@ -20,7 +20,7 @@ void main() {
   
   // صرف ایک کمانڈ سے تجربہ چلائیں
   Future.delayed(Duration(seconds: 2), () {
-    LawExperiment.runSimpleTest(); // ✅ اب کوئی ارر نہیں آئے گا
+    LawExperiment.runCrossMatchTest();
   });
 }
 
