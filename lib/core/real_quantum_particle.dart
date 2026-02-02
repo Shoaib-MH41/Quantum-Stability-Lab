@@ -8,8 +8,8 @@ class RealQuantumParticle {
   static final List<RealQuantumParticle> allParticles = [];
 
   // قوانین (Laws)
-  static double gpuLaw = 25.0; // آئن سٹائن
-  static double npuLaw = 35.0; // نیلز بوہر
+  static double npuLaw = 25.0; // آئن سٹائن
+  static double gpuLaw = 25.0; // نیلز بوہر
 
   // موجودہ ہدف حاصل کرنے کا فنکشن
   double get currentTarget => useClusterLogic ? npuLaw : gpuLaw;
