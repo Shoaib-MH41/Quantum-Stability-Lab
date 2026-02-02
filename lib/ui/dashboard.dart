@@ -40,8 +40,8 @@ class _MultiQuantumDashboardState
       stopwatch..reset()..start();
 
       systemStatus = isGPUMode
-          ? "GPU: Extreme Stress (500k Math Load)"
-          : "NPU: Parallel Pattern Logic";
+          ? "NPU: Extreme Stress (200k Math Load)"
+          : "GPU: Parallel Pattern Logic";
 
       statusColor = isGPUMode ? Colors.redAccent : Colors.blueAccent;
     });
